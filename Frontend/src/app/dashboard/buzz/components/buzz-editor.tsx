@@ -20,10 +20,11 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
   const [isPreview, setIsPreview] = useState(false);
   const [html, setHtml] = useState("");
   const [isEditorLoaded, setIsEditorLoaded] = useState(false);
-  const [editorInstance, setEditorInstance] = useState<any>(null);
+  console.log(html,"html");
+  
   const handleSave = () => {
-    if (emailEditorRef.current && isEditorLoaded) {
-      emailEditorRef.current.exportHtml((data: any) => {
+    if (emailEditorRef.current?.editor && isEditorLoaded) {
+      emailEditorRef.current.editor.exportHtml((data: { design: object; html: string }) => {
         setHtml(data.html);
         onSave(data.html, data.design);
         onClose();
@@ -34,8 +35,8 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
   };
 
   const handlePreview = () => {
-    if (emailEditorRef.current && isEditorLoaded) {
-      emailEditorRef.current.exportHtml((data: any) => {
+    if (emailEditorRef.current?.editor && isEditorLoaded) {
+      emailEditorRef.current.editor.exportHtml((data: { design: object; html: string }) => {
         setHtml(data.html);
         setIsPreview(true);
       });
@@ -55,17 +56,17 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
             <EmailEditor
               ref={emailEditorRef}
               minHeight="60vh"
-              projectId={1234} // Optional: replace with your Unlayer project ID
+              projectId={1234} // Replace with your actual Unlayer project ID
               options={{
                 displayMode: "email",
                 appearance: {
                   theme: "dark",
                 },
               }}
-              onLoad={() => {
+              onReady={(editor: any) => {
                 setIsEditorLoaded(true);
-                if (initialDesign && emailEditorRef.current) {
-                  emailEditorRef.current.loadDesign(initialDesign);
+                if (initialDesign && emailEditorRef.current?.editor) {
+                  emailEditorRef.current.editor.loadDesign(initialDesign);
                 }
               }}
             />
@@ -74,10 +75,17 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
           <div className="flex-1 overflow-y-auto bg-white rounded p-4 prose max-w-none">
             <div dangerouslySetInnerHTML={{ __html: html }} />
             <div className="flex justify-end gap-4 mt-4">
-              <Button variant="outline" className="rounded-full px-6 py-2 text-base font-semibold" onClick={() => setIsPreview(false)}>
+              <Button
+                variant="outline"
+                className="rounded-full px-6 py-2 text-base font-semibold"
+                onClick={() => setIsPreview(false)}
+              >
                 Edit
               </Button>
-              <Button className="rounded-full px-6 py-2 text-base font-semibold bg-primary text-white" onClick={handleSave}>
+              <Button
+                className="rounded-full px-6 py-2 text-base font-semibold bg-primary text-white"
+                onClick={handleSave}
+              >
                 Save Buzz
               </Button>
             </div>
@@ -85,7 +93,12 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
         )}
         {!isPreview && (
           <div className="flex justify-end gap-4 mt-4">
-            <Button variant="outline" className="rounded-full px-6 py-2 text-base font-semibold" onClick={handlePreview} disabled={!isEditorLoaded}>
+            <Button
+              variant="outline"
+              className="rounded-full px-6 py-2 text-base font-semibold"
+              onClick={handlePreview}
+              disabled={!isEditorLoaded}
+            >
               <Eye className="mr-2 h-4 w-4" />
               Preview
             </Button>
@@ -101,4 +114,4 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
       </DialogContent>
     </Dialog>
   );
-} 
+}

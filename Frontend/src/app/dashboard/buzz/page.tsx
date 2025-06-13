@@ -27,7 +27,7 @@ export default function BuzzPage() {
 
   const fetchBuzzes = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/buzz');
+      const response = await fetch('http://localhost:3000/buzz');
       if (!response.ok) throw new Error('Failed to fetch buzzes');
       const data = await response.json();
       setBuzzes(data);
@@ -105,7 +105,7 @@ export default function BuzzPage() {
         }}
         onSave={async (html, design) => {
           const method = editingBuzz ? 'PATCH' : 'POST';
-          const url = editingBuzz ? `http://localhost:3000/api/buzz/${editingBuzz.id}` : 'http://localhost:3000/api/buzz';
+          const url = editingBuzz ? `http://localhost:3000/buzz/${editingBuzz.id}` : 'http://localhost:3000/buzz';
 
           try {
             const response = await fetch(url, {
