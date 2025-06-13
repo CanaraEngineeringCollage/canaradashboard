@@ -8,6 +8,15 @@ export const QualificationSchema = z.object({
   specialization: z.string().min(1, 'Area of specialization is required'),
 });
 
+export const DepartmentHeadSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(6, 'Confirm password must be at least 6 characters'),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 export const PatentSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, 'Title is required'),
@@ -74,9 +83,12 @@ export const FacultySchema = z.object({
   name: z.string().min(1, 'Name is required'),
   designation: z.string().min(1, 'Designation is required'),
   department: z.string().min(1, 'Department is required'),
-  joiningDate: z.string().min(1, 'Joining date is required'), // Can be refined with z.date() if using a date picker that provides Date objects
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+  joiningDate: z.string().min(1, 'Joining date is required'),
   experience: z.string().min(1, 'Experience is required'),
   employmentType: z.enum(['Regular', 'Contract', 'Visiting']),
+  isDepartmentHead: z.boolean().default(false),
+  departmentHead: DepartmentHeadSchema.optional(),
   qualifications: z.array(QualificationSchema).min(1, 'At least one qualification is required'),
   avatar: z.string().url().optional().or(z.literal('')),
   patents: z.array(PatentSchema).default([]),

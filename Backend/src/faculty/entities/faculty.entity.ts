@@ -28,6 +28,9 @@ export class Faculty {
   department: string;
 
   @Column()
+  email: string;
+
+  @Column()
   joiningDate: string;
 
   @Column()
@@ -35,6 +38,15 @@ export class Faculty {
 
   @Column()
   employmentType: string;
+
+  @Column({ default: false })
+  isDepartmentHead: boolean;
+
+  @Column({ nullable: true })
+  username: string;
+
+  @Column({ nullable: true })
+  password: string;
 
   @Column({ type: 'longblob', nullable: true })
   image: Buffer;

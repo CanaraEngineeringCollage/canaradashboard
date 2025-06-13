@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, ValidateNested, IsArray } from 'class-validator';
+import { IsString, IsEnum, IsOptional, ValidateNested, IsArray, IsEmail, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateQualificationDto } from './create-qualification.dto';
 import { CreatePatentDto } from './create-patent.dto';
@@ -8,9 +8,9 @@ import { CreateJournalPublicationDto } from './create-journal-publication.dto';
 import { CreateConferencePublicationDto } from './create-conference-publication.dto';
 
 export enum EmploymentType {
-  FullTime = 'FullTime',
-  PartTime = 'PartTime',
+  Regular = 'Regular',
   Contract = 'Contract',
+  Visiting = 'Visiting',
 }
 
 export class CreateFacultyDto {
@@ -23,6 +23,9 @@ export class CreateFacultyDto {
   @IsString()
   department: string;
 
+  @IsEmail()
+  email: string;
+
   @IsString()
   joiningDate: string;
 
@@ -32,9 +35,24 @@ export class CreateFacultyDto {
   @IsEnum(EmploymentType)
   employmentType: EmploymentType;
 
+  @IsBoolean()
+  @IsOptional()
+  isDepartmentHead?: boolean;
+
+  @IsString()
+  @IsOptional()
+  username?: string;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
+
   @IsOptional()
   @IsString()
   avatar?: string;
+
+  @IsOptional()
+  image?: Buffer;
 
   @IsArray()
   @ValidateNested({ each: true })

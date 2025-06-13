@@ -73,9 +73,13 @@ export interface Faculty {
   name: string;
   designation: string;
   department: string;
+  email: string;
   joiningDate: string; // Store as ISO string or YYYY-MM-DD
   experience: string; // e.g., "28 Years"
   employmentType: 'Regular' | 'Contract' | 'Visiting';
+  isDepartmentHead: boolean;
+  username?: string;
+  password?: string;
   qualifications: Qualification[];
   image?: { data: number[] }; // Buffer data from backend
   patents: Patent[];

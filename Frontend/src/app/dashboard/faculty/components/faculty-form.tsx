@@ -39,6 +39,9 @@ import type { Faculty } from '@/lib/types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { createFaculty, updateFaculty } from '@/lib/faculty';
 import { useToast } from '@/hooks/use-toast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 interface FacultyFormProps {
   isOpen: boolean;
@@ -112,7 +115,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const totalSteps = 8; // Added Review step
+  const totalSteps = 9; // Added Department Head step
   const formData = watch();
   const { toast } = useToast();
 
@@ -154,6 +157,11 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
         }
       });
 
+      // Ensure email is included
+      if (data.email) {
+        formData.set('email', data.email);
+      }
+
       // Only append image file if a new one was selected
       if (selectedImage) {
         formData.append('image', selectedImage);
@@ -174,7 +182,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
         title: "Success",
         description: `Faculty member has been successfully ${editingFaculty ? 'updated' : 'added'}.`,
       });
-    onSubmit(data);
+      onSubmit(data);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({
@@ -189,8 +197,12 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
     let isValid = true;
     // Optionally validate current step before proceeding
     if (currentStep === 1) { // Basic Info
-      isValid = await trigger(["name", "designation", "department", "joiningDate", "experience", "employmentType", "avatar"]);
-    } else if (currentStep === 2) { // Qualifications
+      isValid = await trigger(["name", "designation", "department", "email", "joiningDate", "experience", "employmentType", "avatar"]);
+    } else if (currentStep === 2) { // Department Head Information
+      if (formData.isDepartmentHead) {
+        isValid = await trigger(["departmentHead.username", "departmentHead.password", "departmentHead.confirmPassword"]);
+      }
+    } else if (currentStep === 3) { // Qualifications
       isValid = await trigger(["qualifications"]);
     } // Add more step-specific validations if needed for other steps
 
@@ -215,6 +227,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
               <FormField control={control} name="name" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="e.g., Dr. Nagesh H R" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={control} name="designation" render={({ field }) => (<FormItem><FormLabel>Designation</FormLabel><FormControl><Input placeholder="e.g., Professor" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={control} name="department" render={({ field }) => (<FormItem><FormLabel>Department</FormLabel><FormControl><Input placeholder="e.g., Computer Science & Engineering" {...field} /></FormControl><FormMessage /></FormItem>)} />
+              <FormField control={control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" placeholder="e.g., faculty@canaraengineering.in" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={control} name="joiningDate" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Joining Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(parseISO(field.value), "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value ? parseISO(field.value) : undefined} onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : '')} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>)} />
               <FormField control={control} name="experience" render={({ field }) => (<FormItem><FormLabel>Experience</FormLabel><FormControl><Input placeholder="e.g., 28 Years" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={control} name="employmentType" render={({ field }) => (<FormItem><FormLabel>Employment Type</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select employment type" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Regular">Regular</SelectItem><SelectItem value="Contract">Contract</SelectItem><SelectItem value="Visiting">Visiting</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
@@ -241,7 +254,78 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             </div>
           </div>
         );
-      case 2: // Qualifications
+      case 2: // Department Head Information
+        return (
+          <div className="space-y-6 pt-4">
+            <h3 className="text-lg font-semibold">Department Head Information</h3>
+            <div className="space-y-4">
+              <FormField
+                control={control}
+                name="isDepartmentHead"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Is Department Head</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Enable this if the faculty member is the head of their department
+                      </p>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              {formData.isDepartmentHead && (
+                <div className="space-y-4">
+                  <FormField
+                    control={control}
+                    name="departmentHead.username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter username for department head access" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="departmentHead.password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Enter password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="departmentHead.confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Confirm password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      case 3: // Qualifications
         return (
           <div className="space-y-6 pt-4">
             <h3 className="text-lg font-semibold">Qualifications</h3>
@@ -261,7 +345,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             />
           </div>
         );
-      case 3: // Patents
+      case 4: // Patents
         return (
           <div className="space-y-6 pt-4">
             <h3 className="text-lg font-semibold">Patent Details</h3>
@@ -372,7 +456,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             />
           </div>
         );
-      case 4: // Book Chapters
+      case 5: // Book Chapters
          return (
           <div className="space-y-6 pt-4">
             <h3 className="text-lg font-semibold">Book Chapters Published</h3>
@@ -510,7 +594,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             />
           </div>
         );
-      case 5: // Certifications
+      case 6: // Certifications
         return (
           <div className="space-y-6 pt-4">
             <h3 className="text-lg font-semibold">Certification Details</h3>
@@ -621,7 +705,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             />
           </div>
         );
-      case 6: // International Journal Publications
+      case 7: // International Journal Publications
         return (
           <div className="space-y-6 pt-4">
             <h3 className="text-lg font-semibold">International Journal Publications</h3>
@@ -771,7 +855,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             />
           </div>
         );
-      case 7: // International Conference Publications
+      case 8: // International Conference Publications
         return (
           <div className="space-y-6 pt-4">
             <h3 className="text-lg font-semibold">International Conference Publications</h3>
@@ -908,11 +992,11 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             />
           </div>
         );
-      case 8: // Review Step
+      case 9: // Review Step
         return (
           <div className="space-y-6 pt-4">
-            <h3 className="text-lg font-semibold">Review Details</h3>
-            <div className="space-y-8">
+            <h3 className="text-lg font-semibold">Review Information</h3>
+            <div className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -922,63 +1006,86 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
                   </Button>
                 </div>
                 <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
-                  <div className="md:col-span-2 flex items-center gap-4">
-                    {imagePreview && (
-                      <div className="relative h-24 w-24">
-                        <img
-                          src={imagePreview}
-                          alt="Profile Preview"
-                          className="h-full w-full rounded-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Profile Image</p>
-                      <p>{selectedImage ? selectedImage.name : 'No image selected'}</p>
-                    </div>
-                  </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Name</p>
-                    <p>{formData.name}</p>
+                    <p className="font-medium">{formData.name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Designation</p>
-                    <p>{formData.designation}</p>
+                    <p className="font-medium">{formData.designation}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Department</p>
-                    <p>{formData.department}</p>
+                    <p className="font-medium">{formData.department}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium">{formData.email}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Joining Date</p>
-                    <p>{formData.joiningDate}</p>
+                    <p className="font-medium">{formData.joiningDate}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Experience</p>
-                    <p>{formData.experience}</p>
+                    <p className="font-medium">{formData.experience}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Employment Type</p>
-                    <p>{formData.employmentType}</p>
+                    <p className="font-medium">{formData.employmentType}</p>
                   </div>
                 </div>
               </div>
+
+              {/* Department Head Information */}
+              {formData.isDepartmentHead && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Department Head Information</h4>
+                    <Button variant="outline" size="sm" onClick={() => setCurrentStep(2)}>
+                      Edit
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Username</p>
+                      <p className="font-medium">{formData.departmentHead?.username}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Password</p>
+                      <p className="font-medium">••••••••</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Qualifications */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Qualifications</h4>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(2)}>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(3)}>
                     Edit
                   </Button>
                 </div>
-                <div className="space-y-4">
-                  {formData.qualifications?.map((qual, index) => (
-                    <div key={index} className="rounded-lg border p-4">
-                      <p><span className="font-medium">Degree:</span> {qual.degree}</p>
-                      <p><span className="font-medium">Year:</span> {qual.passingYear}</p>
-                      <p><span className="font-medium">College:</span> {qual.college}</p>
-                      <p><span className="font-medium">Specialization:</span> {qual.specialization}</p>
+                <div className="space-y-4 rounded-lg border p-4">
+                  {formData.qualifications.map((qualification, index) => (
+                    <div key={index} className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Degree</p>
+                        <p className="font-medium">{qualification.degree}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Passing Year</p>
+                        <p className="font-medium">{qualification.passingYear}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">College</p>
+                        <p className="font-medium">{qualification.college}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Specialization</p>
+                        <p className="font-medium">{qualification.specialization}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -988,7 +1095,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Patents</h4>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(3)}>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(4)}>
                     Edit
                   </Button>
                 </div>
@@ -1008,7 +1115,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Book Chapters</h4>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(4)}>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(5)}>
                     Edit
                   </Button>
                 </div>
@@ -1028,7 +1135,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Certifications</h4>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(5)}>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(6)}>
                     Edit
                   </Button>
                 </div>
@@ -1048,7 +1155,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Journal Publications</h4>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(6)}>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(7)}>
                     Edit
                   </Button>
                 </div>
@@ -1068,7 +1175,7 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Conference Publications</h4>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(7)}>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentStep(8)}>
                     Edit
                   </Button>
                 </div>

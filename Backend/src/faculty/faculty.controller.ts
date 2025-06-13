@@ -2,6 +2,7 @@ import { Body, Controller, Post, Get, Patch, Delete, Param, UseInterceptors, Upl
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
 import { Faculty } from './entities/faculty.entity';
+import { CreateFacultyDto } from './dto/create-faculty.dto';
 
 @Controller('faculty')
 export class FacultyController {
@@ -17,16 +18,20 @@ export class FacultyController {
     console.log("Received file:", file);
 
     // Parse JSON strings back to objects
-    const parsedData = {
+    const parsedData: CreateFacultyDto = {
       ...facultyData,
-      qualifications: JSON.parse(facultyData.qualifications || '[]'),
-      patents: JSON.parse(facultyData.patents || '[]'), 
-      bookChapters: JSON.parse(facultyData.bookChapters || '[]'),
-      certifications: JSON.parse(facultyData.certifications || '[]'),
-      internationalJournalPublications: JSON.parse(facultyData.internationalJournalPublications || '[]'),
-      internationalConferencePublications: JSON.parse(facultyData.internationalConferencePublications || '[]'),
-      image: file ? file.buffer : null
+      qualifications: facultyData.qualifications ? JSON.parse(facultyData.qualifications) : [],
+      patents: facultyData.patents ? JSON.parse(facultyData.patents) : [], 
+      bookChapters: facultyData.bookChapters ? JSON.parse(facultyData.bookChapters) : [],
+      certifications: facultyData.certifications ? JSON.parse(facultyData.certifications) : [],
+      internationalJournalPublications: facultyData.internationalJournalPublications ? JSON.parse(facultyData.internationalJournalPublications) : [],
+      internationalConferencePublications: facultyData.internationalConferencePublications ? JSON.parse(facultyData.internationalConferencePublications) : [],
     };
+
+    // Only include image if a file was uploaded
+    if (file) {
+      parsedData.image = file.buffer;
+    }
 
     console.log("Parsed faculty data:", parsedData);
     return this.facultyService.createFaculty(parsedData);
@@ -49,14 +54,14 @@ export class FacultyController {
     console.log("Received file:", file);
 
     // Parse JSON strings back to objects
-    const parsedData = {
+    const parsedData: Partial<CreateFacultyDto> = {
       ...facultyData,
-      qualifications: JSON.parse(facultyData.qualifications || '[]'),
-      patents: JSON.parse(facultyData.patents || '[]'),
-      bookChapters: JSON.parse(facultyData.bookChapters || '[]'),
-      certifications: JSON.parse(facultyData.certifications || '[]'),
-      internationalJournalPublications: JSON.parse(facultyData.internationalJournalPublications || '[]'),
-      internationalConferencePublications: JSON.parse(facultyData.internationalConferencePublications || '[]'),
+      qualifications: facultyData.qualifications ? JSON.parse(facultyData.qualifications) : undefined,
+      patents: facultyData.patents ? JSON.parse(facultyData.patents) : undefined,
+      bookChapters: facultyData.bookChapters ? JSON.parse(facultyData.bookChapters) : undefined,
+      certifications: facultyData.certifications ? JSON.parse(facultyData.certifications) : undefined,
+      internationalJournalPublications: facultyData.internationalJournalPublications ? JSON.parse(facultyData.internationalJournalPublications) : undefined,
+      internationalConferencePublications: facultyData.internationalConferencePublications ? JSON.parse(facultyData.internationalConferencePublications) : undefined,
     };
 
     // Only include image if a new file was uploaded
