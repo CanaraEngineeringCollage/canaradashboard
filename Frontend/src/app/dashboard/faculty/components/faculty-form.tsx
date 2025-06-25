@@ -140,6 +140,8 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
   };
 
   const processSubmit = async (data: FacultyFormData) => {
+    console.log("Processing Submit with data:", data);
+    
     try {
       console.log("Form Data Submitted:", data);
       
@@ -226,7 +228,33 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField control={control} name="name" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="e.g., Dr. Nagesh H R" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={control} name="designation" render={({ field }) => (<FormItem><FormLabel>Designation</FormLabel><FormControl><Input placeholder="e.g., Professor" {...field} /></FormControl><FormMessage /></FormItem>)} />
-              <FormField control={control} name="department" render={({ field }) => (<FormItem><FormLabel>Department</FormLabel><FormControl><Input placeholder="e.g., Computer Science & Engineering" {...field} /></FormControl><FormMessage /></FormItem>)} />
+              <FormField
+                control={control}
+                name="department"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Department</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select department" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Computer Science & Engineering">Computer Science & Engineering</SelectItem>
+                        <SelectItem value="Electronics & Communication Engineering">Electronics & Communication Engineering</SelectItem>
+                        <SelectItem value="Mechanical Engineering">Mechanical Engineering</SelectItem>
+                        <SelectItem value="Civil Engineering">Civil Engineering</SelectItem>
+                        <SelectItem value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</SelectItem>
+                        <SelectItem value="Basic Science">Basic Science</SelectItem>
+                        {/* Add more departments as needed */}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField control={control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" placeholder="e.g., faculty@canaraengineering.in" {...field} /></FormControl><FormMessage /></FormItem>)} />
               <FormField control={control} name="joiningDate" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Joining Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(parseISO(field.value), "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value ? parseISO(field.value) : undefined} onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : '')} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>)} />
               <FormField control={control} name="experience" render={({ field }) => (<FormItem><FormLabel>Experience</FormLabel><FormControl><Input placeholder="e.g., 28 Years" {...field} /></FormControl><FormMessage /></FormItem>)} />
