@@ -20,7 +20,6 @@ export function BuzzEditor({ isOpen, onClose, onSave, initialDesign }: BuzzEdito
   const [isPreview, setIsPreview] = useState(false);
   const [html, setHtml] = useState("");
   const [isEditorLoaded, setIsEditorLoaded] = useState(false);
-  console.log(html,"html");
   
   const handleSave = () => {
     if (emailEditorRef.current?.editor && isEditorLoaded) {

@@ -106,6 +106,8 @@ export default function FacultyPage() {
   }, [faculties, searchTerm, selectedDepartment, selectedEmploymentType]);
 
   const handleAddFaculty = () => {
+console.log("Adding new faculty");
+    
     setEditingFaculty(null);
     form.reset({
       name: '',
@@ -157,6 +159,8 @@ export default function FacultyPage() {
   };
 
   const onSubmit = (data: FacultyFormData) => {
+    console.log("Form submitted with data:", data);
+    
     if (editingFaculty) {
       setFaculties(
         faculties.map((f) =>

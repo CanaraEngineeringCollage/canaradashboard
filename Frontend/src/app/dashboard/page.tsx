@@ -1,19 +1,33 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { PageTitle } from '@/components/page-title';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { UsersRound, Newspaper, FileText, LayoutDashboard } from 'lucide-react';
-import { initialFaculties, initialBuzzItems, initialInquiries } from '@/lib/data';
-import type { Faculty, Buzz, Inquiry } from '@/lib/types';
+import { useState, useEffect } from "react";
+import { PageTitle } from "@/components/page-title";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { UsersRound, Newspaper, FileText, LayoutDashboard } from "lucide-react";
+import { initialFaculties, initialBuzzItems, initialInquiries } from "@/lib/data";
+import type { Faculty, Buzz, Inquiry } from "@/lib/types";
+import { getAllBuzz } from "@/lib/buzz";
+import { getAllFaculty } from "@/lib/faculty";
 
 export default function DashboardPage() {
   const [facultyCount, setFacultyCount] = useState(0);
   const [buzzCount, setBuzzCount] = useState(0);
   const [inquiryCount, setInquiryCount] = useState(0);
 
+  const fetchAllData = async () => {
+    try {
+      const buzz = await getAllBuzz();
+      const faculties=await getAllFaculty();
+    setBuzzCount(buzz.length);
+    setFacultyCount(faculties.length);
+    } catch (error) {
+      
+    }
+    
+  };
   useEffect(() => {
     // In a real app, fetch this data
+    fetchAllData();
     setFacultyCount(initialFaculties.length);
     setBuzzCount(initialBuzzItems.length);
     setInquiryCount(initialInquiries.length);
@@ -64,16 +78,16 @@ export default function DashboardPage() {
             {/* Placeholder for recent activity feed or charts */}
             <p className="text-muted-foreground">Recent activity feed will be displayed here.</p>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-lg border p-4">
-                    <h3 className="font-semibold">New Faculty Added</h3>
-                    <p className="text-sm text-muted-foreground">Dr. Emily Carter joined the Physics department.</p>
-                    <p className="text-xs text-muted-foreground">2 days ago</p>
-                </div>
-                <div className="rounded-lg border p-4">
-                    <h3 className="font-semibold">Upcoming Event: Seminar</h3>
-                    <p className="text-sm text-muted-foreground">Seminar on Quantum Computing scheduled for next week.</p>
-                     <p className="text-xs text-muted-foreground">Posted 1 day ago</p>
-                </div>
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">New Faculty Added</h3>
+                <p className="text-sm text-muted-foreground">Dr. Emily Carter joined the Physics department.</p>
+                <p className="text-xs text-muted-foreground">2 days ago</p>
+              </div>
+              <div className="rounded-lg border p-4">
+                <h3 className="font-semibold">Upcoming Event: Seminar</h3>
+                <p className="text-sm text-muted-foreground">Seminar on Quantum Computing scheduled for next week.</p>
+                <p className="text-xs text-muted-foreground">Posted 1 day ago</p>
+              </div>
             </div>
           </CardContent>
         </Card>

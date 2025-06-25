@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Megaphone } from "lucide-react";
 import { BuzzEditor } from "./components/buzz-editor";
 import { useToast } from "@/hooks/use-toast";
+import { createBuzz, deleteBuzz, editBuzz, getAllBuzz } from "@/lib/buzz";
 
 interface Buzz {
   id: string;
@@ -59,10 +60,9 @@ export default function BuzzPage() {
 
   const fetchBuzzes = async () => {
     try {
-      const response = await fetch("http://localhost:3000/buzz");
-      if (!response.ok) throw new Error("Failed to fetch buzzes");
-      const data = await response.json();
-      setBuzzes(data);
+      const response = await getAllBuzz();
+
+      setBuzzes(response);
     } catch (error) {
       console.error("Error fetching buzzes:", error);
       toast({
@@ -75,10 +75,7 @@ export default function BuzzPage() {
 
   const DeleteBuzz = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/buzz/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete buzz");
+      const response = await deleteBuzz(id);
       await fetchBuzzes();
       toast({
         title: "Success",
@@ -158,31 +155,17 @@ export default function BuzzPage() {
           setEditingBuzz(null);
         }}
         onSave={async (html, design) => {
-          const method = editingBuzz ? "PATCH" : "POST";
-          const url = editingBuzz ? `http://localhost:3000/buzz/${editingBuzz.id}` : "http://localhost:3000/buzz";
+         
 
           try {
-            const response = await fetch(url, {
-              method,
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                content: html,
-                design: design,
-              }),
-            });
+             const response = editingBuzz ? await editBuzz(editingBuzz.id, html, design) : await createBuzz(html, design);
 
-            if (!response.ok) {
-              throw new Error(`Failed to ${editingBuzz ? "update" : "create"} buzz`);
-            }
+            await fetchBuzzes();
 
             toast({
               title: "Success",
               description: `${editingBuzz ? "Updated" : "Created"} buzz successfully.`,
             });
-
-            handleSave();
           } catch (error) {
             console.error(`Error ${editingBuzz ? "updating" : "creating"} buzz:`, error);
             toast({

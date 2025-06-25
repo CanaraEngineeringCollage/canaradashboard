@@ -140,6 +140,8 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
   };
 
   const processSubmit = async (data: FacultyFormData) => {
+    console.log("Processing Submit with data:", data);
+    
     try {
       console.log("Form Data Submitted:", data);
       
