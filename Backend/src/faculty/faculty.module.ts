@@ -9,6 +9,7 @@ import { Certification } from './entities/certification.entity';
 import { JournalPublication } from './entities/journal-publication.entity';
 import { ConferencePublication } from './entities/conference-publication.entity';
 import { Qualification } from './entities/qualification.entity';
+import { DepartmentHead } from './entities/department-head.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { Qualification } from './entities/qualification.entity';
       Certification,
       JournalPublication,
       ConferencePublication,
-      Qualification
+      Qualification,
+      DepartmentHead
     ])
   ],
   controllers: [FacultyController],
