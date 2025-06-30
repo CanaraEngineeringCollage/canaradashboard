@@ -12,6 +12,7 @@ import { Certification } from './certification.entity';
 import { JournalPublication } from './journal-publication.entity';
 import { ConferencePublication } from './conference-publication.entity';
 import { Qualification } from './qualification.entity';
+import { DepartmentHead } from './department-head.entity';
 
 @Entity()
 export class Faculty {
@@ -68,4 +69,6 @@ export class Faculty {
 
   @OneToMany(() => Qualification, qualification => qualification.faculty, { cascade: true })
   qualifications: Qualification[];
+  @OneToMany(() => DepartmentHead, departmentHead => departmentHead.faculty, { cascade: true })
+  departmentHeads: DepartmentHead[];
 }

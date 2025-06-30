@@ -6,6 +6,7 @@ import { CreateBookChapterDto } from './create-book-chapter.dto';
 import { CreateCertificationDto } from './create-certification.dto';
 import { CreateJournalPublicationDto } from './create-journal-publication.dto';
 import { CreateConferencePublicationDto } from './create-conference-publication.dto';
+import { CreateDepartmentHeadDto } from './create-department-head-dto';
 
 export enum EmploymentType {
   Regular = 'Regular',
@@ -58,6 +59,11 @@ export class CreateFacultyDto {
   @ValidateNested({ each: true })
   @Type(() => CreateQualificationDto)
   qualifications: CreateQualificationDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateDepartmentHeadDto)
+  departmentHead: CreateDepartmentHeadDto[];
 
   @IsArray()
   @ValidateNested({ each: true })
