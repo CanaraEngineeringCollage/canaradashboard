@@ -30,3 +30,4 @@ export class BuzzController {
     return this.buzzService.deleteBuzz(id);
   }
 }
+

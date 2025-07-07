@@ -13,6 +13,9 @@ export class FacultyService {
   ) {}
 
   async createFaculty(facultyData: CreateFacultyDto): Promise<Faculty> {
+
+    console.log(facultyData);
+    
     // Check if faculty is department head
     if (facultyData.isDepartmentHead) {
       // Check if department already has a head
@@ -22,6 +25,9 @@ export class FacultyService {
           isDepartmentHead: true,
         },
       });
+
+      console.log(existingHead, " existingHead");
+      
 
       if (existingHead) {
         throw new ConflictException(`Department ${facultyData.department} already has a head`);
@@ -35,6 +41,8 @@ export class FacultyService {
     }
 
     const faculty = this.facultyRepository.create(facultyData);
+    console.log(faculty, " faculty");
+    
     return this.facultyRepository.save(faculty);
   }
 
@@ -83,7 +91,9 @@ export class FacultyService {
   }
 
   async getAllFaculty(): Promise<Faculty[]> {
-    return this.facultyRepository.find();
+    const facultyList = await this.facultyRepository.find();
+    console.log(facultyList, "All Faculty");
+    return facultyList;
   }
 
   async findByDepartment(department: string): Promise<Faculty[]> {
