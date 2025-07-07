@@ -29,6 +29,15 @@ export interface BookChapter {
   scopusIndexed: boolean;
   pageNumbers: string;
 }
+// types/event.ts
+export type Event = {
+  id: string;
+  title: string;
+  tagline: string;
+  description: string;
+  date: string;
+  image: { type: string; data: number[] }; // Buffer-like structure for backend
+};
 
 export interface Certification {
   id?: string;

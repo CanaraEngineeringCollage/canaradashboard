@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Event {
@@ -17,6 +17,6 @@ export class Event {
   @Column()
   date: string;
 
-  @Column()
-  image: string;
+  @Column('longblob') 
+  image: Buffer;
 }
