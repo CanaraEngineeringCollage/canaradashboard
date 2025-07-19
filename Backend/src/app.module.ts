@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { FacultyModule } from './faculty/faculty.module';
 import { BuzzModule } from './buzz/buzz.module';
 import { EventModule } from './events/events.module';
+import { AdminModule } from './admin/admin.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { EventModule } from './events/events.module';
     }),
     FacultyModule,
     BuzzModule,
-    EventModule
+    EventModule,
+     AdminModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
