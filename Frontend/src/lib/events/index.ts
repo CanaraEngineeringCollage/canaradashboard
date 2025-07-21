@@ -1,43 +1,51 @@
-import { apiFetch } from "../client";
 
-export interface Buzz {
-  id: string;
-  content: string;
-  design: string;
+import { apiFetch } from '../client';
+
+export interface Event {
+  id: number;
+  title: string;
+  tagline: string;
+  date: string;
+  type: string;
+  description: string;
+  imageUrl?: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export const getAllEvents = () => {
-   return apiFetch('/events', {
+  return apiFetch('/events', {
     method: 'GET',
   });
 };
 
+export const getFeaturedEvent = () => {
+  return apiFetch('/events/featured', {
+    method: 'GET',
+  });
+};
 
-export const deleteEvents = (id: string) => {
+export const createEvent = (data: Omit<Event, 'id' | 'createdAt'>) => {
+  return apiFetch('/events', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const updateEvent = (id: number, data: Partial<Event>) => {
+  return apiFetch(`/events/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const deleteEvent = (id: number) => {
   return apiFetch(`/events/${id}`, {
     method: 'DELETE',
   });
-}
-
-export const createEvents = (data) => {
-  return apiFetch('/events', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-}
-
-export const editEvents = (id, data) => {
-  return apiFetch(`/events/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-}
-
+};
