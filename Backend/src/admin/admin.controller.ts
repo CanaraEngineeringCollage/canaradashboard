@@ -33,7 +33,6 @@ export class AdminController {
     return this.adminService.logout(res);
   }
 
-  // Optional: create one admin if not exists
   @Get('seed')
   seed() {
     return this.adminService.seedAdmin();

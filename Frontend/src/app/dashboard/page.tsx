@@ -8,11 +8,28 @@ import { initialFaculties, initialBuzzItems, initialInquiries } from "@/lib/data
 import type { Faculty, Buzz, Inquiry } from "@/lib/types";
 import { getAllBuzz } from "@/lib/buzz";
 import { getAllFaculty } from "@/lib/faculty";
+import axios from "axios";
+
 
 export default function DashboardPage() {
   const [facultyCount, setFacultyCount] = useState(0);
   const [buzzCount, setBuzzCount] = useState(0);
   const [inquiryCount, setInquiryCount] = useState(0);
+  const [admin, setAdmin] = useState<any>(null);
+
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/admin/profile', { withCredentials: true });
+        setAdmin(res.data);
+      } catch {
+        window.location.href = '/login';
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const fetchAllData = async () => {
     try {
@@ -32,6 +49,7 @@ export default function DashboardPage() {
     setBuzzCount(initialBuzzItems.length);
     setInquiryCount(initialInquiries.length);
   }, []);
+  
 
   return (
     <>

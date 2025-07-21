@@ -16,15 +16,19 @@ export class AdminService {
 
   async login(email: string, password: string, res: any) {
     const admin = await this.adminRepo.findOne({ where: { email } });
+    
     if (!admin) throw new UnauthorizedException('Invalid email or password');
 
     const isMatch = await bcrypt.compare(password, admin.password);
+    
     if (!isMatch) throw new UnauthorizedException('Invalid email or password');
 
     const token = this.jwtService.sign({ id: admin.id, email: admin.email });
+    
 
     res.cookie('jwt', token, { httpOnly: true, secure: false });
-    return { message: 'Login successful' };
+    
+    return res.json({ message: 'Login successful' });
   }
 
  async getProfile(id: number) {
@@ -49,7 +53,7 @@ export class AdminService {
 
   async logout(res: any) {
     res.clearCookie('jwt');
-    return { message: 'Logged out' };
+    return res.json({ message: 'Logged out' });
   }
 
   async seedAdmin() {
