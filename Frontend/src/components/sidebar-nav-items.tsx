@@ -26,6 +26,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/faculty', label: 'Faculty', icon: UsersRound },
+  { href: '/dashboard/events', label: 'Events', icon: UserCog },
   { href: '/dashboard/buzz', label: 'Buzz', icon: Newspaper },
   { href: '/dashboard/inquiries', label: 'Inquiries', icon: FileText },
   { href: '/dashboard/profile', label: 'Profile', icon: UserCog },
