@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const cookie = nestRes.headers['set-cookie']?.[0];
 
     if (cookie) {
-      return new NextResponse(JSON.stringify({ message: 'Login successful' }), {
+      return new NextResponse(JSON.stringify({ message: 'Login successful',data:nestRes.data }), {
         status: 200,
         headers: {
           'Set-Cookie': cookie,

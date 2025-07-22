@@ -5,11 +5,13 @@ import { AdminController } from './admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { Admin } from './entities/admin.entity';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Admin]),
-    JwtModule.register({ secret: 'your_jwt_secret', signOptions: { expiresIn: '1d' } }),
+    JwtModule.register({ secret: process.env.JWT_SECRET, signOptions: { expiresIn: '1d' } }),
   ],
   controllers: [AdminController],
   providers: [AdminService],

@@ -92,7 +92,6 @@ export class FacultyService {
 
   async getAllFaculty(): Promise<Faculty[]> {
     const facultyList = await this.facultyRepository.find();
-    console.log(facultyList, "All Faculty");
     return facultyList;
   }
 

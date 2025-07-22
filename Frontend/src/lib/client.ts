@@ -4,7 +4,6 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   const url = `${baseUrl}${endpoint}`;
 
-  console.log('API Request:', { url, options });
 
   try {
     const response = await fetch(url, {
@@ -38,7 +37,6 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
     // Try to parse JSON response
     const data = await response.json().catch(() => null);
-    console.log('API Response Data:', data);
     return data;
   } catch (error) {
     console.error('API Request Failed:', {

@@ -140,10 +140,8 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
   };
 
   const processSubmit = async (data: FacultyFormData) => {
-    console.log("Processing Submit with data:", data);
     
     try {
-      console.log("Form Data Submitted:", data);
       
       // Create FormData to handle file upload
       const formData = new FormData();
@@ -170,7 +168,6 @@ export function FacultyForm({ isOpen, onClose, onSubmit, form, editingFaculty }:
       }
 
       // Log the FormData contents for debugging
-      console.log('FormData contents:');
       for (const [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }

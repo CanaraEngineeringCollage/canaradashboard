@@ -72,7 +72,6 @@ export default function FacultyPage() {
     // Simulate fetching data
     const fetchFaculties = async () => {
       const response = await getAllFaculty();
-      console.log("Response", response);
       setFaculties(response as Faculty[]);
     }
     fetchFaculties();
@@ -106,7 +105,6 @@ export default function FacultyPage() {
   }, [faculties, searchTerm, selectedDepartment, selectedEmploymentType]);
 
   const handleAddFaculty = () => {
-console.log("Adding new faculty");
     
     setEditingFaculty(null);
     form.reset({
@@ -159,7 +157,6 @@ console.log("Adding new faculty");
   };
 
   const onSubmit = (data: FacultyFormData) => {
-    console.log("Form submitted with data:", data);
     
     if (editingFaculty) {
       setFaculties(
