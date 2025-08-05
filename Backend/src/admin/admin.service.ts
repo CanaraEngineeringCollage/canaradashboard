@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Admin } from './entities/admin.entity';
+import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Injectable()
 export class AdminService {
@@ -40,17 +41,32 @@ export class AdminService {
   return result;
 }
 
-  async updateAdmin(id: number, dto: any) {
-    const admin = await this.adminRepo.findOne({ where: { id } });
-    if (!admin) throw new NotFoundException('Admin not found');
+async updateAdmin(id: number, dto: UpdateAdminDto) {
+  const admin = await this.adminRepo.findOne({ where: { id } });
+  if (!admin) throw new NotFoundException('Admin not found');
 
-    if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
+  // If user is trying to update password, verify current password first
+  if (dto.password) {
+    if (!dto.currentPassword) {
+      throw new BadRequestException('Current password is required to update the password');
     }
 
-    await this.adminRepo.update(id, dto);
-    return { message: 'Admin updated successfully' };
+    const isMatch = await bcrypt.compare(dto.currentPassword, admin.password);
+    if (!isMatch) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    // Hash new password
+    dto.password = await bcrypt.hash(dto.password, 10);
   }
+
+  // Remove currentPassword before updating
+  delete dto.currentPassword;
+
+  await this.adminRepo.update(id, dto);
+  return { message: 'Admin updated successfully' };
+}
+
 
   async logout(res: any) {
     res.clearCookie('jwt');
@@ -60,7 +76,7 @@ export class AdminService {
   async seedAdmin() {
     const exists = await this.adminRepo.findOne({ where: { email: 'admin@example.com' } });
     if (!exists) {
-      const hashed = await bcrypt.hash('admin123', 10);
+      const hashed = await bcrypt.hash('123456', 10);
       const admin = this.adminRepo.create({
         name: 'Admin',
         email: 'admin@example.com',

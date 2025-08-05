@@ -1,37 +1,19 @@
 "use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  AdminProfileSchema,
-  ChangePasswordSchema,
-  type AdminProfileFormData,
-  type ChangePasswordFormData,
-} from '@/lib/schemas';
-import { PageTitle } from '@/components/page-title';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { UserCog } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
-import { setAdmin } from '@/redux/slices/authSlice';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AdminProfileSchema, ChangePasswordSchema, type AdminProfileFormData, type ChangePasswordFormData } from "@/lib/schemas";
+import { PageTitle } from "@/components/page-title";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { UserCog } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { setAdmin } from "@/redux/slices/authSlice";
 
 export default function ProfilePage() {
   const { toast } = useToast();
@@ -49,53 +31,55 @@ export default function ProfilePage() {
   const passwordForm = useForm<ChangePasswordFormData>({
     resolver: zodResolver(ChangePasswordSchema),
     defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     },
   });
 
-   const updateAdminProfile = async (data: any) => {
-  const response = await axios.patch(
-    'http://localhost:3000/admin/update',
-    data,
-    {
+  const updateAdminProfile = async (data: any) => {
+    const response = await axios.patch("http://localhost:3000/admin/update", data, {
       withCredentials: true, // send cookie
-    }
-  );
-  return response.data;
-};
+    });
+    return response.data;
+  };
 
   const onProfileSubmit = async (data: AdminProfileFormData) => {
     try {
+      if (admin.name === data.name && admin.email === data.email) {
+        return toast({
+          title: "No changes made",
+          description: "You have not made any changes",
+        });
+      }
       await updateAdminProfile(data);
       dispatch(setAdmin({ name: data.name, email: data.email }));
       toast({
-        title: 'Profile Updated',
-        description: 'Your profile information has been updated.',
+        title: "Profile Updated",
+        description: "Your profile information has been updated.",
       });
     } catch (error: any) {
       toast({
-        title: 'Update Failed',
-        description: error?.response?.data?.message || 'Something went wrong',
-        variant: 'destructive',
+        title: "Update Failed",
+        description: error?.response?.data?.message || "Something went wrong",
+        variant: "destructive",
       });
     }
   };
 
   const onPasswordSubmit = async (data: ChangePasswordFormData) => {
     try {
-      await updateAdminProfile({ password: data.newPassword });
+      await updateAdminProfile({ currentPassword:data.currentPassword,password: data.newPassword });
       toast({
-        title: 'Password Changed',
-        description: 'Your password has been successfully changed.',
+        title: "Password Changed",
+        description: "Your password has been successfully changed.",
       });
       passwordForm.reset();
     } catch (error: any) {
       toast({
-        title: 'Update Failed',
-        description: error?.response?.data?.message || 'Something went wrong',
-        variant: 'destructive',
+        title: "Update Failed",
+        description: error?.response?.data?.message || "Something went wrong",
+        variant: "destructive",
       });
     }
   };
@@ -108,20 +92,12 @@ export default function ProfilePage() {
           <Card>
             <CardHeader className="items-center text-center">
               <Avatar className="h-24 w-24 mb-4">
-                <AvatarImage
-                  src="https://placehold.co/100x100.png"
-                  alt="Admin User"
-                />
+                <AvatarImage src="/canaraLogo.svg" alt="Admin User" />
                 <AvatarFallback>AU</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl">
-                {profileForm.watch('name')}
-              </CardTitle>
-              <CardDescription>{profileForm.watch('email')}</CardDescription>
+              <CardTitle className="text-2xl">{profileForm.watch("name")}</CardTitle>
+              <CardDescription>{profileForm.watch("email")}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button className="w-full">Change Avatar (Not Implemented)</Button>
-            </CardContent>
           </Card>
         </div>
 
@@ -134,10 +110,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <Form {...profileForm}>
-                <form
-                  onSubmit={profileForm.handleSubmit(onProfileSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
                   <FormField
                     control={profileForm.control}
                     name="name"
@@ -158,23 +131,14 @@ export default function ProfilePage() {
                       <FormItem>
                         <FormLabel>Email Address</FormLabel>
                         <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="your.email@example.com"
-                            {...field}
-                          />
+                          <Input type="email" placeholder="your.email@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    disabled={profileForm.formState.isSubmitting}
-                  >
-                    {profileForm.formState.isSubmitting
-                      ? 'Saving...'
-                      : 'Save Changes'}
+                  <Button type="submit" disabled={profileForm.formState.isSubmitting}>
+                    {profileForm.formState.isSubmitting ? "Saving..." : "Save Changes"}
                   </Button>
                 </form>
               </Form>
@@ -189,10 +153,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <Form {...passwordForm}>
-                <form
-                  onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
                   <FormField
                     control={passwordForm.control}
                     name="currentPassword"
@@ -232,13 +193,8 @@ export default function ProfilePage() {
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    disabled={passwordForm.formState.isSubmitting}
-                  >
-                    {passwordForm.formState.isSubmitting
-                      ? 'Updating...'
-                      : 'Update Password'}
+                  <Button type="submit" disabled={passwordForm.formState.isSubmitting}>
+                    {passwordForm.formState.isSubmitting ? "Updating..." : "Update Password"}
                   </Button>
                 </form>
               </Form>

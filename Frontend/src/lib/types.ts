@@ -36,6 +36,7 @@ export type Event = {
   tagline: string;
   description: string;
   date: string;
+  category: string;
   image: { type: string; data: number[] }; // Buffer-like structure for backend
 };
 
