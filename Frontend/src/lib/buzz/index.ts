@@ -4,40 +4,39 @@ export interface Buzz {
   id: string;
   content: string;
   design: string;
+  category: string; // Added category here
   createdAt: string;
   updatedAt: string;
 }
 
 export const getAllBuzz = () => {
-   return apiFetch('/buzz', {
-    method: 'GET',
+  return apiFetch("/buzz", {
+    method: "GET",
   });
 };
 
-
 export const deleteBuzz = (id: string) => {
   return apiFetch(`/buzz/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
-}
+};
 
-export const createBuzz = (content: string, design: object) => {
-  return apiFetch('/buzz', {
-    method: 'POST',
+export const createBuzz = (content: string, design: object, category: string,eventDate:string) => {
+  return apiFetch("/buzz", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ content, design }),
+    body: JSON.stringify({ content, design, category,eventDate }), // send category
   });
-}
+};
 
-export const editBuzz = (id: string, content: string, design: object) => {
+export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string) => {
   return apiFetch(`/buzz/${id}`, {
-    method: 'PATCH',
+    method: "PATCH",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ content, design }),
+    body: JSON.stringify({ content, design, category,eventDate }), // send category
   });
-}
-
+};

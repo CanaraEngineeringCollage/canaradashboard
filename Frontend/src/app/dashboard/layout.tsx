@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <SidebarFooter className="p-4 group-data-[collapsible=icon]:p-2">
           <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="https://placehold.co/40x40.png" alt="Admin" />
+              <AvatarImage src="/canaraLogo.svg" alt="Admin" />
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
@@ -91,7 +91,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <span className="sr-only">Notifications</span>
             </Button>
             <Avatar className="h-9 w-9">
-              <AvatarImage src="https://placehold.co/40x40.png" alt="Admin" />
+              <AvatarImage src="/canaraLogo.svg" alt="Admin" />
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
             <Button onClick={logoutHandler} variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
