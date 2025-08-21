@@ -36,6 +36,9 @@ export class JournalPublication {
   @Column({ nullable: true })
   indexing: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.internationalJournalPublications)
+  @ManyToOne(() => Faculty, (faculty) => faculty.internationalJournalPublications,{
+    onDelete: 'CASCADE',
+  })
+
   faculty: Faculty;
 }

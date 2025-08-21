@@ -27,6 +27,8 @@ export class Certification {
   @Column({ nullable: true })
   credits: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.certifications)
+  @ManyToOne(() => Faculty, (faculty) => faculty.certifications,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }

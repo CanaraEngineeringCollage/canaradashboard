@@ -33,6 +33,8 @@ export class BookChapter {
   @Column({ nullable: true })
   pageNumbers: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.bookChapters)
+  @ManyToOne(() => Faculty, (faculty) => faculty.bookChapters,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }

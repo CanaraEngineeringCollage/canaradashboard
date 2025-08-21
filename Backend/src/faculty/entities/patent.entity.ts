@@ -27,6 +27,8 @@ export class Patent {
   @Column({ nullable: true })
   reference: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.patents)
+  @ManyToOne(() => Faculty, (faculty) => faculty.patents,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }

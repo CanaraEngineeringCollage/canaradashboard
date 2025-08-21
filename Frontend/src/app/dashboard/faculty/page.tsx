@@ -1343,6 +1343,8 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteFaculty = (id: string) => {
+    console.log(id,"id");
+    
     if (confirm('Are you sure you want to delete this faculty?')) {
       fetch(`${API_BASE_URL}/faculty/${id}`, {
         method: 'DELETE',
@@ -1360,6 +1362,8 @@ const Page: React.FC = () => {
     }
   };
 
+
+  
   return (
     <div className="p-4">
 

@@ -33,6 +33,8 @@ export class ConferencePublication {
   @Column({ nullable: true })
   pageNumbers: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.internationalConferencePublications)
+  @ManyToOne(() => Faculty, (faculty) => faculty.internationalConferencePublications,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }
