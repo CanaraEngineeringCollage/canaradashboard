@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 
 @Entity()
@@ -12,13 +12,13 @@ export class Certification {
   @Column()
   issuingOrganization: string;
 
-  @Column()
-  issueDate: string;
+  @Column({ type: 'date' })
+  issueDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  expiryDate: Date;
 
   @Column({ nullable: true })
-  expiryDate: string;
-
-  @Column()
   credentialId: string;
 
   @Column({ nullable: true })
@@ -27,7 +27,8 @@ export class Certification {
   @Column({ nullable: true })
   credits: string;
 
-  @ManyToOne(() => Faculty, faculty => faculty.certifications)
-  @JoinColumn()
+  @ManyToOne(() => Faculty, (faculty) => faculty.certifications,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }

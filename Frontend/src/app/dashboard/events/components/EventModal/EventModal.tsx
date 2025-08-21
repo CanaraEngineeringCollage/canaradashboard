@@ -1,4 +1,3 @@
-// EventModal.tsx
 import React from "react";
 import { Event } from "@/lib/types";
 
@@ -8,7 +7,9 @@ type Props = {
   eventData: Partial<Event>;
   imagePreview?: string | null;
   onClose: () => void;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void;
   onSubmit: (e: React.FormEvent) => void;
 };
 
@@ -56,6 +57,22 @@ const EventModal: React.FC<Props> = ({
             className="w-full p-2 border rounded"
             required
           />
+            <select
+            name="category"
+            value={eventData.category || ""}
+            onChange={onChange}
+            className="w-full p-2 border rounded"
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+            <option value="Information Science & Engineering">Information Science & Engineering</option>
+            <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+            <option value="Computer Science & Design">Computer Science & Design</option>
+            <option value="Computer Science & Business System">Computer Science & Business System</option>
+            <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
+            <option value="College Event">College Event</option>
+          </select>
           <input
             type="date"
             name="date"
@@ -64,6 +81,9 @@ const EventModal: React.FC<Props> = ({
             className="w-full p-2 border rounded"
             required
           />
+
+        
+
           <input
             type="file"
             name="image"

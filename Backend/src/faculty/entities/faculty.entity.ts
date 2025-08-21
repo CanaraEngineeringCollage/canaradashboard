@@ -1,18 +1,10 @@
-// faculty.entity.ts
-
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Qualification } from './qualification.entity';
 import { Patent } from './patent.entity';
 import { BookChapter } from './book-chapter.entity';
 import { Certification } from './certification.entity';
 import { JournalPublication } from './journal-publication.entity';
 import { ConferencePublication } from './conference-publication.entity';
-import { Qualification } from './qualification.entity';
-import { DepartmentHead } from './department-head.entity';
 
 @Entity()
 export class Faculty {
@@ -31,44 +23,33 @@ export class Faculty {
   @Column()
   email: string;
 
-  @Column()
-  joiningDate: string;
+  @Column({ type: 'date' })
+  joiningDate: Date;
 
   @Column()
   experience: string;
 
-  @Column()
-  employmentType: string;
-
-  @Column({ default: false })
-  isDepartmentHead: boolean;
-
-  @Column({ nullable: true })
-  username: string;
-
-  @Column({ nullable: true })
-  password: string;
+  @Column({ type: 'enum', enum: ['Regular', 'Contract', 'Visiting'] })
+  employmentType: 'Regular' | 'Contract' | 'Visiting';
 
   @Column({ type: 'longblob', nullable: true })
-  image: Buffer;
+  avatar: Buffer;
 
-  @OneToMany(() => Patent, patent => patent.faculty, { cascade: true })
+  @OneToMany(() => Qualification, (qualification) => qualification.faculty, { cascade: true })
+  qualifications: Qualification[];
+
+  @OneToMany(() => Patent, (patent) => patent.faculty, { cascade: true })
   patents: Patent[];
 
-  @OneToMany(() => BookChapter, bookChapter => bookChapter.faculty, { cascade: true })
+  @OneToMany(() => BookChapter, (bookChapter) => bookChapter.faculty, { cascade: true })
   bookChapters: BookChapter[];
 
-  @OneToMany(() => Certification, certification => certification.faculty, { cascade: true })
+  @OneToMany(() => Certification, (certification) => certification.faculty, { cascade: true })
   certifications: Certification[];
 
-  @OneToMany(() => JournalPublication, publication => publication.faculty, { cascade: true })
+  @OneToMany(() => JournalPublication, (journal) => journal.faculty, { cascade: true })
   internationalJournalPublications: JournalPublication[];
 
-  @OneToMany(() => ConferencePublication, publication => publication.faculty, { cascade: true })
+  @OneToMany(() => ConferencePublication, (conference) => conference.faculty, { cascade: true })
   internationalConferencePublications: ConferencePublication[];
-
-  @OneToMany(() => Qualification, qualification => qualification.faculty, { cascade: true })
-  qualifications: Qualification[];
-  @OneToMany(() => DepartmentHead, departmentHead => departmentHead.faculty, { cascade: true })
-  departmentHeads: DepartmentHead[];
 }

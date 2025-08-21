@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 
 @Entity()
@@ -15,16 +15,16 @@ export class JournalPublication {
   @Column()
   journalName: string;
 
-  @Column()
-  publicationDate: string;
+  @Column({ type: 'date', nullable: true })
+  publicationDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   volume: string;
 
   @Column({ nullable: true })
   issue: string;
 
-  @Column()
+  @Column({ nullable: true })
   pageNumbers: string;
 
   @Column({ nullable: true })
@@ -36,7 +36,9 @@ export class JournalPublication {
   @Column({ nullable: true })
   indexing: string;
 
-  @ManyToOne(() => Faculty, faculty => faculty.internationalJournalPublications)
-  @JoinColumn()
+  @ManyToOne(() => Faculty, (faculty) => faculty.internationalJournalPublications,{
+    onDelete: 'CASCADE',
+  })
+
   faculty: Faculty;
 }

@@ -19,4 +19,6 @@ export class Event {
 
   @Column('longblob') 
   image: Buffer;
+   @Column()
+  category: string;
 }

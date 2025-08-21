@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 
 @Entity()
@@ -18,6 +18,8 @@ export class Qualification {
   @Column()
   specialization: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.qualifications, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Faculty, (faculty) => faculty.qualifications,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }
