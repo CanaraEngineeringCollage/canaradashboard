@@ -1,21 +1,183 @@
-import { IsString, IsEnum, IsOptional, ValidateNested, IsArray, IsEmail, IsBoolean } from 'class-validator';
+import { IsString, IsEmail, IsDateString, IsEnum, IsArray, ValidateNested, IsOptional, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateQualificationDto } from './create-qualification.dto';
-import { CreatePatentDto } from './create-patent.dto';
-import { CreateBookChapterDto } from './create-book-chapter.dto';
-import { CreateCertificationDto } from './create-certification.dto';
-import { CreateJournalPublicationDto } from './create-journal-publication.dto';
-import { CreateConferencePublicationDto } from './create-conference-publication.dto';
-import { CreateDepartmentHeadDto } from './create-department-head-dto';
 
-export enum EmploymentType {
-  Regular = 'Regular',
-  Contract = 'Contract',
-  Visiting = 'Visiting',
+export class CreateQualificationDto {
+  @IsString()
+  degree: string;
+
+  @IsString()
+  passingYear: string;
+
+  @IsString()
+  college: string;
+
+  @IsString()
+  specialization: string;
+}
+
+export class CreatePatentDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  authors: string;
+
+  @IsDateString()
+  date: string;
+
+  @IsString()
+  applicationNumber: string;
+
+  @IsOptional()
+  @IsString()
+  patentOffice?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  reference?: string;
+}
+
+export class CreateBookChapterDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  authors: string;
+
+  @IsString()
+  bookTitle: string;
+
+  @IsString()
+  publisher: string;
+
+  @IsOptional()
+  @IsString()
+  publicationYear?: string;
+
+  @IsOptional()
+  @IsString()
+  doi?: string;
+
+  @IsOptional()
+  @IsString()
+  isbn?: string;
+
+  @IsOptional()
+  scopusIndexed?: boolean;
+
+  @IsOptional()
+  @IsString()
+  pageNumbers?: string;
+}
+
+export class CreateCertificationDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  issuingOrganization: string;
+
+  @IsDateString()
+  issueDate: string;
+
+  @IsOptional()
+  @IsDateString()
+  expiryDate?: string;
+
+  @IsOptional()
+  @IsString()
+  credentialId?: string;
+
+  @IsOptional()
+  @IsString()
+  credentialUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  credits?: string;
+}
+
+export class CreateJournalPublicationDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  authors: string;
+
+  @IsString()
+  journalName: string;
+
+  @IsOptional()
+  @IsDateString()
+  publicationDate?: string;
+
+  @IsOptional()
+  @IsString()
+  volume?: string;
+
+  @IsOptional()
+  @IsString()
+  issue?: string;
+
+  @IsOptional()
+  @IsString()
+  pageNumbers?: string;
+
+  @IsOptional()
+  @IsString()
+  doi?: string;
+
+  @IsOptional()
+  @IsString()
+  issn?: string;
+
+  @IsOptional()
+  @IsString()
+  indexing?: string;
+}
+
+export class CreateConferencePublicationDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  authors: string;
+
+  @IsString()
+  conferenceName: string;
+
+  @IsOptional()
+  @IsDateString()
+  conferenceDate?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  doi?: string;
+
+  @IsOptional()
+  @IsString()
+  publisher?: string;
+
+  @IsOptional()
+  @IsString()
+  isbn?: string;
+
+  @IsOptional()
+  @IsString()
+  pageNumbers?: string;
 }
 
 export class CreateFacultyDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
@@ -27,66 +189,47 @@ export class CreateFacultyDto {
   @IsEmail()
   email: string;
 
-  @IsString()
+  @IsDateString()
   joiningDate: string;
 
   @IsString()
   experience: string;
 
-  @IsEnum(EmploymentType)
-  employmentType: EmploymentType;
-
-  @IsBoolean()
-  @IsOptional()
-  isDepartmentHead?: boolean;
-
-  @IsString()
-  @IsOptional()
-  username?: string;
-
-  @IsString()
-  @IsOptional()
-  password?: string;
-
-  @IsOptional()
-  @IsString()
-  avatar?: string;
-
-  @IsOptional()
-  image?: Buffer;
+  @IsEnum(['Regular', 'Contract', 'Visiting'])
+  employmentType: 'Regular' | 'Contract' | 'Visiting';
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateQualificationDto)
   qualifications: CreateQualificationDto[];
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateDepartmentHeadDto)
-  departmentHead: CreateDepartmentHeadDto[];
-
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePatentDto)
-  patents: CreatePatentDto[];
+  patents?: CreatePatentDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateBookChapterDto)
-  bookChapters: CreateBookChapterDto[];
+  bookChapters?: CreateBookChapterDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateCertificationDto)
-  certifications: CreateCertificationDto[];
+  certifications?: CreateCertificationDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateJournalPublicationDto)
-  internationalJournalPublications: CreateJournalPublicationDto[];
+  internationalJournalPublications?: CreateJournalPublicationDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateConferencePublicationDto)
-  internationalConferencePublications: CreateConferencePublicationDto[];
+  internationalConferencePublications?: CreateConferencePublicationDto[];
 }

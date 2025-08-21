@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 
 @Entity()
@@ -15,8 +15,8 @@ export class ConferencePublication {
   @Column()
   conferenceName: string;
 
-  @Column()
-  conferenceDate: string;
+  @Column({ type: 'date', nullable: true })
+  conferenceDate: Date;
 
   @Column({ nullable: true })
   location: string;
@@ -33,7 +33,6 @@ export class ConferencePublication {
   @Column({ nullable: true })
   pageNumbers: string;
 
-  @ManyToOne(() => Faculty, faculty => faculty.internationalConferencePublications)
-  @JoinColumn()
+  @ManyToOne(() => Faculty, (faculty) => faculty.internationalConferencePublications)
   faculty: Faculty;
 }

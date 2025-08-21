@@ -1,31 +1,28 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FacultyService } from './faculty.service';
 import { FacultyController } from './faculty.controller';
+import { FacultyService } from './faculty.service';
 import { Faculty } from './entities/faculty.entity';
+import { Qualification } from './entities/qualification.entity';
 import { Patent } from './entities/patent.entity';
 import { BookChapter } from './entities/book-chapter.entity';
 import { Certification } from './entities/certification.entity';
 import { JournalPublication } from './entities/journal-publication.entity';
 import { ConferencePublication } from './entities/conference-publication.entity';
-import { Qualification } from './entities/qualification.entity';
-import { DepartmentHead } from './entities/department-head.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Faculty,
+      Qualification,
       Patent,
       BookChapter,
       Certification,
       JournalPublication,
       ConferencePublication,
-      Qualification,
-      DepartmentHead
-    ])
+    ]),
   ],
   controllers: [FacultyController],
   providers: [FacultyService],
-  exports: [FacultyService]
 })
 export class FacultyModule {}
