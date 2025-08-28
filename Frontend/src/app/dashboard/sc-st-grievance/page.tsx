@@ -10,21 +10,28 @@ import React, { useEffect, useState } from 'react'
 const page = () => {
   const [grievances, setGrievances] = useState<ScstGrievance[]>([]);
   const [loading, setLoading] = useState(true);
+  console.log(grievances,"scst");
+  
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await getScStGrievances();
-         // parse JSON response
-        setGrievances(res);
-      } catch (error) {
-        console.error(error);
-      }
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+ useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getScStGrievances();
+      // sort by created_at descending (latest first)
+      const sorted = res.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setGrievances(sorted);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
+
+  fetchData();
+}, []);
+
 
   return (
     <div className="p-6">

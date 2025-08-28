@@ -13,6 +13,14 @@ export type UploadPayload = {
   file: File;
 };
 
+interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  id: string | null;
+  onClose: () => void;
+  onConfirm: (id: string) => void;
+  itemName?: string;
+}
+
 interface AdminUploadModalProps {
   open: boolean;
   onClose: () => void;
@@ -204,6 +212,8 @@ function AdminUploadModal({ open, onClose, onSubmit, startYear = 2000, maxSizeBy
 export default function DemoAdminUploadModal() {
   const [open, setOpen] = useState(false);
   const [timetables, setTimetables] = useState<Timetable[]>([]);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   async function handleSubmit(payload: UploadPayload) {
     const formData = new FormData();
@@ -226,14 +236,8 @@ export default function DemoAdminUploadModal() {
 
   async function getTimetables() {
     try {
-      const res = await fetch("http://localhost:3000/timetables", {
-        method: "GET",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch timetables");
-      }
-
+      const res = await fetch("http://localhost:3000/timetables", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
       setTimetables(data);
     } catch (error) {
@@ -243,18 +247,15 @@ export default function DemoAdminUploadModal() {
 
   async function handleDelete(id: number) {
     try {
-      const res = await fetch(`http://localhost:3000/timetables/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete timetable");
-      }
-
+      const res = await fetch(`http://localhost:3000/timetables/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete timetable");
       alert("Deleted successfully!");
       setTimetables((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
       console.error(error);
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteId(null);
     }
   }
 
@@ -265,7 +266,7 @@ export default function DemoAdminUploadModal() {
   return (
     <div className="p-4">
       <PageTitle
-        title="Faculty Management"
+        title="Exam Timetables"
         icon={BookOpenCheck}
         action={
           <Button onClick={() => setOpen(true)}>
@@ -276,6 +277,15 @@ export default function DemoAdminUploadModal() {
       />
 
       <AdminUploadModal open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} startYear={2000} maxSizeBytes={15 * 1024 * 1024} />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        id={deleteId || 0}
+        itemName="this timetable"
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+      />
 
       <div className="overflow-x-auto mt-6">
         <table className="min-w-full border border-gray-200 rounded-lg">
@@ -289,8 +299,7 @@ export default function DemoAdminUploadModal() {
           </thead>
           <tbody>
             {timetables.map((t) => {
-              // Convert buffer data to a Blob URL
-              const pdfData = new Uint8Array(t.file.data); // t.file.data is the array of bytes
+              const pdfData = new Uint8Array(t.file.data);
               const blob = new Blob([pdfData], { type: t.mimetype });
               const url = URL.createObjectURL(blob);
 
@@ -303,7 +312,13 @@ export default function DemoAdminUploadModal() {
                     <button onClick={() => window.open(url, "_blank")} className="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700 mr-2">
                       View
                     </button>
-                    <button onClick={() => handleDelete(t.id)} className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">
+                    <button
+                      onClick={() => {
+                        setDeleteId(t.id);
+                        setDeleteModalOpen(true);
+                      }}
+                      className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                    >
                       Delete
                     </button>
                   </td>
@@ -319,6 +334,41 @@ export default function DemoAdminUploadModal() {
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+function DeleteConfirmationModal({
+  isOpen,
+  id,
+  onClose,
+  onConfirm,
+  itemName = "this item",
+}: DeleteConfirmationModalProps) {
+  if (!isOpen || !id) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h2>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete <strong>{itemName}</strong>? This action cannot be undone.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(id)}
+            className="px-4 py-2 rounded-md text-sm bg-red-600 text-white hover:bg-red-700"
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );

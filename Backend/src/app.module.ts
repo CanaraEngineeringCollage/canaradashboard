@@ -9,6 +9,8 @@ import { FacultyModule } from './faculty/faculty.module';
 import { GrievanceModule } from './grievance/grievance.module';
 import { ScstGrievanceModule } from './sc-st-grievance/scst-grievance.module';
 import { TimetableModule } from './exam-time-table/timetable.module';
+import { CounsellingModule } from './counselling/counselling.module';
+import { AlumniModule } from './alumni/alumni.module';
 
 @Module({
   imports: [
@@ -30,7 +32,9 @@ import { TimetableModule } from './exam-time-table/timetable.module';
     FacultyModule,
     GrievanceModule,
     ScstGrievanceModule,
-    TimetableModule
+    TimetableModule,
+    CounsellingModule,
+    AlumniModule
   ],
 })
 export class AppModule {}

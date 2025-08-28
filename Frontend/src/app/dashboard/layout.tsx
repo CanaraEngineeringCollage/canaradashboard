@@ -41,20 +41,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <Sidebar collapsible="icon" variant="sidebar" side="left" className="border-r">
         <SidebarHeader className="h-16 flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-8 w-8 text-sidebar-foreground"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
+        <Avatar className="h-9 w-9">
+              <AvatarImage src="/navIcon.png" alt="Admin" />
+              <AvatarFallback>AD</AvatarFallback>
+            </Avatar>
             <h1 className="text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">Canara Engineering College</h1>
           </div>
         </SidebarHeader>
