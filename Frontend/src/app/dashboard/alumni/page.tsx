@@ -24,7 +24,7 @@ const AlumniPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-  const res = await fetch("http://localhost:3000/alumni", { method: "GET" });
+  const res = await fetch("http://localhost:3000/alumni", { method: "GET",credentials:"include" });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
         // sort by createdAt descending

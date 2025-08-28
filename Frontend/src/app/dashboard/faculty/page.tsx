@@ -1685,7 +1685,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   );
 };
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Page: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
@@ -1725,6 +1725,7 @@ const Page: React.FC = () => {
       fetch(`${API_BASE_URL}/faculty`, {
         method: 'POST',
         body: formData,
+         credentials: "include"
       })
         .then((res) => {
           if (!res.ok) {
@@ -1750,6 +1751,7 @@ const Page: React.FC = () => {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
         method: 'PATCH',
         body: formData,
+         credentials: "include"
       })
         .then((res) => {
           if (!res.ok) {
@@ -1777,6 +1779,7 @@ const Page: React.FC = () => {
   const handleDeleteFaculty = (id: string) => {
     fetch(`${API_BASE_URL}/faculty/${id}`, {
       method: 'DELETE',
+      credentials: "include"
     })
       .then((res) => {
         if (!res.ok) {
