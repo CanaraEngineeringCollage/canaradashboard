@@ -2,6 +2,7 @@
 
 import { PageTitle } from '@/components/page-title';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { LandPlot, PlusCircle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
@@ -1273,7 +1274,7 @@ const Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
-
+const { toast } = useToast();
   useEffect(() => {
     fetch(`${API_BASE_URL}/faculty`)
       .then(res => res.json())
@@ -1315,7 +1316,12 @@ const Page: React.FC = () => {
         .then(newFaculty => {
           setFaculties([...faculties, newFaculty]);
           setIsModalOpen(false);
+           toast({
+        title: "Success",
+        description: "Faculty added successfully.",
+      });
         })
+        
         .catch(error => {
           console.error('Error adding faculty:', error);
           alert(`Failed to add faculty: ${error.message}`);
@@ -1334,6 +1340,10 @@ const Page: React.FC = () => {
         .then(updatedFaculty => {
           setFaculties(faculties.map(f => f.id === updatedFaculty.id ? updatedFaculty : f));
           setIsModalOpen(false);
+            toast({
+        title: "Success",
+        description: "Faculty information updated successfully.",
+      });
         })
         .catch(error => {
           console.error('Error updating faculty:', error);
@@ -1343,9 +1353,9 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteFaculty = (id: string) => {
-    console.log(id,"id");
+   
     
-    if (confirm('Are you sure you want to delete this faculty?')) {
+  
       fetch(`${API_BASE_URL}/faculty/${id}`, {
         method: 'DELETE',
       })
@@ -1354,12 +1364,17 @@ const Page: React.FC = () => {
             return res.json().then(err => { throw new Error(err.message); });
           }
           setFaculties(faculties.filter(f => f.id !== id));
+           toast({
+        title: "Success",
+        description: "Faculty Deleted successfully.",
+      });
         })
+        
         .catch(error => {
           console.error('Error deleting faculty:', error);
           alert(`Failed to delete faculty: ${error.message}`);
         });
-    }
+    
   };
 
 
@@ -1380,18 +1395,18 @@ const Page: React.FC = () => {
           }
         />
     
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border px-4 py-2">Avatar</th>
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">Designation</th>
-            <th className="border px-4 py-2">Department</th>
-            <th className="border px-4 py-2">Email</th>
-            <th className="border px-4 py-2">Joining Date</th>
+        <table className="min-w-full border border-gray-200 rounded-lg">
+            <thead className="bg-gray-100">
+          <tr >
+            <th className="border  px-4 py-2">Avatar</th>
+            <th className="border  px-4 py-2">Name</th>
+            <th className="border  px-4 py-2">Designation</th>
+            <th className="border  px-4 py-2">Department</th>
+            <th className="border  px-4 py-2">Email</th>
+            <th className="border  px-4 py-2">Joining Date</th>
           
-            <th className="border px-4 py-2">Employment Type</th>
-            <th className="border px-4 py-2">Actions</th>
+            <th className="border  px-4 py-2">Employment Type</th>
+            <th className="border  px-4 py-2">Actions</th>
           </tr>
         </thead>
         <tbody>

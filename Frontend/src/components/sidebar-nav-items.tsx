@@ -1,21 +1,11 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  UsersRound,
-  Newspaper,
-  FileText,
-  UserCog,
-  type LucideIcon,
-} from 'lucide-react';
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, UsersRound, Newspaper, FileText, UserCog, type LucideIcon, ShieldCheck, BookOpenCheck } from "lucide-react";
+
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 interface NavItem {
   href: string;
@@ -24,12 +14,16 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/faculty', label: 'Faculty', icon: UsersRound },
-  { href: '/dashboard/events', label: 'Events', icon: UserCog },
-  { href: '/dashboard/buzz', label: 'Buzz', icon: Newspaper },
-  { href: '/dashboard/inquiries', label: 'Inquiries', icon: FileText },
-  { href: '/dashboard/profile', label: 'Profile', icon: UserCog },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/faculty", label: "Faculty", icon: UsersRound },
+  { href: "/dashboard/events", label: "Events", icon: UserCog },
+   { href: "/dashboard/exam-timetable", label: "Exam Timetable", icon: BookOpenCheck },
+
+  { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
+  { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
+    { href: "/dashboard/sc-st-grievance", label: "Sc-St Grievance", icon: ShieldCheck },
+  { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },
+  { href: "/dashboard/profile", label: "Profile", icon: UserCog },
 ];
 
 export function SidebarNavItems() {
@@ -42,10 +36,10 @@ export function SidebarNavItems() {
           <Link href={item.href} passHref legacyBehavior>
             <SidebarMenuButton
               asChild
-              isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
+              isActive={pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))}
               className={cn(
                 "justify-start",
-                (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href)))
+                pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
                   ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
                   : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}

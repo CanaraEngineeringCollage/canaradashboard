@@ -126,34 +126,39 @@ const handleSubmit = async (e: React.FormEvent) => {
           ))}
         </select>
         </div>
-      {filteredEvents.map((event) => (
-        <div
-          key={event.id}
-          className="bg-white border border-gray-200 shadow-sm rounded p-4 mb-4"
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-semibold mb-1">{event.title}</h2>
-              <p className="text-sm text-gray-600 italic">Event Tagline: {event.tagline}</p>
-              <p className="mt-2 text-gray-800">Event Description: {event.description}</p>
-              <p className="text-sm text-gray-500 mt-3">Event Date: {event.date}</p>
-              <p className="text-sm text-gray-500">Category: {event.category}</p>
-            </div>
-            <img
+           <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-200 rounded-lg">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2 text-left">Date</th>
+                <th className="px-4 py-2 text-left">Image</th>
+                <th className="px-4 py-2 text-left">Title</th>
+                <th className="px-4 py-2 text-left">Tagline</th>
+                <th className="px-4 py-2 text-left">Description</th>
+                <th className="px-4 py-2 text-left">Category</th>
+                <th className="px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEvents.map((event) => (
+                <tr  key={event.id} className="border-t border-gray-200 hover:bg-gray-50">
+                   <td className="px-4 py-2">{event.date}</td>
+                  <td className="px-4 py-2"> <img
               src={bufferToBase64(event.image)}
               alt={event.title}
               className="w-32 h-20 object-cover rounded ml-4"
-            />
-          </div>
-
-          <div className="flex justify-end mt-4 gap-2">
-            <button
+            /></td>
+                  <td className="px-4 py-2">{event.title}</td>
+                  <td className="px-4 py-2">{event.tagline}</td>
+                  <td className="px-4 py-2">{event.description}</td>
+                  <td className="px-4 py-2">{event.category}</td>
+                 
+                  <td className="px-4 py-2">     <button
               className="px-4 py-1 rounded bg-red-100 text-red-700 border border-red-300 hover:bg-red-200"
               onClick={() => handleDelete(event.id)}
             >
               Delete
-            </button>
-            <button
+            </button>  <button
               className="px-4 py-1 rounded bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
               onClick={() => {
                 setIsEdit(true);
@@ -164,10 +169,14 @@ const handleSubmit = async (e: React.FormEvent) => {
               }}
             >
               Edit
-            </button>
-          </div>
+            </button></td>
+                  
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+     
 
       <EventModal
         isOpen={showModal}

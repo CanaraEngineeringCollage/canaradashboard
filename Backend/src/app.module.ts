@@ -6,6 +6,9 @@ import { EventModule } from './events/events.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { FacultyModule } from './faculty/faculty.module';
+import { GrievanceModule } from './grievance/grievance.module';
+import { ScstGrievanceModule } from './sc-st-grievance/scst-grievance.module';
+import { TimetableModule } from './exam-time-table/timetable.module';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { FacultyModule } from './faculty/faculty.module';
     AdminModule,
     AuthModule,
     FacultyModule,
+    GrievanceModule,
+    ScstGrievanceModule,
+    TimetableModule
   ],
 })
 export class AppModule {}
