@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { FacultyModule } from './faculty/faculty.module';
 import { BuzzModule } from './buzz/buzz.module';
 import { EventModule } from './events/events.module';
+import { AdminModule } from './admin/admin.module';
+import { AuthModule } from './auth/auth.module';
+import { FacultyModule } from './faculty/faculty.module';
 
 @Module({
   imports: [
@@ -24,7 +26,10 @@ import { EventModule } from './events/events.module';
 
     FacultyModule,
     BuzzModule,
-    EventModule
+    EventModule,
+    AdminModule,
+    AuthModule,
+    FacultyModule,
   ],
 })
 export class AppModule {}

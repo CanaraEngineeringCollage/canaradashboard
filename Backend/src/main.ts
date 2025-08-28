@@ -1,16 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+<<<<<<< HEAD
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+=======
+import * as cookieParser from 'cookie-parser';
+
+>>>>>>> f6965bb370ccab7dcdd7fa971ecf17e36748a121
 
 async function bootstrap() {
   console.log('🚀 Bootstrapping NestJS...');
   const app = await NestFactory.create(AppModule);
   console.log('✅ NestJS application created');
+ app.setGlobalPrefix('api');
 
-  // ✅ Set global API prefix
-  app.setGlobalPrefix('api');
-
-  // ✅ Enable CORS
+ 
+  app.use(cookieParser());
   app.enableCors({
     origin: ['http://localhost:9002', 'http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -35,3 +39,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+
+
+

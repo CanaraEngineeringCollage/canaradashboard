@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 
 @Entity()
@@ -18,7 +18,7 @@ export class BookChapter {
   @Column()
   publisher: string;
 
-  @Column()
+  @Column({ nullable: true })
   publicationYear: string;
 
   @Column({ nullable: true })
@@ -30,10 +30,11 @@ export class BookChapter {
   @Column({ default: false })
   scopusIndexed: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   pageNumbers: string;
 
-  @ManyToOne(() => Faculty, faculty => faculty.bookChapters)
-  @JoinColumn()
+  @ManyToOne(() => Faculty, (faculty) => faculty.bookChapters,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }

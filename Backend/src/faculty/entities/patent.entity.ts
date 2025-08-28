@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 
 @Entity()
@@ -12,22 +12,23 @@ export class Patent {
   @Column()
   authors: string;
 
-  @Column()
-  date: string;
+  @Column({ type: 'date' })
+  date: Date;
 
   @Column()
   applicationNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   patentOffice: string;
 
-  @Column()
+  @Column({ nullable: true })
   status: string;
 
-  @Column()
+  @Column({ nullable: true })
   reference: string;
 
-  @ManyToOne(() => Faculty, faculty => faculty.patents)
-  @JoinColumn()
+  @ManyToOne(() => Faculty, (faculty) => faculty.patents,{
+    onDelete: 'CASCADE',
+  })
   faculty: Faculty;
 }

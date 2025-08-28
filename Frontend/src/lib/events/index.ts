@@ -9,35 +9,23 @@ export interface Buzz {
 }
 
 export const getAllEvents = () => {
-   return apiFetch('/events', {
-    method: 'GET',
+  return apiFetch('/events', { method: 'GET' });
+};
+
+export const deleteEvent = (id: string) => {
+  return apiFetch(`/events/${id}`, { method: 'DELETE' });
+};
+
+export const createEvent = (formData: FormData) => {
+  return apiFetch('/events', {
+    method: 'POST',
+    body: formData,
   });
 };
 
-
-export const deleteEvents = (id: string) => {
+export const editEvent = (id: string, formData: FormData) => {
   return apiFetch(`/events/${id}`, {
-    method: 'DELETE',
+    method: 'PUT', 
+    body: formData,
   });
-}
-
-export const createEvents = (data) => {
-  return apiFetch('/events', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-}
-
-export const editEvents = (id, data) => {
-  return apiFetch(`/events/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-}
-
+};
