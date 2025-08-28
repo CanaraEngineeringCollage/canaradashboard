@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { PageTitle } from '@/components/page-title';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { LandPlot, PlusCircle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { PageTitle } from "@/components/page-title";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { LandPlot, PlusCircle } from "lucide-react";
+import React, { useState, useEffect } from "react";
 
 // Interfaces
 interface Faculty {
@@ -15,7 +15,7 @@ interface Faculty {
   email: string;
   joiningDate: string;
   experience: string;
-  employmentType: 'Regular' | 'Contract' | 'Visiting';
+  employmentType: "Regular" | "Contract" | "Visiting";
   qualifications: Qualification[];
   avatar?: { type: string; data: number[] } | null;
   patents?: Patent[];
@@ -99,23 +99,23 @@ interface FacultyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (faculty: Faculty, avatarFile: File | null) => void;
-  mode: 'add' | 'edit';
+  mode: "add" | "edit";
   facultyToEdit?: Faculty;
 }
 
 const departments = [
-  'Computer Science & Engineering',
-  'Information Science & Engineering',
-  'Electronics & Communication Engineering',
-  'Computer Science & Design',
-  'Computer Science & Business System',
-  'Artificial Intelligence & Machine Learning',
-  'Placement Team',
-  'other',
+  "Computer Science & Engineering",
+  "Information Science & Engineering",
+  "Electronics & Communication Engineering",
+  "Computer Science & Design",
+  "Computer Science & Business System",
+  "Artificial Intelligence & Machine Learning",
+  "Placement Team",
+  "other",
 ];
 
 const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
-  const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+  const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
   const base64 = btoa(binary);
   return `data:image/jpeg;base64,${base64}`;
 };
@@ -124,13 +124,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const [step, setStep] = useState(1);
   const initialFaculty: Faculty = {
     id: Math.random().toString(36).substr(2, 9),
-    name: '',
-    designation: '',
-    department: '',
-    email: '',
-    joiningDate: '',
-    experience: '',
-    employmentType: 'Regular',
+    name: "",
+    designation: "",
+    department: "",
+    email: "",
+    joiningDate: "",
+    experience: "",
+    employmentType: "Regular",
     qualifications: [],
     avatar: null,
     patents: [],
@@ -146,88 +146,88 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   // Initial states for each section
   const initialQualification: Qualification = {
     id: Math.random().toString(36).substr(2, 9),
-    degree: '',
-    passingYear: '',
-    college: '',
-    specialization: '',
+    degree: "",
+    passingYear: "",
+    college: "",
+    specialization: "",
   };
   const [newQualification, setNewQualification] = useState<Qualification>(initialQualification);
   const [editQualificationId, setEditQualificationId] = useState<string | null>(null);
 
   const initialPatent: Patent = {
     id: Math.random().toString(36).substr(2, 9),
-    title: '',
-    authors: '',
-    date: '',
-    applicationNumber: '',
-    patentOffice: '',
-    status: '',
-    reference: '',
+    title: "",
+    authors: "",
+    date: "",
+    applicationNumber: "",
+    patentOffice: "",
+    status: "",
+    reference: "",
   };
   const [newPatent, setNewPatent] = useState<Patent>(initialPatent);
   const [editPatentId, setEditPatentId] = useState<string | null>(null);
 
   const initialBookChapter: BookChapter = {
     id: Math.random().toString(36).substr(2, 9),
-    title: '',
-    authors: '',
-    bookTitle: '',
-    publisher: '',
-    publicationYear: '',
-    doi: '',
-    isbn: '',
+    title: "",
+    authors: "",
+    bookTitle: "",
+    publisher: "",
+    publicationYear: "",
+    doi: "",
+    isbn: "",
     scopusIndexed: false,
-    pageNumbers: '',
+    pageNumbers: "",
   };
   const [newBookChapter, setNewBookChapter] = useState<BookChapter>(initialBookChapter);
   const [editBookChapterId, setEditBookChapterId] = useState<string | null>(null);
 
   const initialCertification: Certification = {
     id: Math.random().toString(36).substr(2, 9),
-    name: '',
-    issuingOrganization: '',
-    issueDate: '',
-    expiryDate: '',
-    credentialId: '',
-    credentialUrl: '',
-    credits: '',
+    name: "",
+    issuingOrganization: "",
+    issueDate: "",
+    expiryDate: "",
+    credentialId: "",
+    credentialUrl: "",
+    credits: "",
   };
   const [newCertification, setNewCertification] = useState<Certification>(initialCertification);
   const [editCertificationId, setEditCertificationId] = useState<string | null>(null);
 
   const initialJournal: JournalPublication = {
     id: Math.random().toString(36).substr(2, 9),
-    title: '',
-    authors: '',
-    journalName: '',
-    publicationDate: '',
-    volume: '',
-    issue: '',
-    pageNumbers: '',
-    doi: '',
-    issn: '',
-    indexing: '',
+    title: "",
+    authors: "",
+    journalName: "",
+    publicationDate: "",
+    volume: "",
+    issue: "",
+    pageNumbers: "",
+    doi: "",
+    issn: "",
+    indexing: "",
   };
   const [newJournalPublication, setNewJournalPublication] = useState<JournalPublication>(initialJournal);
   const [editJournalPublicationId, setEditJournalPublicationId] = useState<string | null>(null);
 
   const initialConference: ConferencePublication = {
     id: Math.random().toString(36).substr(2, 9),
-    title: '',
-    authors: '',
-    conferenceName: '',
-    conferenceDate: '',
-    location: '',
-    doi: '',
-    publisher: '',
-    isbn: '',
-    pageNumbers: '',
+    title: "",
+    authors: "",
+    conferenceName: "",
+    conferenceDate: "",
+    location: "",
+    doi: "",
+    publisher: "",
+    isbn: "",
+    pageNumbers: "",
   };
   const [newConferencePublication, setNewConferencePublication] = useState<ConferencePublication>(initialConference);
   const [editConferencePublicationId, setEditConferencePublicationId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (mode === 'add') {
+    if (mode === "add") {
       setFaculty(initialFaculty);
       setAvatarFile(null);
       setNewQualification(initialQualification);
@@ -244,7 +244,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       setEditConferencePublicationId(null);
       setStep(1);
       setErrors({});
-    } else if (mode === 'edit' && facultyToEdit) {
+    } else if (mode === "edit" && facultyToEdit) {
       setFaculty(facultyToEdit);
       setAvatarFile(null);
       setNewQualification(initialQualification);
@@ -266,21 +266,64 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const totalSteps = 7;
 
+  // Auto-populate edit input with 0th item if available and not already editing
+  useEffect(() => {
+    if (step === 2 && faculty.qualifications.length > 0 && !editQualificationId) {
+      setNewQualification(faculty.qualifications[0]);
+      setEditQualificationId(faculty.qualifications[0].id);
+    }
+    if (step === 3 && faculty.patents && faculty.patents.length > 0 && !editPatentId) {
+      setNewPatent(faculty.patents[0]);
+      setEditPatentId(faculty.patents[0].id);
+    }
+    if (step === 4 && faculty.bookChapters && faculty.bookChapters.length > 0 && !editBookChapterId) {
+      setNewBookChapter(faculty.bookChapters[0]);
+      setEditBookChapterId(faculty.bookChapters[0].id);
+    }
+    if (step === 5 && faculty.certifications && faculty.certifications.length > 0 && !editCertificationId) {
+      setNewCertification(faculty.certifications[0]);
+      setEditCertificationId(faculty.certifications[0].id);
+    }
+    if (step === 6 && faculty.internationalJournalPublications && faculty.internationalJournalPublications.length > 0 && !editJournalPublicationId) {
+      setNewJournalPublication(faculty.internationalJournalPublications[0]);
+      setEditJournalPublicationId(faculty.internationalJournalPublications[0].id);
+    }
+    if (
+      step === 7 &&
+      faculty.internationalConferencePublications &&
+      faculty.internationalConferencePublications.length > 0 &&
+      !editConferencePublicationId
+    ) {
+      setNewConferencePublication(faculty.internationalConferencePublications[0]);
+      setEditConferencePublicationId(faculty.internationalConferencePublications[0].id);
+    }
+  }, [step]);
+
   const validateStep = (currentStep: number) => {
     const newErrors: { [key: string]: string } = {};
     if (currentStep === 1) {
-      if (!faculty.name || faculty.name.trim() === '') newErrors.name = 'Name is required';
-      if (!faculty.designation || faculty.designation.trim() === '') newErrors.designation = 'Designation is required';
-      if (!faculty.department) newErrors.department = 'Department is required';
-      if (!faculty.email || !/\S+@\S+\.\S+/.test(faculty.email)) newErrors.email = 'Valid email is required';
-      if (!faculty.joiningDate) newErrors.joiningDate = 'Joining date is required';
-      if (!faculty.experience || faculty.experience.trim() === '') newErrors.experience = 'Experience is required';
-      if (!faculty.employmentType) newErrors.employmentType = 'Employment type is required';
-      if (mode === 'add' && !faculty.avatar && !avatarFile) newErrors.avatar = 'Avatar is required';
+      if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
+      if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
+      if (!faculty.department) newErrors.department = "Department is required";
+      if (!faculty.email || !/\S+@\S+\.\S+/.test(faculty.email)) newErrors.email = "Valid email is required";
+      if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
+      if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
+      if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
+      if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
     }
     if (currentStep === 2) {
-      if (faculty.qualifications.length === 0) {
-        newErrors.qualifications = 'At least one qualification is required';
+      // Modal-style validation for qualification fields
+      if (!newQualification.degree || newQualification.degree.trim() === "") {
+        newErrors.degree = "Degree is required";
+      }
+      if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
+        newErrors.passingYear = "Passing Year is required";
+      }
+      if (!newQualification.college || newQualification.college.trim() === "") {
+        newErrors.college = "College is required";
+      }
+      if (!newQualification.specialization || newQualification.specialization.trim() === "") {
+        newErrors.specialization = "Specialization is required";
       }
     }
     setErrors(newErrors);
@@ -292,9 +335,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editQualificationId) {
         setFaculty({
           ...faculty,
-          qualifications: faculty.qualifications.map((q) =>
-            q.id === editQualificationId ? { ...newQualification, id: q.id } : q
-          ),
+          qualifications: faculty.qualifications.map((q) => (q.id === editQualificationId ? { ...newQualification, id: q.id } : q)),
         });
         setEditQualificationId(null);
         setNewQualification(initialQualification);
@@ -310,9 +351,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editPatentId) {
         setFaculty({
           ...faculty,
-          patents: (faculty.patents || []).map((p) =>
-            p.id === editPatentId ? { ...newPatent, id: p.id } : p
-          ),
+          patents: (faculty.patents || []).map((p) => (p.id === editPatentId ? { ...newPatent, id: p.id } : p)),
         });
         setEditPatentId(null);
         setNewPatent(initialPatent);
@@ -328,9 +367,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
-          bookChapters: (faculty.bookChapters || []).map((b) =>
-            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
-          ),
+          bookChapters: (faculty.bookChapters || []).map((b) => (b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b)),
         });
         setEditBookChapterId(null);
         setNewBookChapter(initialBookChapter);
@@ -346,9 +383,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editCertificationId) {
         setFaculty({
           ...faculty,
-          certifications: (faculty.certifications || []).map((c) =>
-            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
-          ),
+          certifications: (faculty.certifications || []).map((c) => (c.id === editCertificationId ? { ...newCertification, id: c.id } : c)),
         });
         setEditCertificationId(null);
         setNewCertification(initialCertification);
@@ -381,25 +416,32 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewJournalPublication(initialJournal);
       }
     }
-    if (step === 7 && newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
-      if (editConferencePublicationId) {
-        setFaculty({
-          ...faculty,
-          internationalConferencePublications: (faculty.internationalConferencePublications || []).map((c) =>
-            c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c
-          ),
-        });
-        setEditConferencePublicationId(null);
-        setNewConferencePublication(initialConference);
+    let shouldSubmit = false;
+    if (step === 7) {
+      // If the Conference Publication input is filled, add/update it before submit
+      if (newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
+        if (editConferencePublicationId) {
+          setFaculty((prev) => ({
+            ...prev,
+            internationalConferencePublications: (prev.internationalConferencePublications || []).map((c) =>
+              c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c
+            ),
+          }));
+          setEditConferencePublicationId(null);
+          setNewConferencePublication(initialConference);
+        } else {
+          setFaculty((prev) => ({
+            ...prev,
+            internationalConferencePublications: [
+              ...(prev.internationalConferencePublications || []),
+              { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) },
+            ],
+          }));
+          setNewConferencePublication(initialConference);
+        }
+        shouldSubmit = true;
       } else {
-        setFaculty({
-          ...faculty,
-          internationalConferencePublications: [
-            ...(faculty.internationalConferencePublications || []),
-            { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) },
-          ],
-        });
-        setNewConferencePublication(initialConference);
+        shouldSubmit = true;
       }
     }
 
@@ -407,8 +449,25 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (step < totalSteps) {
         setStep(step + 1);
       } else {
-        onSubmit(faculty, avatarFile);
-        onClose();
+        // Wait for state update if we just added a conference publication
+        if (step === 7 && newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
+          setTimeout(() => {
+            onSubmit(
+              {
+                ...faculty,
+                internationalConferencePublications: [
+                  ...(faculty.internationalConferencePublications || []),
+                  { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) },
+                ],
+              },
+              avatarFile
+            );
+            onClose();
+          }, 0);
+        } else {
+          onSubmit(faculty, avatarFile);
+          onClose();
+        }
       }
     }
   };
@@ -430,7 +489,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === 'avatar') {
+    if (name === "avatar") {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         setAvatarFile(file);
@@ -460,9 +519,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editQualificationId) {
         setFaculty({
           ...faculty,
-          qualifications: faculty.qualifications.map((q) =>
-            q.id === editQualificationId ? { ...newQualification, id: q.id } : q
-          ),
+          qualifications: faculty.qualifications.map((q) => (q.id === editQualificationId ? { ...newQualification, id: q.id } : q)),
         });
         setEditQualificationId(null);
         setNewQualification(initialQualification);
@@ -474,7 +531,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewQualification(initialQualification);
       }
     } else {
-      alert('Please fill all required fields for the qualification.');
+      alert("Please fill all required fields for the qualification.");
     }
   };
 
@@ -513,9 +570,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editPatentId) {
         setFaculty({
           ...faculty,
-          patents: (faculty.patents || []).map((p) =>
-            p.id === editPatentId ? { ...newPatent, id: p.id } : p
-          ),
+          patents: (faculty.patents || []).map((p) => (p.id === editPatentId ? { ...newPatent, id: p.id } : p)),
         });
         setEditPatentId(null);
         setNewPatent(initialPatent);
@@ -527,7 +582,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewPatent(initialPatent);
       }
     } else {
-      alert('Please fill all required fields for the patent.');
+      alert("Please fill all required fields for the patent.");
     }
   };
 
@@ -558,7 +613,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   // Book Chapter Handlers
   const handleBookChapterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target as any;
-    setNewBookChapter({ ...newBookChapter, [name]: type === 'checkbox' ? checked : value });
+    setNewBookChapter({ ...newBookChapter, [name]: type === "checkbox" ? checked : value });
   };
 
   const addOrUpdateBookChapter = () => {
@@ -566,9 +621,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
-          bookChapters: (faculty.bookChapters || []).map((b) =>
-            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
-          ),
+          bookChapters: (faculty.bookChapters || []).map((b) => (b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b)),
         });
         setEditBookChapterId(null);
         setNewBookChapter(initialBookChapter);
@@ -580,7 +633,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewBookChapter(initialBookChapter);
       }
     } else {
-      alert('Please fill all required fields for the book chapter.');
+      alert("Please fill all required fields for the book chapter.");
     }
   };
 
@@ -619,9 +672,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (editCertificationId) {
         setFaculty({
           ...faculty,
-          certifications: (faculty.certifications || []).map((c) =>
-            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
-          ),
+          certifications: (faculty.certifications || []).map((c) => (c.id === editCertificationId ? { ...newCertification, id: c.id } : c)),
         });
         setEditCertificationId(null);
         setNewCertification(initialCertification);
@@ -633,7 +684,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewCertification(initialCertification);
       }
     } else {
-      alert('Please fill all required fields for the certification.');
+      alert("Please fill all required fields for the certification.");
     }
   };
 
@@ -689,7 +740,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewJournalPublication(initialJournal);
       }
     } else {
-      alert('Please fill all required fields for the journal publication.');
+      alert("Please fill all required fields for the journal publication.");
     }
   };
 
@@ -745,7 +796,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewConferencePublication(initialConference);
       }
     } else {
-      alert('Please fill all required fields for the conference publication.');
+      alert("Please fill all required fields for the conference publication.");
     }
   };
 
@@ -778,17 +829,16 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">{mode === 'add' ? 'Add Faculty' : 'Edit Faculty'}</h2>
+        <h2 className="text-2xl font-bold mb-4">{mode === "add" ? "Add Faculty" : "Edit Faculty"}</h2>
         <div className="mb-4">
           <div className="flex justify-between">
             {Array.from({ length: totalSteps }, (_, i) => (
-              <div
-                key={i}
-                className={`flex-1 h-2 mx-1 rounded ${i + 1 <= step ? 'bg-blue-500' : 'bg-gray-300'}`}
-              />
+              <div key={i} className={`flex-1 h-2 mx-1 rounded ${i + 1 <= step ? "bg-blue-500" : "bg-gray-300"}`} />
             ))}
           </div>
-          <p className="text-sm text-gray-600 mt-2">Step {step} of {totalSteps}</p>
+          <p className="text-sm text-gray-600 mt-2">
+            Step {step} of {totalSteps}
+          </p>
         </div>
 
         {step === 1 && (
@@ -882,7 +932,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 {errors.employmentType && <p className="text-red-500 text-sm mt-1">{errors.employmentType}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Avatar {mode === 'add' ? '*' : '(Optional)'}</label>
+                <label className="block text-sm font-medium mb-1">Avatar {mode === "add" ? "*" : "(Optional)"}</label>
                 <input
                   type="file"
                   name="avatar"
@@ -891,12 +941,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.avatar && <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>}
-                 {faculty.avatar && (
-                  <img
-                    src={bufferToBase64(faculty.avatar)}
-                    alt="Avatar preview"
-                    className="mt-2 w-32 h-32 object-cover rounded-full"
-                  />
+                {faculty.avatar && (
+                  <img src={bufferToBase64(faculty.avatar)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
                 )}
               </div>
             </div>
@@ -916,6 +962,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   onChange={handleQualificationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.degree && <p className="text-red-500 text-sm mt-1">{errors.degree}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Passing Year *</label>
@@ -926,6 +973,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   onChange={handleQualificationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.passingYear && <p className="text-red-500 text-sm mt-1">{errors.passingYear}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">College *</label>
@@ -936,6 +984,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   onChange={handleQualificationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.college && <p className="text-red-500 text-sm mt-1">{errors.college}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Specialization *</label>
@@ -946,20 +995,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   onChange={handleQualificationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {errors.specialization && <p className="text-red-500 text-sm mt-1">{errors.specialization}</p>}
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
-                onClick={addOrUpdateQualification}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {editQualificationId ? 'Update Qualification' : 'Add Qualification'}
+              <button onClick={addOrUpdateQualification} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {editQualificationId ? "Update Qualification" : "Add Qualification"}
               </button>
               {editQualificationId && (
-                <button
-                  onClick={cancelEditQualification}
-                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                >
+                <button onClick={cancelEditQualification} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                   Cancel Edit
                 </button>
               )}
@@ -971,16 +1015,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <li key={q.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {q.degree} - {q.college} ({q.passingYear}) - {q.specialization}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => editQualification(q.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
+                      <button onClick={() => editQualification(q.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
                       </button>
-                      <button
-                        onClick={() => removeQualification(q.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removeQualification(q.id)} className="text-red-500 hover:text-red-700">
                         Remove
                       </button>
                     </div>
@@ -1067,17 +1105,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
-                onClick={addOrUpdatePatent}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {editPatentId ? 'Update Patent' : 'Add Patent'}
+              <button onClick={addOrUpdatePatent} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {editPatentId ? "Update Patent" : "Add Patent"}
               </button>
               {editPatentId && (
-                <button
-                  onClick={cancelEditPatent}
-                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                >
+                <button onClick={cancelEditPatent} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                   Cancel Edit
                 </button>
               )}
@@ -1088,16 +1120,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <li key={p.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {p.title} - {p.applicationNumber}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => editPatent(p.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
+                      <button onClick={() => editPatent(p.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
                       </button>
-                      <button
-                        onClick={() => removePatent(p.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removePatent(p.id)} className="text-red-500 hover:text-red-700">
                         Remove
                       </button>
                     </div>
@@ -1206,17 +1232,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
-                onClick={addOrUpdateBookChapter}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {editBookChapterId ? 'Update Book Chapter' : 'Add Book Chapter'}
+              <button onClick={addOrUpdateBookChapter} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {editBookChapterId ? "Update Book Chapter" : "Add Book Chapter"}
               </button>
               {editBookChapterId && (
-                <button
-                  onClick={cancelEditBookChapter}
-                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                >
+                <button onClick={cancelEditBookChapter} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                   Cancel Edit
                 </button>
               )}
@@ -1227,16 +1247,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <li key={bc.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {bc.title} - {bc.bookTitle}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => editBookChapter(bc.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
+                      <button onClick={() => editBookChapter(bc.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
                       </button>
-                      <button
-                        onClick={() => removeBookChapter(bc.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removeBookChapter(bc.id)} className="text-red-500 hover:text-red-700">
                         Remove
                       </button>
                     </div>
@@ -1323,17 +1337,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
-                onClick={addOrUpdateCertification}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {editCertificationId ? 'Update Certification' : 'Add Certification'}
+              <button onClick={addOrUpdateCertification} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {editCertificationId ? "Update Certification" : "Add Certification"}
               </button>
               {editCertificationId && (
-                <button
-                  onClick={cancelEditCertification}
-                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                >
+                <button onClick={cancelEditCertification} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                   Cancel Edit
                 </button>
               )}
@@ -1344,16 +1352,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <li key={c.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {c.name} - {c.issuingOrganization}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => editCertification(c.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
+                      <button onClick={() => editCertification(c.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
                       </button>
-                      <button
-                        onClick={() => removeCertification(c.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removeCertification(c.id)} className="text-red-500 hover:text-red-700">
                         Remove
                       </button>
                     </div>
@@ -1470,17 +1472,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
-                onClick={addOrUpdateJournalPublication}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {editJournalPublicationId ? 'Update Journal Publication' : 'Add Journal Publication'}
+              <button onClick={addOrUpdateJournalPublication} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {editJournalPublicationId ? "Update Journal Publication" : "Add Journal Publication"}
               </button>
               {editJournalPublicationId && (
-                <button
-                  onClick={cancelEditJournalPublication}
-                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                >
+                <button onClick={cancelEditJournalPublication} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                   Cancel Edit
                 </button>
               )}
@@ -1491,16 +1487,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <li key={jp.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {jp.title} - {jp.journalName}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => editJournalPublication(jp.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
+                      <button onClick={() => editJournalPublication(jp.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
                       </button>
-                      <button
-                        onClick={() => removeJournalPublication(jp.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removeJournalPublication(jp.id)} className="text-red-500 hover:text-red-700">
                         Remove
                       </button>
                     </div>
@@ -1607,17 +1597,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
-                onClick={addOrUpdateConferencePublication}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {editConferencePublicationId ? 'Update Conference Publication' : 'Add Conference Publication'}
+              <button onClick={addOrUpdateConferencePublication} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {editConferencePublicationId ? "Update Conference Publication" : "Add Conference Publication"}
               </button>
               {editConferencePublicationId && (
-                <button
-                  onClick={cancelEditConferencePublication}
-                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                >
+                <button onClick={cancelEditConferencePublication} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                   Cancel Edit
                 </button>
               )}
@@ -1628,16 +1612,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <li key={cp.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {cp.title} - {cp.conferenceName}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => editConferencePublication(cp.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
+                      <button onClick={() => editConferencePublication(cp.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
                       </button>
-                      <button
-                        onClick={() => removeConferencePublication(cp.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                      <button onClick={() => removeConferencePublication(cp.id)} className="text-red-500 hover:text-red-700">
                         Remove
                       </button>
                     </div>
@@ -1649,34 +1627,22 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         )}
 
         <div className="flex justify-between mt-6">
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-          >
+          <button onClick={onClose} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
             Cancel
           </button>
           <div className="flex space-x-2">
             {step > 1 && (
-              <button
-                onClick={handleBack}
-                className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-              >
+              <button onClick={handleBack} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                 Back
               </button>
             )}
             {step > 1 && step < totalSteps && (
-              <button
-                onClick={handleSkip}
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-              >
+              <button onClick={handleSkip} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
                 Skip
               </button>
             )}
-            <button
-              onClick={handleNext}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              {step === totalSteps ? 'Submit' : 'Next'}
+            <button onClick={handleNext} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              {step === totalSteps ? "Submit" : "Next"}
             </button>
           </div>
         </div>
@@ -1689,26 +1655,31 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Page: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
+  const [search, setSearch] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
   const { toast } = useToast();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/faculty`)
       .then((res) => res.json())
-      .then(setFaculties)
-      .catch((error) => console.error('Error fetching faculties:', error));
+      .then((data) => {
+        const sorted = data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setFaculties(sorted);
+      })
+      .catch((error) => console.error("Error fetching faculties:", error));
   }, []);
 
   const handleAddFaculty = () => {
-    setModalMode('add');
+    setModalMode("add");
     setSelectedFaculty(undefined);
     setIsModalOpen(true);
   };
 
   const handleEditFaculty = (faculty: Faculty) => {
-    setModalMode('edit');
+    setModalMode("edit");
     setSelectedFaculty(faculty);
     setIsModalOpen(true);
   };
@@ -1716,16 +1687,16 @@ const Page: React.FC = () => {
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
     const facultyData = { ...faculty, avatar: undefined }; // Remove avatar buffer from data
     const formData = new FormData();
-    formData.append('data', JSON.stringify(facultyData));
+    formData.append("data", JSON.stringify(facultyData));
     if (avatarFile) {
-      formData.append('avatar', avatarFile);
+      formData.append("avatar", avatarFile);
     }
 
-    if (modalMode === 'add') {
+    if (modalMode === "add") {
       fetch(`${API_BASE_URL}/faculty`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
-         credentials: "include"
+        credentials: "include",
       })
         .then((res) => {
           if (!res.ok) {
@@ -1739,19 +1710,19 @@ const Page: React.FC = () => {
           setFaculties([...faculties, newFaculty]);
           setIsModalOpen(false);
           toast({
-            title: 'Success',
-            description: 'Faculty added successfully.',
+            title: "Success",
+            description: "Faculty added successfully.",
           });
         })
         .catch((error) => {
-          console.error('Error adding faculty:', error);
+          console.error("Error adding faculty:", error);
           alert(`Failed to add faculty: ${error.message}`);
         });
     } else {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: formData,
-         credentials: "include"
+        credentials: "include",
       })
         .then((res) => {
           if (!res.ok) {
@@ -1765,12 +1736,12 @@ const Page: React.FC = () => {
           setFaculties(faculties.map((f) => (f.id === updatedFaculty.id ? updatedFaculty : f)));
           setIsModalOpen(false);
           toast({
-            title: 'Success',
-            description: 'Faculty information updated successfully.',
+            title: "Success",
+            description: "Faculty information updated successfully.",
           });
         })
         .catch((error) => {
-          console.error('Error updating faculty:', error);
+          console.error("Error updating faculty:", error);
           alert(`Failed to update faculty: ${error.message}`);
         });
     }
@@ -1778,8 +1749,8 @@ const Page: React.FC = () => {
 
   const handleDeleteFaculty = (id: string) => {
     fetch(`${API_BASE_URL}/faculty/${id}`, {
-      method: 'DELETE',
-      credentials: "include"
+      method: "DELETE",
+      credentials: "include",
     })
       .then((res) => {
         if (!res.ok) {
@@ -1789,15 +1760,25 @@ const Page: React.FC = () => {
         }
         setFaculties(faculties.filter((f) => f.id !== id));
         toast({
-          title: 'Success',
-          description: 'Faculty deleted successfully.',
+          title: "Success",
+          description: "Faculty deleted successfully.",
         });
       })
       .catch((error) => {
-        console.error('Error deleting faculty:', error);
+        console.error("Error deleting faculty:", error);
         alert(`Failed to delete faculty: ${error.message}`);
       });
   };
+
+  // Filter faculties by search and department
+  const filteredFaculties = faculties.filter((faculty) => {
+    const matchesName = faculty.name.toLowerCase().includes(search.toLowerCase());
+    const matchesDept = departmentFilter ? faculty.department === departmentFilter : true;
+    return matchesName && matchesDept;
+  });
+
+  // Get unique departments for dropdown
+  const departmentOptions = Array.from(new Set(faculties.map((f) => f.department))).filter(Boolean);
 
   return (
     <div className="p-4">
@@ -1811,6 +1792,23 @@ const Page: React.FC = () => {
           </Button>
         }
       />
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search by faculty name"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border outline-none rounded p-2 w-full md:w-1/3"
+        />
+        <select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} className="border rounded p-2 w-full md:w-1/4">
+          <option value="">All Departments</option>
+          {departmentOptions.map((dept) => (
+            <option key={dept} value={dept}>
+              {dept}
+            </option>
+          ))}
+        </select>
+      </div>
       <table className="min-w-full border border-gray-200 rounded-lg">
         <thead className="bg-gray-100">
           <tr>
@@ -1825,15 +1823,11 @@ const Page: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {faculties.map((faculty) => (
+          {filteredFaculties.map((faculty) => (
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
                 {faculty.avatar && (
-                  <img
-                    src={bufferToBase64(faculty.avatar)}
-                    alt={`${faculty.name}'s avatar`}
-                    className="w-12 h-12 object-cover rounded"
-                  />
+                  <img src={bufferToBase64(faculty.avatar)} alt={`${faculty.name}'s avatar`} className="w-12 h-12 object-cover rounded" />
                 )}
               </td>
               <td className="border px-4 py-2">{faculty.name}</td>
@@ -1843,25 +1837,19 @@ const Page: React.FC = () => {
               <td className="border px-4 py-2">{faculty.joiningDate}</td>
               <td className="border px-4 py-2">{faculty.employmentType}</td>
               <td className="border px-4 py-2 flex">
-                <button
-                  onClick={() => handleEditFaculty(faculty)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                >
+                <button onClick={() => handleEditFaculty(faculty)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
                   Edit
                 </button>
-                <button
-                  onClick={() => handleDeleteFaculty(faculty.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
+                <button onClick={() => handleDeleteFaculty(faculty.id)} className="bg-red-500 text-white px-2 py-1 rounded">
                   Delete
                 </button>
               </td>
             </tr>
           ))}
-          {faculties.length === 0 && (
+          {filteredFaculties.length === 0 && (
             <tr>
               <td colSpan={9} className="border px-4 py-2 text-center">
-                No faculties added yet.
+                No faculties found.
               </td>
             </tr>
           )}

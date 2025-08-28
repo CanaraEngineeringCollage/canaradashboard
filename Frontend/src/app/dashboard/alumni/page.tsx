@@ -1,6 +1,6 @@
 "use client";
 import { PageTitle } from "@/components/page-title";
-import { ShieldCheck } from "lucide-react";
+import { GraduationCap, ShieldCheck } from "lucide-react";
 import React, { useEffect, useState } from "react";
 // your API fetch function
 
@@ -44,7 +44,7 @@ const AlumniPage = () => {
 
   return (
     <div className="p-6">
-      <PageTitle title="Alumni Network" icon={ShieldCheck} />
+      <PageTitle title="Alumni Network" icon={GraduationCap} />
 
       {loading ? (
         <p>Loading...</p>
