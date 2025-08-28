@@ -124,3 +124,16 @@ export interface AdminProfile {
   email: string;
   avatar?: string;
 }
+
+export interface ScstGrievance {
+  id: number;
+  date: string;
+  name: string;
+  grievance_from: string; // e.g., STUDENT, PARENT, FACULTY
+  contact_number: string;
+  email: string;
+  category: 'SC' | 'ST' | 'OBC' | 'Other'; // SC/ST/OBC/Other
+  nature_of_grievance: string;
+  created_at: string; // timestamp of creation
+}
+
