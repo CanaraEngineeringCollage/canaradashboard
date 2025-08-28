@@ -2,9 +2,11 @@
 
 import { PageTitle } from '@/components/page-title';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { LandPlot, PlusCircle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
+// Interfaces
 interface Faculty {
   id: string;
   name: string;
@@ -109,11 +111,11 @@ const departments = [
   'Computer Science & Business System',
   'Artificial Intelligence & Machine Learning',
   'Placement Team',
-  'other'
+  'other',
 ];
 
 const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
-  const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
+  const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
   const base64 = btoa(binary);
   return `data:image/jpeg;base64,${base64}`;
 };
@@ -140,6 +142,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const [faculty, setFaculty] = useState<Faculty>(initialFaculty);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // Initial states for each section
   const initialQualification: Qualification = {
     id: Math.random().toString(36).substr(2, 9),
     degree: '',
@@ -148,6 +152,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     specialization: '',
   };
   const [newQualification, setNewQualification] = useState<Qualification>(initialQualification);
+  const [editQualificationId, setEditQualificationId] = useState<string | null>(null);
+
   const initialPatent: Patent = {
     id: Math.random().toString(36).substr(2, 9),
     title: '',
@@ -159,6 +165,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     reference: '',
   };
   const [newPatent, setNewPatent] = useState<Patent>(initialPatent);
+  const [editPatentId, setEditPatentId] = useState<string | null>(null);
+
   const initialBookChapter: BookChapter = {
     id: Math.random().toString(36).substr(2, 9),
     title: '',
@@ -172,6 +180,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     pageNumbers: '',
   };
   const [newBookChapter, setNewBookChapter] = useState<BookChapter>(initialBookChapter);
+  const [editBookChapterId, setEditBookChapterId] = useState<string | null>(null);
+
   const initialCertification: Certification = {
     id: Math.random().toString(36).substr(2, 9),
     name: '',
@@ -183,6 +193,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     credits: '',
   };
   const [newCertification, setNewCertification] = useState<Certification>(initialCertification);
+  const [editCertificationId, setEditCertificationId] = useState<string | null>(null);
+
   const initialJournal: JournalPublication = {
     id: Math.random().toString(36).substr(2, 9),
     title: '',
@@ -197,6 +209,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     indexing: '',
   };
   const [newJournalPublication, setNewJournalPublication] = useState<JournalPublication>(initialJournal);
+  const [editJournalPublicationId, setEditJournalPublicationId] = useState<string | null>(null);
+
   const initialConference: ConferencePublication = {
     id: Math.random().toString(36).substr(2, 9),
     title: '',
@@ -210,28 +224,41 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     pageNumbers: '',
   };
   const [newConferencePublication, setNewConferencePublication] = useState<ConferencePublication>(initialConference);
+  const [editConferencePublicationId, setEditConferencePublicationId] = useState<string | null>(null);
 
   useEffect(() => {
     if (mode === 'add') {
       setFaculty(initialFaculty);
       setAvatarFile(null);
       setNewQualification(initialQualification);
+      setEditQualificationId(null);
       setNewPatent(initialPatent);
+      setEditPatentId(null);
       setNewBookChapter(initialBookChapter);
+      setEditBookChapterId(null);
       setNewCertification(initialCertification);
+      setEditCertificationId(null);
       setNewJournalPublication(initialJournal);
+      setEditJournalPublicationId(null);
       setNewConferencePublication(initialConference);
+      setEditConferencePublicationId(null);
       setStep(1);
       setErrors({});
     } else if (mode === 'edit' && facultyToEdit) {
       setFaculty(facultyToEdit);
       setAvatarFile(null);
       setNewQualification(initialQualification);
+      setEditQualificationId(null);
       setNewPatent(initialPatent);
+      setEditPatentId(null);
       setNewBookChapter(initialBookChapter);
+      setEditBookChapterId(null);
       setNewCertification(initialCertification);
+      setEditCertificationId(null);
       setNewJournalPublication(initialJournal);
+      setEditJournalPublicationId(null);
       setNewConferencePublication(initialConference);
+      setEditConferencePublicationId(null);
       setStep(1);
       setErrors({});
     }
@@ -262,46 +289,118 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const handleNext = () => {
     if (step === 2 && newQualification.degree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
-      setFaculty({
-        ...faculty,
-        qualifications: [...faculty.qualifications, { ...newQualification, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewQualification(initialQualification);
+      if (editQualificationId) {
+        setFaculty({
+          ...faculty,
+          qualifications: faculty.qualifications.map((q) =>
+            q.id === editQualificationId ? { ...newQualification, id: q.id } : q
+          ),
+        });
+        setEditQualificationId(null);
+        setNewQualification(initialQualification);
+      } else {
+        setFaculty({
+          ...faculty,
+          qualifications: [...faculty.qualifications, { ...newQualification, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewQualification(initialQualification);
+      }
     }
     if (step === 3 && newPatent.title && newPatent.authors && newPatent.date && newPatent.applicationNumber) {
-      setFaculty({
-        ...faculty,
-        patents: [...(faculty.patents || []), { ...newPatent, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewPatent(initialPatent);
+      if (editPatentId) {
+        setFaculty({
+          ...faculty,
+          patents: (faculty.patents || []).map((p) =>
+            p.id === editPatentId ? { ...newPatent, id: p.id } : p
+          ),
+        });
+        setEditPatentId(null);
+        setNewPatent(initialPatent);
+      } else {
+        setFaculty({
+          ...faculty,
+          patents: [...(faculty.patents || []), { ...newPatent, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewPatent(initialPatent);
+      }
     }
     if (step === 4 && newBookChapter.title && newBookChapter.authors && newBookChapter.bookTitle && newBookChapter.publisher) {
-      setFaculty({
-        ...faculty,
-        bookChapters: [...(faculty.bookChapters || []), { ...newBookChapter, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewBookChapter(initialBookChapter);
+      if (editBookChapterId) {
+        setFaculty({
+          ...faculty,
+          bookChapters: (faculty.bookChapters || []).map((b) =>
+            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
+          ),
+        });
+        setEditBookChapterId(null);
+        setNewBookChapter(initialBookChapter);
+      } else {
+        setFaculty({
+          ...faculty,
+          bookChapters: [...(faculty.bookChapters || []), { ...newBookChapter, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewBookChapter(initialBookChapter);
+      }
     }
     if (step === 5 && newCertification.name && newCertification.issuingOrganization && newCertification.issueDate) {
-      setFaculty({
-        ...faculty,
-        certifications: [...(faculty.certifications || []), { ...newCertification, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewCertification(initialCertification);
+      if (editCertificationId) {
+        setFaculty({
+          ...faculty,
+          certifications: (faculty.certifications || []).map((c) =>
+            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
+          ),
+        });
+        setEditCertificationId(null);
+        setNewCertification(initialCertification);
+      } else {
+        setFaculty({
+          ...faculty,
+          certifications: [...(faculty.certifications || []), { ...newCertification, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewCertification(initialCertification);
+      }
     }
     if (step === 6 && newJournalPublication.title && newJournalPublication.authors && newJournalPublication.journalName) {
-      setFaculty({
-        ...faculty,
-        internationalJournalPublications: [...(faculty.internationalJournalPublications || []), { ...newJournalPublication, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewJournalPublication(initialJournal);
+      if (editJournalPublicationId) {
+        setFaculty({
+          ...faculty,
+          internationalJournalPublications: (faculty.internationalJournalPublications || []).map((j) =>
+            j.id === editJournalPublicationId ? { ...newJournalPublication, id: j.id } : j
+          ),
+        });
+        setEditJournalPublicationId(null);
+        setNewJournalPublication(initialJournal);
+      } else {
+        setFaculty({
+          ...faculty,
+          internationalJournalPublications: [
+            ...(faculty.internationalJournalPublications || []),
+            { ...newJournalPublication, id: Math.random().toString(36).substr(2, 9) },
+          ],
+        });
+        setNewJournalPublication(initialJournal);
+      }
     }
     if (step === 7 && newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
-      setFaculty({
-        ...faculty,
-        internationalConferencePublications: [...(faculty.internationalConferencePublications || []), { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewConferencePublication(initialConference);
+      if (editConferencePublicationId) {
+        setFaculty({
+          ...faculty,
+          internationalConferencePublications: (faculty.internationalConferencePublications || []).map((c) =>
+            c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c
+          ),
+        });
+        setEditConferencePublicationId(null);
+        setNewConferencePublication(initialConference);
+      } else {
+        setFaculty({
+          ...faculty,
+          internationalConferencePublications: [
+            ...(faculty.internationalConferencePublications || []),
+            { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) },
+          ],
+        });
+        setNewConferencePublication(initialConference);
+      }
     }
 
     if (validateStep(step)) {
@@ -338,7 +437,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = {
           type: file.type,
-          data: Array.from(new Uint8Array(arrayBuffer))
+          data: Array.from(new Uint8Array(arrayBuffer)),
         };
         setFaculty({ ...faculty, avatar: buffer });
       } else {
@@ -350,148 +449,328 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     }
   };
 
+  // Qualification Handlers
   const handleQualificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewQualification({ ...newQualification, [name]: value });
   };
 
-  const addQualification = () => {
+  const addOrUpdateQualification = () => {
     if (newQualification.degree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
-      setFaculty({
-        ...faculty,
-        qualifications: [...faculty.qualifications, { ...newQualification, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewQualification(initialQualification);
+      if (editQualificationId) {
+        setFaculty({
+          ...faculty,
+          qualifications: faculty.qualifications.map((q) =>
+            q.id === editQualificationId ? { ...newQualification, id: q.id } : q
+          ),
+        });
+        setEditQualificationId(null);
+        setNewQualification(initialQualification);
+      } else {
+        setFaculty({
+          ...faculty,
+          qualifications: [...faculty.qualifications, { ...newQualification, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewQualification(initialQualification);
+      }
     } else {
       alert('Please fill all required fields for the qualification.');
+    }
+  };
+
+  const editQualification = (id: string) => {
+    const qualification = faculty.qualifications.find((q) => q.id === id);
+    if (qualification) {
+      setNewQualification(qualification);
+      setEditQualificationId(id);
     }
   };
 
   const removeQualification = (id: string) => {
     setFaculty({
       ...faculty,
-      qualifications: faculty.qualifications.filter(q => q.id !== id),
+      qualifications: faculty.qualifications.filter((q) => q.id !== id),
     });
+    if (editQualificationId === id) {
+      setEditQualificationId(null);
+      setNewQualification(initialQualification);
+    }
   };
 
+  const cancelEditQualification = () => {
+    setEditQualificationId(null);
+    setNewQualification(initialQualification);
+  };
+
+  // Patent Handlers
   const handlePatentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewPatent({ ...newPatent, [name]: value });
   };
 
-  const addPatent = () => {
+  const addOrUpdatePatent = () => {
     if (newPatent.title && newPatent.authors && newPatent.date && newPatent.applicationNumber) {
-      setFaculty({
-        ...faculty,
-        patents: [...(faculty.patents || []), { ...newPatent, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewPatent(initialPatent);
+      if (editPatentId) {
+        setFaculty({
+          ...faculty,
+          patents: (faculty.patents || []).map((p) =>
+            p.id === editPatentId ? { ...newPatent, id: p.id } : p
+          ),
+        });
+        setEditPatentId(null);
+        setNewPatent(initialPatent);
+      } else {
+        setFaculty({
+          ...faculty,
+          patents: [...(faculty.patents || []), { ...newPatent, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewPatent(initialPatent);
+      }
     } else {
       alert('Please fill all required fields for the patent.');
+    }
+  };
+
+  const editPatent = (id: string) => {
+    const patent = (faculty.patents || []).find((p) => p.id === id);
+    if (patent) {
+      setNewPatent(patent);
+      setEditPatentId(id);
     }
   };
 
   const removePatent = (id: string) => {
     setFaculty({
       ...faculty,
-      patents: (faculty.patents || []).filter(p => p.id !== id),
+      patents: (faculty.patents || []).filter((p) => p.id !== id),
     });
+    if (editPatentId === id) {
+      setEditPatentId(null);
+      setNewPatent(initialPatent);
+    }
   };
 
+  const cancelEditPatent = () => {
+    setEditPatentId(null);
+    setNewPatent(initialPatent);
+  };
+
+  // Book Chapter Handlers
   const handleBookChapterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target as any;
     setNewBookChapter({ ...newBookChapter, [name]: type === 'checkbox' ? checked : value });
   };
 
-  const addBookChapter = () => {
+  const addOrUpdateBookChapter = () => {
     if (newBookChapter.title && newBookChapter.authors && newBookChapter.bookTitle && newBookChapter.publisher) {
-      setFaculty({
-        ...faculty,
-        bookChapters: [...(faculty.bookChapters || []), { ...newBookChapter, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewBookChapter(initialBookChapter);
+      if (editBookChapterId) {
+        setFaculty({
+          ...faculty,
+          bookChapters: (faculty.bookChapters || []).map((b) =>
+            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
+          ),
+        });
+        setEditBookChapterId(null);
+        setNewBookChapter(initialBookChapter);
+      } else {
+        setFaculty({
+          ...faculty,
+          bookChapters: [...(faculty.bookChapters || []), { ...newBookChapter, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewBookChapter(initialBookChapter);
+      }
     } else {
       alert('Please fill all required fields for the book chapter.');
+    }
+  };
+
+  const editBookChapter = (id: string) => {
+    const bookChapter = (faculty.bookChapters || []).find((b) => b.id === id);
+    if (bookChapter) {
+      setNewBookChapter(bookChapter);
+      setEditBookChapterId(id);
     }
   };
 
   const removeBookChapter = (id: string) => {
     setFaculty({
       ...faculty,
-      bookChapters: (faculty.bookChapters || []).filter(b => b.id !== id),
+      bookChapters: (faculty.bookChapters || []).filter((b) => b.id !== id),
     });
+    if (editBookChapterId === id) {
+      setEditBookChapterId(null);
+      setNewBookChapter(initialBookChapter);
+    }
   };
 
+  const cancelEditBookChapter = () => {
+    setEditBookChapterId(null);
+    setNewBookChapter(initialBookChapter);
+  };
+
+  // Certification Handlers
   const handleCertificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewCertification({ ...newCertification, [name]: value });
   };
 
-  const addCertification = () => {
+  const addOrUpdateCertification = () => {
     if (newCertification.name && newCertification.issuingOrganization && newCertification.issueDate) {
-      setFaculty({
-        ...faculty,
-        certifications: [...(faculty.certifications || []), { ...newCertification, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewCertification(initialCertification);
+      if (editCertificationId) {
+        setFaculty({
+          ...faculty,
+          certifications: (faculty.certifications || []).map((c) =>
+            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
+          ),
+        });
+        setEditCertificationId(null);
+        setNewCertification(initialCertification);
+      } else {
+        setFaculty({
+          ...faculty,
+          certifications: [...(faculty.certifications || []), { ...newCertification, id: Math.random().toString(36).substr(2, 9) }],
+        });
+        setNewCertification(initialCertification);
+      }
     } else {
       alert('Please fill all required fields for the certification.');
+    }
+  };
+
+  const editCertification = (id: string) => {
+    const certification = (faculty.certifications || []).find((c) => c.id === id);
+    if (certification) {
+      setNewCertification(certification);
+      setEditCertificationId(id);
     }
   };
 
   const removeCertification = (id: string) => {
     setFaculty({
       ...faculty,
-      certifications: (faculty.certifications || []).filter(c => c.id !== id),
+      certifications: (faculty.certifications || []).filter((c) => c.id !== id),
     });
+    if (editCertificationId === id) {
+      setEditCertificationId(null);
+      setNewCertification(initialCertification);
+    }
   };
 
+  const cancelEditCertification = () => {
+    setEditCertificationId(null);
+    setNewCertification(initialCertification);
+  };
+
+  // Journal Publication Handlers
   const handleJournalPublicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewJournalPublication({ ...newJournalPublication, [name]: value });
   };
 
-  const addJournalPublication = () => {
+  const addOrUpdateJournalPublication = () => {
     if (newJournalPublication.title && newJournalPublication.authors && newJournalPublication.journalName) {
-      setFaculty({
-        ...faculty,
-        internationalJournalPublications: [...(faculty.internationalJournalPublications || []), { ...newJournalPublication, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewJournalPublication(initialJournal);
+      if (editJournalPublicationId) {
+        setFaculty({
+          ...faculty,
+          internationalJournalPublications: (faculty.internationalJournalPublications || []).map((j) =>
+            j.id === editJournalPublicationId ? { ...newJournalPublication, id: j.id } : j
+          ),
+        });
+        setEditJournalPublicationId(null);
+        setNewJournalPublication(initialJournal);
+      } else {
+        setFaculty({
+          ...faculty,
+          internationalJournalPublications: [
+            ...(faculty.internationalJournalPublications || []),
+            { ...newJournalPublication, id: Math.random().toString(36).substr(2, 9) },
+          ],
+        });
+        setNewJournalPublication(initialJournal);
+      }
     } else {
       alert('Please fill all required fields for the journal publication.');
+    }
+  };
+
+  const editJournalPublication = (id: string) => {
+    const journal = (faculty.internationalJournalPublications || []).find((j) => j.id === id);
+    if (journal) {
+      setNewJournalPublication(journal);
+      setEditJournalPublicationId(id);
     }
   };
 
   const removeJournalPublication = (id: string) => {
     setFaculty({
       ...faculty,
-      internationalJournalPublications: (faculty.internationalJournalPublications || []).filter(j => j.id !== id),
+      internationalJournalPublications: (faculty.internationalJournalPublications || []).filter((j) => j.id !== id),
     });
+    if (editJournalPublicationId === id) {
+      setEditJournalPublicationId(null);
+      setNewJournalPublication(initialJournal);
+    }
   };
 
+  const cancelEditJournalPublication = () => {
+    setEditJournalPublicationId(null);
+    setNewJournalPublication(initialJournal);
+  };
+
+  // Conference Publication Handlers
   const handleConferencePublicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewConferencePublication({ ...newConferencePublication, [name]: value });
   };
 
-  const addConferencePublication = () => {
+  const addOrUpdateConferencePublication = () => {
     if (newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
-      setFaculty({
-        ...faculty,
-        internationalConferencePublications: [...(faculty.internationalConferencePublications || []), { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) }],
-      });
-      setNewConferencePublication(initialConference);
+      if (editConferencePublicationId) {
+        setFaculty({
+          ...faculty,
+          internationalConferencePublications: (faculty.internationalConferencePublications || []).map((c) =>
+            c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c
+          ),
+        });
+        setEditConferencePublicationId(null);
+        setNewConferencePublication(initialConference);
+      } else {
+        setFaculty({
+          ...faculty,
+          internationalConferencePublications: [
+            ...(faculty.internationalConferencePublications || []),
+            { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) },
+          ],
+        });
+        setNewConferencePublication(initialConference);
+      }
     } else {
       alert('Please fill all required fields for the conference publication.');
+    }
+  };
+
+  const editConferencePublication = (id: string) => {
+    const conference = (faculty.internationalConferencePublications || []).find((c) => c.id === id);
+    if (conference) {
+      setNewConferencePublication(conference);
+      setEditConferencePublicationId(id);
     }
   };
 
   const removeConferencePublication = (id: string) => {
     setFaculty({
       ...faculty,
-      internationalConferencePublications: (faculty.internationalConferencePublications || []).filter(c => c.id !== id),
+      internationalConferencePublications: (faculty.internationalConferencePublications || []).filter((c) => c.id !== id),
     });
+    if (editConferencePublicationId === id) {
+      setEditConferencePublicationId(null);
+      setNewConferencePublication(initialConference);
+    }
+  };
+
+  const cancelEditConferencePublication = () => {
+    setEditConferencePublicationId(null);
+    setNewConferencePublication(initialConference);
   };
 
   if (!isOpen) return null;
@@ -548,7 +827,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 >
                   <option value="">Select Department</option>
                   {departments.map((dept) => (
-                    <option key={dept} value={dept}>{dept}</option>
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
                   ))}
                 </select>
                 {errors.department && <p className="text-red-500 text-sm mt-1">{errors.department}</p>}
@@ -610,11 +891,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.avatar && <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>}
-                {faculty.avatar && (
+                 {faculty.avatar && (
                   <img
                     src={bufferToBase64(faculty.avatar)}
                     alt="Avatar preview"
-                    className="mt-2 w-32 h-32 object-cover rounded"
+                    className="mt-2 w-32 h-32 object-cover rounded-full"
                   />
                 )}
               </div>
@@ -667,19 +948,42 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
               </div>
             </div>
-            <button
-              onClick={addQualification}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Qualification
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={addOrUpdateQualification}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {editQualificationId ? 'Update Qualification' : 'Add Qualification'}
+              </button>
+              {editQualificationId && (
+                <button
+                  onClick={cancelEditQualification}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             {errors.qualifications && <p className="text-red-500 text-sm mt-2">{errors.qualifications}</p>}
             {faculty.qualifications.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {faculty.qualifications.map((q) => (
                   <li key={q.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {q.degree} - {q.college} ({q.passingYear}) - {q.specialization}
-                    <button onClick={() => removeQualification(q.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => editQualification(q.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => removeQualification(q.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -762,18 +1066,41 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
               </div>
             </div>
-            <button
-              onClick={addPatent}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Patent
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={addOrUpdatePatent}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {editPatentId ? 'Update Patent' : 'Add Patent'}
+              </button>
+              {editPatentId && (
+                <button
+                  onClick={cancelEditPatent}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             {faculty.patents && faculty.patents.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {faculty.patents.map((p) => (
                   <li key={p.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {p.title} - {p.applicationNumber}
-                    <button onClick={() => removePatent(p.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => editPatent(p.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => removePatent(p.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -878,18 +1205,41 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 </label>
               </div>
             </div>
-            <button
-              onClick={addBookChapter}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Book Chapter
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={addOrUpdateBookChapter}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {editBookChapterId ? 'Update Book Chapter' : 'Add Book Chapter'}
+              </button>
+              {editBookChapterId && (
+                <button
+                  onClick={cancelEditBookChapter}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             {faculty.bookChapters && faculty.bookChapters.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {faculty.bookChapters.map((bc) => (
                   <li key={bc.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {bc.title} - {bc.bookTitle}
-                    <button onClick={() => removeBookChapter(bc.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => editBookChapter(bc.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => removeBookChapter(bc.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -972,18 +1322,41 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
               </div>
             </div>
-            <button
-              onClick={addCertification}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Certification
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={addOrUpdateCertification}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {editCertificationId ? 'Update Certification' : 'Add Certification'}
+              </button>
+              {editCertificationId && (
+                <button
+                  onClick={cancelEditCertification}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             {faculty.certifications && faculty.certifications.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {faculty.certifications.map((c) => (
                   <li key={c.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {c.name} - {c.issuingOrganization}
-                    <button onClick={() => removeCertification(c.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => editCertification(c.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => removeCertification(c.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -1096,18 +1469,41 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
               </div>
             </div>
-            <button
-              onClick={addJournalPublication}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Journal Publication
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={addOrUpdateJournalPublication}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {editJournalPublicationId ? 'Update Journal Publication' : 'Add Journal Publication'}
+              </button>
+              {editJournalPublicationId && (
+                <button
+                  onClick={cancelEditJournalPublication}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             {faculty.internationalJournalPublications && faculty.internationalJournalPublications.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {faculty.internationalJournalPublications.map((jp) => (
                   <li key={jp.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {jp.title} - {jp.journalName}
-                    <button onClick={() => removeJournalPublication(jp.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => editJournalPublication(jp.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => removeJournalPublication(jp.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -1210,18 +1606,41 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
               </div>
             </div>
-            <button
-              onClick={addConferencePublication}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Conference Publication
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={addOrUpdateConferencePublication}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {editConferencePublicationId ? 'Update Conference Publication' : 'Add Conference Publication'}
+              </button>
+              {editConferencePublicationId && (
+                <button
+                  onClick={cancelEditConferencePublication}
+                  className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             {faculty.internationalConferencePublications && faculty.internationalConferencePublications.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {faculty.internationalConferencePublications.map((cp) => (
                   <li key={cp.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
                     {cp.title} - {cp.conferenceName}
-                    <button onClick={() => removeConferencePublication(cp.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => editConferencePublication(cp.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => removeConferencePublication(cp.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -1273,12 +1692,13 @@ const Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/faculty`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setFaculties)
-      .catch(error => console.error('Error fetching faculties:', error));
+      .catch((error) => console.error('Error fetching faculties:', error));
   }, []);
 
   const handleAddFaculty = () => {
@@ -1306,17 +1726,23 @@ const Page: React.FC = () => {
         method: 'POST',
         body: formData,
       })
-        .then(res => {
+        .then((res) => {
           if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.message); });
+            return res.json().then((err) => {
+              throw new Error(err.message);
+            });
           }
           return res.json();
         })
-        .then(newFaculty => {
+        .then((newFaculty) => {
           setFaculties([...faculties, newFaculty]);
           setIsModalOpen(false);
+          toast({
+            title: 'Success',
+            description: 'Faculty added successfully.',
+          });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error adding faculty:', error);
           alert(`Failed to add faculty: ${error.message}`);
         });
@@ -1325,17 +1751,23 @@ const Page: React.FC = () => {
         method: 'PATCH',
         body: formData,
       })
-        .then(res => {
+        .then((res) => {
           if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.message); });
+            return res.json().then((err) => {
+              throw new Error(err.message);
+            });
           }
           return res.json();
         })
-        .then(updatedFaculty => {
-          setFaculties(faculties.map(f => f.id === updatedFaculty.id ? updatedFaculty : f));
+        .then((updatedFaculty) => {
+          setFaculties(faculties.map((f) => (f.id === updatedFaculty.id ? updatedFaculty : f)));
           setIsModalOpen(false);
+          toast({
+            title: 'Success',
+            description: 'Faculty information updated successfully.',
+          });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error updating faculty:', error);
           alert(`Failed to update faculty: ${error.message}`);
         });
@@ -1343,53 +1775,48 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteFaculty = (id: string) => {
-    console.log(id,"id");
-    
-    if (confirm('Are you sure you want to delete this faculty?')) {
-      fetch(`${API_BASE_URL}/faculty/${id}`, {
-        method: 'DELETE',
-      })
-        .then(res => {
-          if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.message); });
-          }
-          setFaculties(faculties.filter(f => f.id !== id));
-        })
-        .catch(error => {
-          console.error('Error deleting faculty:', error);
-          alert(`Failed to delete faculty: ${error.message}`);
+    fetch(`${API_BASE_URL}/faculty/${id}`, {
+      method: 'DELETE',
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(err.message);
+          });
+        }
+        setFaculties(faculties.filter((f) => f.id !== id));
+        toast({
+          title: 'Success',
+          description: 'Faculty deleted successfully.',
         });
-    }
+      })
+      .catch((error) => {
+        console.error('Error deleting faculty:', error);
+        alert(`Failed to delete faculty: ${error.message}`);
+      });
   };
 
-
-  
   return (
     <div className="p-4">
-
-   <PageTitle
-          title="Faculty Management"
-          icon={LandPlot}
-          action={
-            <Button
-          onClick={handleAddFaculty}
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Faculty
-            </Button>
-          }
-        />
-    
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
+      <PageTitle
+        title="Faculty Management"
+        icon={LandPlot}
+        action={
+          <Button onClick={handleAddFaculty}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Faculty
+          </Button>
+        }
+      />
+      <table className="min-w-full border border-gray-200 rounded-lg">
+        <thead className="bg-gray-100">
+          <tr>
             <th className="border px-4 py-2">Avatar</th>
             <th className="border px-4 py-2">Name</th>
             <th className="border px-4 py-2">Designation</th>
             <th className="border px-4 py-2">Department</th>
             <th className="border px-4 py-2">Email</th>
             <th className="border px-4 py-2">Joining Date</th>
-          
             <th className="border px-4 py-2">Employment Type</th>
             <th className="border px-4 py-2">Actions</th>
           </tr>
@@ -1430,7 +1857,9 @@ const Page: React.FC = () => {
           ))}
           {faculties.length === 0 && (
             <tr>
-              <td colSpan={9} className="border px-4 py-2 text-center">No faculties added yet.</td>
+              <td colSpan={9} className="border px-4 py-2 text-center">
+                No faculties added yet.
+              </td>
             </tr>
           )}
         </tbody>
