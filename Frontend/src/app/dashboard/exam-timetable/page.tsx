@@ -225,7 +225,7 @@ export default function DemoAdminUploadModal() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
       method: "POST",
       body: formData,
-      credentials: "include",
+     
     });
 
     if (!res.ok) {
@@ -253,7 +253,7 @@ export default function DemoAdminUploadModal() {
 
   async function handleDelete(id: number) {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables/${id}`, { method: "DELETE", credentials: "include" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete timetable");
       toast({
         title: "Success",
