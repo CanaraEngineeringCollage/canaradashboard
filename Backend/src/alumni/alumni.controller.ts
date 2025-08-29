@@ -12,7 +12,7 @@ export class AlumniController {
   create(@Body() data: CreateAlumniDto) {
     return this.alumniService.create(data);
   }
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.alumniService.findAll();

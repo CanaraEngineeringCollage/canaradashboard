@@ -11,7 +11,7 @@ export class ScstGrievanceController {
   async create(@Body() dto: CreateScstGrievanceDto) {
     return this.scstService.create(dto);
   }
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     return this.scstService.findAll();

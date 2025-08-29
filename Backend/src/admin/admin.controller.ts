@@ -27,13 +27,13 @@ async login(
   return { message: 'Login successful', admin };
 }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('profile')
   profile(@Req() req: Request) {
     return this.adminService.getProfile(req['user'].id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Patch('update')
   update(@Req() req: Request, @Body() dto: UpdateAdminDto) {
     return this.adminService.updateAdmin(req['user'].id, dto);

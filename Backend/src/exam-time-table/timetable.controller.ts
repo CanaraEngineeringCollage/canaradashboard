@@ -18,7 +18,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller('timetables')
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async upload(
@@ -32,7 +32,7 @@ export class TimetableController {
   async findAll() {
     return this.timetableService.findAll();
   }
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number) {
     return this.timetableService.remove(id);

@@ -12,7 +12,7 @@ export class CounsellingController {
   async create(@Body() body: CreateCounsellingDto) {
     return this.counsellingService.create(body);
   }
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     return this.counsellingService.findAll();

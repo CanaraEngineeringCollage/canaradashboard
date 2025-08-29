@@ -11,7 +11,7 @@ export class GrievanceController {
   async create(@Body() createGrievanceDto: CreateGrievanceDto) {
     return this.grievanceService.create(createGrievanceDto);
   }
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     return this.grievanceService.findAll();

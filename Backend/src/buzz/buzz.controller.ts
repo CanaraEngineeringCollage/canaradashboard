@@ -12,12 +12,12 @@ export class BuzzController {
   async getAllBuzz(): Promise<Buzz[]> {
     return this.buzzService.getAllBuzz();
   }
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Post()
   async createBuzz(@Body() createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     return this.buzzService.createBuzz(createBuzzDto);
   }
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateBuzz(
     @Param('id') id: string,
@@ -25,7 +25,7 @@ export class BuzzController {
   ): Promise<Buzz> {
     return this.buzzService.updateBuzz(id, createBuzzDto);
   }
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteBuzz(@Param('id') id: string): Promise<void> {
     return this.buzzService.deleteBuzz(id);
