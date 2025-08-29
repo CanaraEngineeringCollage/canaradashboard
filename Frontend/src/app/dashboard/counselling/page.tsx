@@ -31,7 +31,7 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
       if (fetchData) {
         data = await fetchData();
       } else {
-        const res = await fetch("http://localhost:3000/counselling", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling`, {
           method: "GET",
           credentials: "include", 
         });

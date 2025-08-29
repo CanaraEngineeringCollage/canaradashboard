@@ -50,7 +50,7 @@ export default function DashboardPage() {
   // Load Counselling count
   const fetchCounsellingCount = async () => {
     try {
-      const res = await fetch("http://localhost:3000/counselling");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling`);
       const data = await res.json();
       setCounsellingCount(data.length);
     } catch (error) {
@@ -61,7 +61,7 @@ export default function DashboardPage() {
   // Load Alumni count
   const fetchAlumniCount = async () => {
     try {
-      const res = await fetch("http://localhost:3000/alumni");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`);
       const data = await res.json();
       setAlumniCount(data.length);
     } catch (error) {
