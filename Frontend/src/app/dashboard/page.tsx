@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { UsersRound, Newspaper, FileText, LayoutDashboard } from "lucide-react";
+import { UsersRound, Newspaper, FileText, LayoutDashboard, ShieldCheck, GraduationCap, Brain } from "lucide-react";
 import { initialFaculties, initialBuzzItems, initialInquiries } from "@/lib/data";
 import type { Faculty, Buzz, Inquiry } from "@/lib/types";
 import { getAllBuzz } from "@/lib/buzz";
@@ -50,7 +50,7 @@ export default function DashboardPage() {
   // Load Counselling count
   const fetchCounsellingCount = async () => {
     try {
-      const res = await fetch("http://localhost:3000/counselling");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling`);
       const data = await res.json();
       setCounsellingCount(data.length);
     } catch (error) {
@@ -61,7 +61,7 @@ export default function DashboardPage() {
   // Load Alumni count
   const fetchAlumniCount = async () => {
     try {
-      const res = await fetch("http://localhost:3000/alumni");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`);
       const data = await res.json();
       setAlumniCount(data.length);
     } catch (error) {
@@ -97,21 +97,12 @@ export default function DashboardPage() {
     </CardContent>
   </Card>
 
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium">Grievance Received</CardTitle>
-      <FileText className="h-5 w-5 text-muted-foreground" />
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{grievanceCount}</div>
-      <p className="text-xs text-muted-foreground">Total grievances submitted by website visitors</p>
-    </CardContent>
-  </Card>
+  
 
   <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">SC/ST Grievance Received</CardTitle>
-      <FileText className="h-5 w-5 text-muted-foreground" />
+      <ShieldCheck className="h-5 w-5 text-muted-foreground" />
     </CardHeader>
     <CardContent>
       <div className="text-2xl font-bold">{scstGrievanceCount}</div>
@@ -122,7 +113,7 @@ export default function DashboardPage() {
   <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">Counselling Received</CardTitle>
-      <FileText className="h-5 w-5 text-muted-foreground" />
+      <Brain className="h-5 w-5 text-muted-foreground" />
     </CardHeader>
     <CardContent>
       <div className="text-2xl font-bold">{counsellingCount}</div>
@@ -133,11 +124,21 @@ export default function DashboardPage() {
   <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">Alumni Received</CardTitle>
-      <FileText className="h-5 w-5 text-muted-foreground" />
+      <GraduationCap className="h-5 w-5 text-muted-foreground" />
     </CardHeader>
     <CardContent>
       <div className="text-2xl font-bold">{alumniCount}</div>
       <p className="text-xs text-muted-foreground">Total queries received from alumni</p>
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">Grievance Received</CardTitle>
+      <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{grievanceCount}</div>
+      <p className="text-xs text-muted-foreground">Total grievances submitted by website visitors</p>
     </CardContent>
   </Card>
 </div>

@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const nestRes = await axios.post(
-      'http://localhost:3000/admin/login',
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/login`,
       body,
       { withCredentials: true }
     );

@@ -1,6 +1,6 @@
 "use client";
 import { PageTitle } from "@/components/page-title";
-import { ShieldCheck } from "lucide-react";
+import { GraduationCap, ShieldCheck } from "lucide-react";
 import React, { useEffect, useState } from "react";
 // your API fetch function
 
@@ -24,7 +24,7 @@ const AlumniPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-  const res = await fetch("http://localhost:3000/alumni", { method: "GET" });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`, { method: "GET",credentials:"include" });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
         // sort by createdAt descending
@@ -44,7 +44,7 @@ const AlumniPage = () => {
 
   return (
     <div className="p-6">
-      <PageTitle title="Alumni Network" icon={ShieldCheck} />
+      <PageTitle title="Alumni Network" icon={GraduationCap} />
 
       {loading ? (
         <p>Loading...</p>

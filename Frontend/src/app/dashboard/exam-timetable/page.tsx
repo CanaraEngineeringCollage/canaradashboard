@@ -1,6 +1,7 @@
 "use client";
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { BookOpenCheck, PlusCircle } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -214,29 +215,34 @@ export default function DemoAdminUploadModal() {
   const [timetables, setTimetables] = useState<Timetable[]>([]);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { toast } = useToast();
 
   async function handleSubmit(payload: UploadPayload) {
     const formData = new FormData();
     formData.append("academicYear", payload.academicYear);
     formData.append("file", payload.file);
 
-    const res = await fetch("http://localhost:3000/timetables", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
       method: "POST",
       body: formData,
+      credentials: "include",
     });
 
     if (!res.ok) {
       throw new Error("Failed to upload timetable");
     }
 
-    alert("Uploaded successfully!");
+    toast({
+      title: "Success",
+      description: "Timetable Uploaded successfully!",
+    });
     setOpen(false);
     getTimetables(); // refresh after upload
   }
 
   async function getTimetables() {
     try {
-      const res = await fetch("http://localhost:3000/timetables", { method: "GET" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, { method: "GET" });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
       setTimetables(data);
@@ -247,9 +253,12 @@ export default function DemoAdminUploadModal() {
 
   async function handleDelete(id: number) {
     try {
-      const res = await fetch(`http://localhost:3000/timetables/${id}`, { method: "DELETE" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables/${id}`, { method: "DELETE", credentials: "include" });
       if (!res.ok) throw new Error("Failed to delete timetable");
-      alert("Deleted successfully!");
+      toast({
+        title: "Success",
+        description: "Timetable deleted successfully.",
+      });
       setTimetables((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
       console.error(error);
@@ -339,13 +348,7 @@ export default function DemoAdminUploadModal() {
   );
 }
 
-function DeleteConfirmationModal({
-  isOpen,
-  id,
-  onClose,
-  onConfirm,
-  itemName = "this item",
-}: DeleteConfirmationModalProps) {
+function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "this item" }: DeleteConfirmationModalProps) {
   if (!isOpen || !id) return null;
 
   return (
@@ -356,16 +359,10 @@ function DeleteConfirmationModal({
           Are you sure you want to delete <strong>{itemName}</strong>? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300"
-          >
+          <button onClick={onClose} className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300">
             Cancel
           </button>
-          <button
-            onClick={() => onConfirm(id)}
-            className="px-4 py-2 rounded-md text-sm bg-red-600 text-white hover:bg-red-700"
-          >
+          <button onClick={() => onConfirm(id)} className="px-4 py-2 rounded-md text-sm bg-red-600 text-white hover:bg-red-700">
             Delete
           </button>
         </div>

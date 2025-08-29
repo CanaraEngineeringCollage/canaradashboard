@@ -16,7 +16,7 @@ async function bootstrap() {
  
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:9002', 'http://localhost:3000'],
+    origin: [`${process.env.NEXT_PUBLIC_FRONTEND_URL}`],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -37,7 +37,6 @@ async function bootstrap() {
   await app.listen(3000);
   console.log(`🚀 Server is running on http://localhost:3000/api`);
 }
-
 bootstrap();
 
 
