@@ -24,23 +24,7 @@ async loginWithoutRes(email: string, password: string) {
   console.log('🔹 Admin found in DB:', admin);
 
   // If no admin exists, seed the default admin
-  if (!admin) {
-    console.log('⚠️ No admin found, seeding default admin...');
-    const hashedPassword = await bcrypt.hash('123456', 10);
-    admin = this.adminRepo.create({
-      name: 'Admin',
-      email: 'admin@example.com',
-      password: hashedPassword,
-    });
-    await this.adminRepo.save(admin);
-    console.log('✅ Default admin seeded:', admin);
-
-    // If email matches seeded admin, override password for login
-    if (email === 'admin@example.com') {
-      password = '123456';
-      console.log('🔹 Overriding password for seeded admin:', password);
-    }
-  }
+  if (!admin) throw new UnauthorizedException('Invalid email or password');
 
   // Compare password with hash
   const isMatch = await bcrypt.compare(password, admin.password);
@@ -98,10 +82,9 @@ async updateAdmin(id: number, dto: UpdateAdminDto) {
 }
 
 
-  async logout(res: any) {
-    res.clearCookie('jwt');
-    return res.json({ message: 'Logged out' });
-  }
+async logout() {
+  return { message: 'Logged out successfully' };
+}
 
   async seedAdmin() {
     const exists = await this.adminRepo.findOne({ where: { email: 'admin@example.com' } });

@@ -40,9 +40,18 @@ async login(
   }
 
   @Post('logout')
-  logout(@Res() res: Response) {
-    return this.adminService.logout(res);
+  async logout(@Res({ passthrough: true }) res: Response) {
+    // Clear the JWT cookie
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+  
+    // Return JSON response via service
+    return this.adminService.logout();
   }
+  
 
   @Get('seed')
   seed() {
