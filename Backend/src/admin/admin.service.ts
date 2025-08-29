@@ -15,23 +15,17 @@ export class AdminService {
     private jwtService: JwtService,
   ) {}
 
-  async login(email: string, password: string, res: any) {
-    const admin = await this.adminRepo.findOne({ where: { email } });
-    
-    
-    if (!admin) throw new UnauthorizedException('Invalid email or password');
+async loginWithoutRes(email: string, password: string) {
+  const admin = await this.adminRepo.findOne({ where: { email } });
+  if (!admin) throw new UnauthorizedException('Invalid email or password');
 
-    const isMatch = await bcrypt.compare(password, admin.password);
-    
-    if (!isMatch) throw new UnauthorizedException('Invalid email or password');
+  const isMatch = await bcrypt.compare(password, admin.password);
+  if (!isMatch) throw new UnauthorizedException('Invalid email or password');
 
-    const token = this.jwtService.sign({ id: admin.id, email: admin.email });
-    
+  const token = this.jwtService.sign({ id: admin.id, email: admin.email });
 
-    res.cookie('jwt', token, { httpOnly: true, secure: false });
-    
-    return res.json({ message: 'Login successful',admin });
-  }
+  return { admin, token };
+}
 
  async getProfile(id: number) {
   const admin = await this.adminRepo.findOne({ where: { id } });

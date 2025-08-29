@@ -11,10 +11,21 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post('login')
-  login(@Body() dto: LoginDto, @Res() res: Response) {
-    return this.adminService.login(dto.email, dto.password, res);
-  }
+@Post('login')
+async login(
+  @Body() dto: LoginDto,
+  @Res({ passthrough: true }) res: Response,
+) {
+  const { admin, token } = await this.adminService.loginWithoutRes(dto.email, dto.password);
+
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+
+  return { message: 'Login successful', admin };
+}
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')

@@ -1,11 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-<<<<<<< HEAD
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-=======
 import * as cookieParser from 'cookie-parser';
-
->>>>>>> f6965bb370ccab7dcdd7fa971ecf17e36748a121
 
 async function bootstrap() {
   console.log('🚀 Bootstrapping NestJS...');
