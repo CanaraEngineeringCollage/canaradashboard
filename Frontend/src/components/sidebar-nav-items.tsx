@@ -23,8 +23,8 @@ const navItems: NavItem[] = [
     { href: "/dashboard/alumni", label: "alumni", icon: GraduationCap },
    { href: "/dashboard/counselling", label: "Counselling", icon: Brain },
   { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
-    { href: "/dashboard/sc-st-grievance", label: "Sc-St Grievance", icon: ShieldCheck },
-  { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },
+    { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
+  // { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },
   { href: "/dashboard/profile", label: "Profile", icon: UserCog },
 ];
 

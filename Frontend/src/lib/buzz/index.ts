@@ -18,12 +18,14 @@ export const getAllBuzz = () => {
 export const deleteBuzz = (id: string) => {
   return apiFetch(`/buzz/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 };
 
 export const createBuzz = (content: string, design: object, category: string,eventDate:string) => {
   return apiFetch("/buzz", {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -34,6 +36,7 @@ export const createBuzz = (content: string, design: object, category: string,eve
 export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string) => {
   return apiFetch(`/buzz/${id}`, {
     method: "PATCH",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

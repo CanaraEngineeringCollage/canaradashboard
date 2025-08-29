@@ -24,29 +24,38 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        let data: CounsellingType[] = [];
-        if (fetchData) {
-          data = await fetchData();
-        } else {
-          const res = await fetch("http://localhost:3000/counselling");
-          data = await res.json();
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      let data: CounsellingType[] = [];
+      if (fetchData) {
+        data = await fetchData();
+      } else {
+        const res = await fetch("http://localhost:3000/counselling", {
+          method: "GET",
+          credentials: "include", 
+        });
+        if (!res.ok) {
+          throw new Error("Failed to fetch counselling data");
         }
-        // Sort latest first
-        const sorted = data.sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setCounsellingData(sorted);
-      } catch (err) {
-        console.error("Failed to fetch counselling data", err);
+        data = await res.json();
       }
-      setLoading(false);
-    };
 
-    loadData();
-  }, [fetchData]);
+      // Sort latest first
+      const sorted = data.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setCounsellingData(sorted);
+    } catch (err) {
+      console.error("Failed to fetch counselling data", err);
+    }
+    setLoading(false);
+  };
+
+  loadData();
+}, [fetchData]);
+
 
   return (
     <div className="p-6">

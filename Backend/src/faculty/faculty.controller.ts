@@ -11,16 +11,20 @@ import {
   UploadedFile,
   NotFoundException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';   // ✅ import guard
 
 @Controller('faculty')
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
+  // ✅ Only logged-in admin can create
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
@@ -38,11 +42,13 @@ export class FacultyController {
     }
   }
 
+  // Public – Anyone can view faculty list
   @Get()
   async findAll() {
     return await this.facultyService.findAll();
   }
 
+  // Public – Anyone can view one faculty
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const faculty = await this.facultyService.findOne(id);
@@ -52,6 +58,8 @@ export class FacultyController {
     return faculty;
   }
 
+  // ✅ Only logged-in admin can update
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   async update(
@@ -70,6 +78,8 @@ export class FacultyController {
     }
   }
 
+  // ✅ Only logged-in admin can delete
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.facultyService.remove(id);
