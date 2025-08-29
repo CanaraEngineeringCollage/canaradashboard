@@ -16,15 +16,51 @@ export class AdminService {
   ) {}
 
 async loginWithoutRes(email: string, password: string) {
-  const admin = await this.adminRepo.findOne({ where: { email } });
-  if (!admin) throw new UnauthorizedException('Invalid email or password');
+  console.log('🔹 Login attempt with email:', email);
+  console.log('🔹 Password received from POST request:', password);
 
+  // Check if admin exists
+  let admin = await this.adminRepo.findOne({ where: { email } });
+  console.log('🔹 Admin found in DB:', admin);
+
+  // If no admin exists, seed the default admin
+  if (!admin) {
+    console.log('⚠️ No admin found, seeding default admin...');
+    const hashedPassword = await bcrypt.hash('123456', 10);
+    admin = this.adminRepo.create({
+      name: 'Admin',
+      email: 'admin@example.com',
+      password: hashedPassword,
+    });
+    await this.adminRepo.save(admin);
+    console.log('✅ Default admin seeded:', admin);
+
+    // If email matches seeded admin, override password for login
+    if (email === 'admin@example.com') {
+      password = '123456';
+      console.log('🔹 Overriding password for seeded admin:', password);
+    }
+  }
+
+  // Compare password with hash
   const isMatch = await bcrypt.compare(password, admin.password);
-  if (!isMatch) throw new UnauthorizedException('Invalid email or password');
+  console.log('🔹 Password comparison result:', isMatch);
 
+  if (!isMatch) {
+    console.log('❌ Password mismatch!');
+    throw new UnauthorizedException('Invalid email or password');
+  }
+
+  // Sign JWT
   const token = this.jwtService.sign({ id: admin.id, email: admin.email });
+  console.log('🔹 JWT generated:', token);
 
-  return { admin, token };
+  // Return admin info including the real password sent in POST
+  console.log('🔹 Returning admin info with password for testing');
+  return { 
+    admin: { email: admin.email, name: admin.name, password }, 
+    token 
+  };
 }
 
  async getProfile(id: number) {
