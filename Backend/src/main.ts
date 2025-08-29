@@ -11,11 +11,11 @@ async function bootstrap() {
 
  
   app.use(cookieParser());
-  app.enableCors({
-    origin: [`${process.env.NEXT_PUBLIC_FRONTEND_URL}`],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+app.enableCors({
+  origin:'https://canaradashboard-aooq.vercel.app',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+});
 
   // ✅ Swagger setup
   const config = new DocumentBuilder()
