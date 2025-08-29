@@ -17,14 +17,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';   // ✅ import guard
+
 
 @Controller('faculty')
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
   // ✅ Only logged-in admin can create
-  @UseGuards(JwtAuthGuard)
+
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
@@ -59,7 +59,7 @@ export class FacultyController {
   }
 
   // ✅ Only logged-in admin can update
-  @UseGuards(JwtAuthGuard)
+ 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   async update(
@@ -79,7 +79,7 @@ export class FacultyController {
   }
 
   // ✅ Only logged-in admin can delete
-  @UseGuards(JwtAuthGuard)
+ 
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.facultyService.remove(id);
