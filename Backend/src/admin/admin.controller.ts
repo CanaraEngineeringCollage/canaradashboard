@@ -42,10 +42,12 @@ async login(
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     // Clear the JWT cookie
+    console.log("logout")
     res.clearCookie('jwt', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
+      path: '/', // must match the path when cookie was set
     });
   
     // Return JSON response via service
