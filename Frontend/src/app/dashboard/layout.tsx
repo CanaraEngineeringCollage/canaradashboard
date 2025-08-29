@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   
   const logoutHandler = async () => {
     const res = await axios.post(
-      "http://localhost:3000/admin/logout",
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/logout`,
       {},
       {
         withCredentials: true,

@@ -222,7 +222,7 @@ export default function DemoAdminUploadModal() {
     formData.append("academicYear", payload.academicYear);
     formData.append("file", payload.file);
 
-    const res = await fetch("http://localhost:3000/timetables", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
       method: "POST",
       body: formData,
       credentials: "include",
@@ -242,7 +242,7 @@ export default function DemoAdminUploadModal() {
 
   async function getTimetables() {
     try {
-      const res = await fetch("http://localhost:3000/timetables", { method: "GET" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, { method: "GET" });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
       setTimetables(data);
@@ -253,7 +253,7 @@ export default function DemoAdminUploadModal() {
 
   async function handleDelete(id: number) {
     try {
-      const res = await fetch(`http://localhost:3000/timetables/${id}`, { method: "DELETE", credentials: "include" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables/${id}`, { method: "DELETE", credentials: "include" });
       if (!res.ok) throw new Error("Failed to delete timetable");
       toast({
         title: "Success",
