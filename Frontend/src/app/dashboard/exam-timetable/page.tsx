@@ -220,17 +220,24 @@ export default function DemoAdminUploadModal() {
 
   // In your DemoAdminUploadModal.tsx file
 
+// In your DemoAdminUploadModal.tsx file
+
 async function handleSubmit(payload: UploadPayload) {
   const formData = new FormData();
   formData.append("academicYear", payload.academicYear);
   formData.append("file", payload.file);
 
   try {
-    await createTimeTable(formData);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
+      method: "POST",
+      body: formData,
+      // Add this line to send the authentication cookie automatically
+      credentials: "include", 
+    });
 
-    // if (!res.ok) {
-    //   throw new Error(`Server responded with ${res.status}`);
-    // }
+    if (!res.ok) {
+      throw new Error(`Server responded with ${res.status}`);
+    }
 
     toast({
       title: "Success",
