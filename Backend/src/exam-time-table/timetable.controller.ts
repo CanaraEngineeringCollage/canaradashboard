@@ -7,11 +7,11 @@ import {
   Body,
   UploadedFile,
   UseInterceptors,
-  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TimetableService } from './timetable.service';
 import { CreateTimetableDto } from './dto/timetable.dto';
+import { Public } from 'src/auth/public.decorator';
 
 
 
@@ -21,6 +21,7 @@ export class TimetableController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @Public()
   async upload(
     @Body() body: CreateTimetableDto,
     @UploadedFile() file: Express.Multer.File,
@@ -34,6 +35,7 @@ export class TimetableController {
   }
 
   @Delete(':id')
+  @Public()
   async remove(@Param('id') id: number) {
     return this.timetableService.remove(id);
   }

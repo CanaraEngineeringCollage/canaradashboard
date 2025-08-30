@@ -1,5 +1,5 @@
 // src/alumni/alumni.controller.ts
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { AlumniService } from './alumni.service';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
 
