@@ -16,8 +16,8 @@ export interface Buzz {
 //   return apiFetch(`/events/${id}`, { method: 'DELETE' });
 // };
 
-export const createEvent = (formData: FormData) => {
-  return apiFetch('/events', {
+export const createTimeTable = (formData: FormData) => {
+  return apiFetch('/timetables', {
     method: 'POST',
     body: formData,
   });
