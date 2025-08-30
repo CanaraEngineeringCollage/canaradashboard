@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post, Patch, Delete, Param, UseGuards } from '@n
 import { BuzzService } from './buzz.service';
 import { Buzz } from './entities/buzz.entity';
 import { CreateBuzzDto } from './dto/create-buzz.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('buzz')
 export class BuzzController {
@@ -12,12 +11,10 @@ export class BuzzController {
   async getAllBuzz(): Promise<Buzz[]> {
     return this.buzzService.getAllBuzz();
   }
-// @UseGuards(JwtAuthGuard)
   @Post()
   async createBuzz(@Body() createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     return this.buzzService.createBuzz(createBuzzDto);
   }
-// @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateBuzz(
     @Param('id') id: string,
@@ -25,7 +22,6 @@ export class BuzzController {
   ): Promise<Buzz> {
     return this.buzzService.updateBuzz(id, createBuzzDto);
   }
-// @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteBuzz(@Param('id') id: string): Promise<void> {
     return this.buzzService.deleteBuzz(id);
