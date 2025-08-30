@@ -12,7 +12,10 @@ async function bootstrap() {
  
   app.use(cookieParser());
 app.enableCors({
-  origin:'https://canaradashboard-aooq.vercel.app',
+  origin: [
+    'https://canaradashboard-aooq.vercel.app', // Your existing origin
+    'http://localhost:3000'                     // Add your new origin here
+  ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 });
