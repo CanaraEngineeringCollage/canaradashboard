@@ -4,7 +4,6 @@ import { ConfigModule } from '@nestjs/config';
 import { BuzzModule } from './buzz/buzz.module';
 import { EventModule } from './events/events.module';
 import { AdminModule } from './admin/admin.module';
-import { AuthModule } from './auth/auth.module';
 import { FacultyModule } from './faculty/faculty.module';
 import { GrievanceModule } from './grievance/grievance.module';
 import { ScstGrievanceModule } from './sc-st-grievance/scst-grievance.module';
@@ -33,7 +32,6 @@ import { AlumniModule } from './alumni/alumni.module';
     BuzzModule,
     EventModule,
     AdminModule,
-    AuthModule,
     FacultyModule,
     GrievanceModule,
     ScstGrievanceModule,

@@ -5,7 +5,6 @@ import { AdminService } from './admin.service';
 import { Response, Request } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('admin')
 export class AdminController {
