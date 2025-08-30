@@ -2,6 +2,7 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { createTimeTable } from "@/lib/time-table";
 import { BookOpenCheck, PlusCircle } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -217,19 +218,25 @@ export default function DemoAdminUploadModal() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { toast } = useToast();
 
-  async function handleSubmit(payload: UploadPayload) {
-    const formData = new FormData();
-    formData.append("academicYear", payload.academicYear);
-    formData.append("file", payload.file);
+  // In your DemoAdminUploadModal.tsx file
 
+// In your DemoAdminUploadModal.tsx file
+
+async function handleSubmit(payload: UploadPayload) {
+  const formData = new FormData();
+  formData.append("academicYear", payload.academicYear);
+  formData.append("file", payload.file);
+
+  try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
       method: "POST",
       body: formData,
-     
+      // Add this line to send the authentication cookie automatically
+      credentials: "include", 
     });
 
     if (!res.ok) {
-      throw new Error("Failed to upload timetable");
+      throw new Error(`Server responded with ${res.status}`);
     }
 
     toast({
@@ -238,8 +245,16 @@ export default function DemoAdminUploadModal() {
     });
     setOpen(false);
     getTimetables(); // refresh after upload
-  }
 
+  } catch (error) {
+    console.error("Upload failed:", error);
+    toast({
+      variant: "destructive",
+      title: "Upload Failed",
+      description: "Please check your connection or log in again.",
+    });
+  }
+}
   async function getTimetables() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, { method: "GET" });
