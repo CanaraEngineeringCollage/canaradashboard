@@ -218,20 +218,49 @@ export default function DemoAdminUploadModal() {
   const { toast } = useToast();
 
   async function handleSubmit(payload: UploadPayload) {
+    // 1. Get the token from local storage (or wherever you store it)
+    const token = localStorage.getItem("admin_token"); // Or whatever you named the key
+  
+    if (!token) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "You are not logged in. Please log in and try again.",
+      });
+      return; // Stop the function if the user is not logged in
+    }
+  
     const formData = new FormData();
     formData.append("academicYear", payload.academicYear);
     formData.append("file", payload.file);
-
+  
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
       method: "POST",
+      // 2. Add the headers object with the Authorization token
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
       body: formData,
-     
     });
-
+  
     if (!res.ok) {
+      // Check if the error is specifically an authorization error
+      if (res.status === 401) {
+        toast({
+          variant: "destructive",
+          title: "Unauthorized",
+          description: "Your session may have expired. Please log out and log in again.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Upload Failed",
+          description: "An error occurred while uploading the timetable.",
+        });
+      }
       throw new Error("Failed to upload timetable");
     }
-
+  
     toast({
       title: "Success",
       description: "Timetable Uploaded successfully!",
@@ -239,7 +268,6 @@ export default function DemoAdminUploadModal() {
     setOpen(false);
     getTimetables(); // refresh after upload
   }
-
   async function getTimetables() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, { method: "GET" });
