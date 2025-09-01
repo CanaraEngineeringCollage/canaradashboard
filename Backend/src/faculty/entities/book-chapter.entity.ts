@@ -7,31 +7,9 @@ export class BookChapter {
   id: string;
 
   @Column()
-  title: string;
+  bookChapterData: string;
 
-  @Column()
-  authors: string;
 
-  @Column()
-  bookTitle: string;
-
-  @Column()
-  publisher: string;
-
-  @Column({ nullable: true })
-  publicationYear: string;
-
-  @Column({ nullable: true })
-  doi: string;
-
-  @Column({ nullable: true })
-  isbn: string;
-
-  @Column({ default: false })
-  scopusIndexed: boolean;
-
-  @Column({ nullable: true })
-  pageNumbers: string;
 
   @ManyToOne(() => Faculty, (faculty) => faculty.bookChapters,{
     onDelete: 'CASCADE',

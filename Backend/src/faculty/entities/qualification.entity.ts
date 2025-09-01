@@ -18,7 +18,10 @@ export class Qualification {
   @Column()
   specialization: string;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.qualifications,{
+  @Column()
+  nameOfDigree: string;
+
+  @ManyToOne(() => Faculty, (faculty) => faculty.qualifications, {
     onDelete: 'CASCADE',
   })
   faculty: Faculty;
