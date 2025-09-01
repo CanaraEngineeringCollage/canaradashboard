@@ -10,7 +10,7 @@ async function bootstrap() {
   console.log('✅ NestJS application created');
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:9002', 'https://canaradashboard-aooq.vercel.app/'],
+    origin: ['http://localhost:9002', 'https://canaradashboard-aooq.vercel.app/','http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
