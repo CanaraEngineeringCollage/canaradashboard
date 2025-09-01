@@ -7,25 +7,9 @@ export class Certification {
   id: string;
 
   @Column()
-  name: string;
+  certifications: string;
 
-  @Column()
-  issuingOrganization: string;
-
-  @Column({ type: 'date' })
-  issueDate: Date;
-
-  @Column({ type: 'date', nullable: true })
-  expiryDate: Date;
-
-  @Column({ nullable: true })
-  credentialId: string;
-
-  @Column({ nullable: true })
-  credentialUrl: string;
-
-  @Column({ nullable: true })
-  credits: string;
+  
 
   @ManyToOne(() => Faculty, (faculty) => faculty.certifications,{
     onDelete: 'CASCADE',
