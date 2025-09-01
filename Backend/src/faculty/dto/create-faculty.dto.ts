@@ -11,13 +11,16 @@ export class CreateQualificationDto {
   @IsString()
   college: string;
 
+   @IsString()
+  nameOfDigree: string;
+
   @IsString()
   specialization: string;
 }
 
 export class CreatePatentDto {
   @IsString()
-  title: string;
+  patentData: string;
 
   @IsString()
   authors: string;

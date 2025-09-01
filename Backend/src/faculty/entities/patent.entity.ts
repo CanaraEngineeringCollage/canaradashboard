@@ -7,7 +7,7 @@ export class Patent {
   id: string;
 
   @Column()
-  title: string;
+  patentData: string;
 
   @Column()
   authors: string;
