@@ -10,7 +10,7 @@ async function bootstrap() {
   console.log('✅ NestJS application created');
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:9002', 'http://localhost:3001'],
+    origin: ['http://localhost:9002', 'http://localhost:3001','http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
