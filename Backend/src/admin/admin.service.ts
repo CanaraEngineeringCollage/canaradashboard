@@ -28,7 +28,12 @@ export class AdminService {
     const token = this.jwtService.sign({ id: admin.id, email: admin.email });
     
 
-    res.cookie('jwt', token, { httpOnly: true, secure: false });
+   res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: false, // change to true when using https
+    sameSite: 'lax',
+    domain: "http://13.201.229.9", // 👈 use env for flexibility
+  });
     
     return res.json({ message: 'Login successful',admin });
   }
