@@ -10,6 +10,7 @@ import { ScstGrievanceModule } from './sc-st-grievance/scst-grievance.module';
 import { TimetableModule } from './exam-time-table/timetable.module';
 import { CounsellingModule } from './counselling/counselling.module';
 import { AlumniModule } from './alumni/alumni.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AlumniModule } from './alumni/alumni.module';
     BuzzModule,
     EventModule,
     AdminModule,
+    AuthModule,
     FacultyModule,
     GrievanceModule,
     ScstGrievanceModule,
