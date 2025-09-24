@@ -30,10 +30,12 @@ export class AdminService {
 
 res.cookie('jwt', token, {
   httpOnly: true,
-  secure: false, // true if using HTTPS
-  sameSite: 'lax', // 'lax' allows sending cookie for frontend requests
- 
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  domain: "http://13.233.88.75",
+  maxAge: 24 * 60 * 60 * 1000, // 1 day
 });
+
     
     return res.json({ message: 'Login successful',admin });
   }
