@@ -30,10 +30,10 @@ export class AdminService {
 
 res.cookie('jwt', token, {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-  domain: "http://13.233.88.75",
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
+  secure: process.env.NODE_ENV === 'production',  // true on AWS
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' for cross-site
+  maxAge: 24 * 60 * 60 * 1000,
+  path: '/',
 });
 
     
@@ -76,7 +76,12 @@ async updateAdmin(id: number, dto: UpdateAdminDto) {
 
 
   async logout(res: any) {
-    res.clearCookie('jwt');
+res.clearCookie('jwt', {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  path: '/',
+});
     return res.json({ message: 'Logged out' });
   }
 
