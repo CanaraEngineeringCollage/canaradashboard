@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const nestRes = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/login`,
+      `https://testapi.megamind.studio/admin/login`,
       body,
       { withCredentials: true }
     );

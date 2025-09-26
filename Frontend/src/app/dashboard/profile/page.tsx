@@ -38,7 +38,7 @@ export default function ProfilePage() {
   });
 
   const updateAdminProfile = async (data: any) => {
-    const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/admin/update`, data, {
+    const response = await axios.patch(`https://testapi.megamind.studio/admin/update`, data, {
       withCredentials: true, // send cookie
     });
     return response.data;

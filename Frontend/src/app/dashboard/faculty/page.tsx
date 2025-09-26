@@ -1651,7 +1651,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   );
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = "https://testapi.megamind.studio";
 
 const Page: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);

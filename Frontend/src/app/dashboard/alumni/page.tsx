@@ -24,7 +24,7 @@ const AlumniPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`, { method: "GET",credentials:"include" });
+  const res = await fetch(`https://testapi.megamind.studio/alumni`, { method: "GET",credentials:"include" });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
         // sort by createdAt descending

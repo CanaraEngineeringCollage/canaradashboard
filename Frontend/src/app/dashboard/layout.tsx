@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 const logoutHandler = async () => {
   try {
     const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/logout`,
+      `https://testapi.megamind.studio/admin/logout`,
       {},
       {
         withCredentials: true,

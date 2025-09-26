@@ -23,7 +23,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     setIsLoading(true);
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/login`, form, {
+    const res = await axios.post(`https://testapi.megamind.studio/admin/login`, form, {
       withCredentials: true,
     });
 
