@@ -18,33 +18,53 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      setIsLoading(true);
-      const res = await axios.post("/api/auth/login", form);
+  try {
+    setIsLoading(true);
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/login`, form, {
+      withCredentials: true,
+    });
 
-      if (res.status === 200) router.push("/dashboard");
-      dispatch(
-        setAdmin({
-          name: res.data.data.admin.name,
-          email: res.data.data.admin.email,
-        })
-      );
-      setIsLoading(false);
+    console.log('Response Status:', res.status);
+    console.log('Response Data:', res.data);
 
-      toast({
-        title: "Success",
-        description: "Logged successfully.",
+    if (res.status === 200 || res.status === 201) {
+      if (res.data.message === 'Login successful') {
+           toast({
+        title: 'Success',
+        description: 'Logged successfully.',
       });
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Login failed");
+  
+          console.log('Attempting navigation to /dashboard');
+          console.log('Cookies after login:', document.cookie);
+          router.push('/dashboard');
+        dispatch(
+          setAdmin({
+            name: res.data.admin?.name || res.data.name,
+            email: res.data.admin?.email || res.data.email,
+          })
+        );
+        console.log('Dispatched Admin:', {
+          name: res.data.admin?.name || res.data.name,
+          email: res.data.admin?.email || res.data.email,
+        });
+        setIsLoading(false);
+      } else {
+        throw new Error(res.data.message || 'Unexpected response');
+      }
+    } else {
+      throw new Error(`Unexpected status: ${res.status}`);
     }
-    finally{
-      setIsLoading(false);
-    }
-  };
+  } catch (err: any) {
+    console.error('Error:', err.response?.data?.message || err.message || 'Login failed');
+    setError(err?.response?.data?.message || 'Login failed');
+    setIsLoading(false);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex justify-center items-center">

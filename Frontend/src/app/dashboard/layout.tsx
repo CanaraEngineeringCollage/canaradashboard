@@ -16,7 +16,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const admin = useSelector((state: any) => state.admin);
 
   
-  const logoutHandler = async () => {
+const logoutHandler = async () => {
+  try {
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/admin/logout`,
       {},
@@ -24,13 +25,25 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         withCredentials: true,
       }
     );
-
-    router.push("/login");
+    console.log('Logout Response:', res.data);
+    if (res.data.message === 'Logged out') {
+      router.push('/login');
+      toast({
+        title: 'Success',
+        description: 'Logout successfully.',
+      });
+    } else {
+      throw new Error('Unexpected response from logout');
+    }
+  } catch (err) {
+    console.error('Logout Error:', err.response?.data?.message || err.message || 'Logout failed');
     toast({
-      title: "Success",
-      description: "Logout successfully.",
+      title: 'Error',
+      description: err.response?.data?.message || 'Failed to logout. Please try again.',
+      variant: 'destructive',
     });
-  };
+  }
+};
 
 
 

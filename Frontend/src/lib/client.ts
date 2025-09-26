@@ -1,13 +1,13 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const baseUrl = 'https://testapi.megamind.studio';
   const url = `${baseUrl}${endpoint}`;
-
 
   try {
     const response = await fetch(url, {
       ...options,
+      credentials: options.credentials || 'include', // Ensure credentials are included
       headers: {
         ...options.headers,
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
@@ -30,12 +30,10 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
       throw new Error(errorData.message || `API request failed with status ${response.status}`);
     }
 
-    // For DELETE requests or empty responses, return null
     if (response.status === 204 || options.method === 'DELETE') {
       return null;
     }
 
-    // Try to parse JSON response
     const data = await response.json().catch(() => null);
     return data;
   } catch (error) {

@@ -32,6 +32,7 @@ res.cookie('jwt', token, {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',  // true on AWS
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' for cross-site
+domain: process.env.NODE_ENV === 'production' ? 'testapi.megamind.studio' : 'localhost', // Dynamic domain
   maxAge: 24 * 60 * 60 * 1000,
   path: '/',
 });
@@ -77,11 +78,19 @@ async updateAdmin(id: number, dto: UpdateAdminDto) {
 
   async logout(res: any) {
 res.clearCookie('jwt', {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  path: '/',
-});
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? 'testapi.megamind.studio' : 'localhost',
+    path: '/',
+  });
+  console.log('Cookie cleared with options:', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? 'testapi.megamind.studio' : 'localhost',
+    path: '/',
+  });
     return res.json({ message: 'Logged out' });
   }
 
