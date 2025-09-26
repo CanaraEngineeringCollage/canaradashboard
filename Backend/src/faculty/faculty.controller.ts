@@ -19,12 +19,14 @@ import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';   // ✅ import guard
 
+
 @Controller('faculty')
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
   // ✅ Only logged-in admin can create
-  @UseGuards(JwtAuthGuard)
+
+    @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   async create(

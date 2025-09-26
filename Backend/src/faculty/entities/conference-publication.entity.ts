@@ -7,31 +7,8 @@ export class ConferencePublication {
   id: string;
 
   @Column()
-  title: string;
+  conferencePublications: string;
 
-  @Column()
-  authors: string;
-
-  @Column()
-  conferenceName: string;
-
-  @Column({ type: 'date', nullable: true })
-  conferenceDate: Date;
-
-  @Column({ nullable: true })
-  location: string;
-
-  @Column({ nullable: true })
-  doi: string;
-
-  @Column({ nullable: true })
-  publisher: string;
-
-  @Column({ nullable: true })
-  isbn: string;
-
-  @Column({ nullable: true })
-  pageNumbers: string;
 
   @ManyToOne(() => Faculty, (faculty) => faculty.internationalConferencePublications,{
     onDelete: 'CASCADE',

@@ -15,31 +15,22 @@ export class AdminService {
     private jwtService: JwtService,
   ) {}
 
-  async login(email: string, password: string, res: any) {
-    const admin = await this.adminRepo.findOne({ where: { email } });
-    
-    
-    if (!admin) throw new UnauthorizedException('Invalid email or password');
+   async login(email: string, password: string, res: any) {
+  const admin = await this.adminRepo.findOne({ where: { email } });
+  if (!admin) throw new UnauthorizedException('Invalid email or password');
 
-    const isMatch = await bcrypt.compare(password, admin.password);
-    
-    if (!isMatch) throw new UnauthorizedException('Invalid email or password');
+  const isMatch = await bcrypt.compare(password, admin.password);
+  if (!isMatch) throw new UnauthorizedException('Invalid email or password');
 
-    const token = this.jwtService.sign({ id: admin.id, email: admin.email });
-    
+  const token = this.jwtService.sign({ id: admin.id, email: admin.email });
 
-res.cookie('jwt', token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',  // true on AWS
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' for cross-site
-domain: process.env.NODE_ENV === 'production' ? 'testapi.megamind.studio' : 'localhost', // Dynamic domain
-  maxAge: 24 * 60 * 60 * 1000,
-  path: '/',
-});
-
-    
-    return res.json({ message: 'Login successful',admin,token });
-  }
+  // ✅ No more cookies
+  return res.json({
+    message: 'Login successful',
+    admin,
+    token,
+  });
+}
 
  async getProfile(id: number) {
   const admin = await this.adminRepo.findOne({ where: { id } });

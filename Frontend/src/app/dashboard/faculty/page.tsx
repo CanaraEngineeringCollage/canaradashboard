@@ -12,7 +12,7 @@ interface Faculty {
   name: string;
   designation: string;
   department: string;
-  email: string;
+  email?: string;
   joiningDate: string;
   experience: string;
   employmentType: "Regular" | "Contract" | "Visiting";
@@ -30,69 +30,36 @@ interface Qualification {
   degree: string;
   passingYear: string;
   college: string;
+  nameOfDigree:string;
   specialization: string;
 }
 
 interface Patent {
   id: string;
-  title: string;
-  authors: string;
-  date: string;
-  applicationNumber: string;
-  patentOffice: string;
-  status: string;
-  reference: string;
+  patentData: string;
+  
 }
 
 interface BookChapter {
   id: string;
-  title: string;
-  authors: string;
-  bookTitle: string;
-  publisher: string;
-  publicationYear: string;
-  doi: string;
-  isbn: string;
-  scopusIndexed: boolean;
-  pageNumbers: string;
+ bookChapterData:string
 }
 
 interface Certification {
   id: string;
-  name: string;
-  issuingOrganization: string;
-  issueDate: string;
-  expiryDate: string;
-  credentialId: string;
-  credentialUrl: string;
-  credits: string;
+  certifications: string;
+ 
 }
 
 interface JournalPublication {
   id: string;
-  title: string;
-  authors: string;
-  journalName: string;
-  publicationDate: string;
-  volume: string;
-  issue: string;
-  pageNumbers: string;
-  doi: string;
-  issn: string;
-  indexing: string;
+  publicationsData: string;
 }
 
 interface ConferencePublication {
   id: string;
-  title: string;
-  authors: string;
-  conferenceName: string;
-  conferenceDate: string;
-  location: string;
-  doi: string;
-  publisher: string;
-  isbn: string;
-  pageNumbers: string;
+  conferencePublications: string;
+  
 }
 
 interface FacultyModalProps {
@@ -147,6 +114,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const initialQualification: Qualification = {
     id: Math.random().toString(36).substr(2, 9),
     degree: "",
+    nameOfDigree:"",
     passingYear: "",
     college: "",
     specialization: "",
@@ -156,72 +124,40 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const initialPatent: Patent = {
     id: Math.random().toString(36).substr(2, 9),
-    title: "",
-    authors: "",
-    date: "",
-    applicationNumber: "",
-    patentOffice: "",
-    status: "",
-    reference: "",
+   
+    patentData:"",
   };
   const [newPatent, setNewPatent] = useState<Patent>(initialPatent);
   const [editPatentId, setEditPatentId] = useState<string | null>(null);
 
   const initialBookChapter: BookChapter = {
     id: Math.random().toString(36).substr(2, 9),
-    title: "",
-    authors: "",
-    bookTitle: "",
-    publisher: "",
-    publicationYear: "",
-    doi: "",
-    isbn: "",
-    scopusIndexed: false,
-    pageNumbers: "",
+    bookChapterData: "",
+
   };
   const [newBookChapter, setNewBookChapter] = useState<BookChapter>(initialBookChapter);
   const [editBookChapterId, setEditBookChapterId] = useState<string | null>(null);
 
   const initialCertification: Certification = {
     id: Math.random().toString(36).substr(2, 9),
-    name: "",
-    issuingOrganization: "",
-    issueDate: "",
-    expiryDate: "",
-    credentialId: "",
-    credentialUrl: "",
-    credits: "",
+    certifications: "",
+   
   };
   const [newCertification, setNewCertification] = useState<Certification>(initialCertification);
   const [editCertificationId, setEditCertificationId] = useState<string | null>(null);
 
   const initialJournal: JournalPublication = {
     id: Math.random().toString(36).substr(2, 9),
-    title: "",
-    authors: "",
-    journalName: "",
-    publicationDate: "",
-    volume: "",
-    issue: "",
-    pageNumbers: "",
-    doi: "",
-    issn: "",
-    indexing: "",
+    publicationsData: "",
+    
   };
   const [newJournalPublication, setNewJournalPublication] = useState<JournalPublication>(initialJournal);
   const [editJournalPublicationId, setEditJournalPublicationId] = useState<string | null>(null);
 
   const initialConference: ConferencePublication = {
     id: Math.random().toString(36).substr(2, 9),
-    title: "",
-    authors: "",
-    conferenceName: "",
-    conferenceDate: "",
-    location: "",
-    doi: "",
-    publisher: "",
-    isbn: "",
-    pageNumbers: "",
+    conferencePublications: "",
+   
   };
   const [newConferencePublication, setNewConferencePublication] = useState<ConferencePublication>(initialConference);
   const [editConferencePublicationId, setEditConferencePublicationId] = useState<string | null>(null);
@@ -305,7 +241,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
       if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
       if (!faculty.department) newErrors.department = "Department is required";
-      if (!faculty.email || !/\S+@\S+\.\S+/.test(faculty.email)) newErrors.email = "Valid email is required";
+      // if (!faculty.email || !/\S+@\S+\.\S+/.test(faculty.email)) newErrors.email = "Valid email is required";
       if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
       if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
       if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
@@ -315,6 +251,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       // Modal-style validation for qualification fields
       if (!newQualification.degree || newQualification.degree.trim() === "") {
         newErrors.degree = "Degree is required";
+      }
+        if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
+        newErrors.nameOfDigree = "Name of degree is required";
       }
       if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
         newErrors.passingYear = "Passing Year is required";
@@ -331,7 +270,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   const handleNext = () => {
-    if (step === 2 && newQualification.degree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
+    if (step === 2 && newQualification.degree && newQualification.nameOfDigree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
       if (editQualificationId) {
         setFaculty({
           ...faculty,
@@ -347,7 +286,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewQualification(initialQualification);
       }
     }
-    if (step === 3 && newPatent.title && newPatent.authors && newPatent.date && newPatent.applicationNumber) {
+    if (step === 3 && newPatent.patentData) {
       if (editPatentId) {
         setFaculty({
           ...faculty,
@@ -363,7 +302,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewPatent(initialPatent);
       }
     }
-    if (step === 4 && newBookChapter.title && newBookChapter.authors && newBookChapter.bookTitle && newBookChapter.publisher) {
+    if (step === 4 && newBookChapter.bookChapterData) {
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
@@ -379,7 +318,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewBookChapter(initialBookChapter);
       }
     }
-    if (step === 5 && newCertification.name && newCertification.issuingOrganization && newCertification.issueDate) {
+    if (step === 5 && newCertification.certifications) {
       if (editCertificationId) {
         setFaculty({
           ...faculty,
@@ -395,7 +334,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewCertification(initialCertification);
       }
     }
-    if (step === 6 && newJournalPublication.title && newJournalPublication.authors && newJournalPublication.journalName) {
+    if (step === 6 && newJournalPublication.publicationsData) {
       if (editJournalPublicationId) {
         setFaculty({
           ...faculty,
@@ -419,7 +358,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     let shouldSubmit = false;
     if (step === 7) {
       // If the Conference Publication input is filled, add/update it before submit
-      if (newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
+      if (newConferencePublication.conferencePublications) {
         if (editConferencePublicationId) {
           setFaculty((prev) => ({
             ...prev,
@@ -450,7 +389,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setStep(step + 1);
       } else {
         // Wait for state update if we just added a conference publication
-        if (step === 7 && newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
+        if (step === 7 && newConferencePublication.conferencePublications) {
           setTimeout(() => {
             onSubmit(
               {
@@ -560,13 +499,16 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   // Patent Handlers
-  const handlePatentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewPatent({ ...newPatent, [name]: value });
-  };
+const handlePatentChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+  setNewPatent({ ...newPatent, [name]: value });
+};
+
 
   const addOrUpdatePatent = () => {
-    if (newPatent.title && newPatent.authors && newPatent.date && newPatent.applicationNumber) {
+    if (newPatent.patentData) {
       if (editPatentId) {
         setFaculty({
           ...faculty,
@@ -611,13 +553,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   // Book Chapter Handlers
-  const handleBookChapterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBookChapterChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type, checked } = e.target as any;
     setNewBookChapter({ ...newBookChapter, [name]: type === "checkbox" ? checked : value });
   };
 
   const addOrUpdateBookChapter = () => {
-    if (newBookChapter.title && newBookChapter.authors && newBookChapter.bookTitle && newBookChapter.publisher) {
+    if (newBookChapter.bookChapterData) {
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
@@ -662,13 +604,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   // Certification Handlers
-  const handleCertificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCertificationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewCertification({ ...newCertification, [name]: value });
   };
 
   const addOrUpdateCertification = () => {
-    if (newCertification.name && newCertification.issuingOrganization && newCertification.issueDate) {
+    if (newCertification.certifications ) {
       if (editCertificationId) {
         setFaculty({
           ...faculty,
@@ -713,13 +655,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   // Journal Publication Handlers
-  const handleJournalPublicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleJournalPublicationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewJournalPublication({ ...newJournalPublication, [name]: value });
   };
 
   const addOrUpdateJournalPublication = () => {
-    if (newJournalPublication.title && newJournalPublication.authors && newJournalPublication.journalName) {
+    if (newJournalPublication.publicationsData ) {
       if (editJournalPublicationId) {
         setFaculty({
           ...faculty,
@@ -769,13 +711,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   // Conference Publication Handlers
-  const handleConferencePublicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConferencePublicationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewConferencePublication({ ...newConferencePublication, [name]: value });
   };
 
   const addOrUpdateConferencePublication = () => {
-    if (newConferencePublication.title && newConferencePublication.authors && newConferencePublication.conferenceName) {
+    if (newConferencePublication.conferencePublications ) {
       if (editConferencePublicationId) {
         setFaculty({
           ...faculty,
@@ -964,6 +906,17 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
                 {errors.degree && <p className="text-red-500 text-sm mt-1">{errors.degree}</p>}
               </div>
+                     <div>
+                <label className="block text-sm font-medium mb-1">Name of Degree *</label>
+                <input
+                  type="text"
+                  name="nameOfDigree"
+                  value={newQualification.nameOfDigree}
+                  onChange={handleQualificationChange}
+                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.nameOfDigree && <p className="text-red-500 text-sm mt-1">{errors.nameOfDigree}</p>}
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Passing Year *</label>
                 <input
@@ -1035,74 +988,14 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newPatent.title}
+                <textarea
+                  name="patentData"
+                  value={newPatent.patentData}
                   onChange={handlePatentChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Authors *</label>
-                <input
-                  type="text"
-                  name="authors"
-                  value={newPatent.authors}
-                  onChange={handlePatentChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Date *</label>
-                <input
-                  type="date"
-                  name="date"
-                  value={newPatent.date}
-                  onChange={handlePatentChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Application Number *</label>
-                <input
-                  type="text"
-                  name="applicationNumber"
-                  value={newPatent.applicationNumber}
-                  onChange={handlePatentChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Patent Office</label>
-                <input
-                  type="text"
-                  name="patentOffice"
-                  value={newPatent.patentOffice}
-                  onChange={handlePatentChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
-                <input
-                  type="text"
-                  name="status"
-                  value={newPatent.status}
-                  onChange={handlePatentChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Reference</label>
-                <input
-                  type="text"
-                  name="reference"
-                  value={newPatent.reference}
-                  onChange={handlePatentChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              
             </div>
             <div className="flex space-x-2">
               <button onClick={addOrUpdatePatent} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -1118,7 +1011,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <ul className="mt-4 space-y-2">
                 {faculty.patents.map((p) => (
                   <li key={p.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {p.title} - {p.applicationNumber}
+                    {p.patentData}
                     <div className="flex space-x-2">
                       <button onClick={() => editPatent(p.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
@@ -1139,97 +1032,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
             <h3 className="text-lg font-semibold mb-4">Book Chapters (Optional)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newBookChapter.title}
+                <label className="block text-sm font-medium mb-1">Book Chapters</label>
+                <textarea
+                  name="bookChapterData"
+                  value={newBookChapter.bookChapterData}
                   onChange={handleBookChapterChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Authors *</label>
-                <input
-                  type="text"
-                  name="authors"
-                  value={newBookChapter.authors}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Book Title *</label>
-                <input
-                  type="text"
-                  name="bookTitle"
-                  value={newBookChapter.bookTitle}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Publisher *</label>
-                <input
-                  type="text"
-                  name="publisher"
-                  value={newBookChapter.publisher}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Publication Year</label>
-                <input
-                  type="text"
-                  name="publicationYear"
-                  value={newBookChapter.publicationYear}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">DOI</label>
-                <input
-                  type="text"
-                  name="doi"
-                  value={newBookChapter.doi}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">ISBN</label>
-                <input
-                  type="text"
-                  name="isbn"
-                  value={newBookChapter.isbn}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Page Numbers</label>
-                <input
-                  type="text"
-                  name="pageNumbers"
-                  value={newBookChapter.pageNumbers}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="flex items-center text-sm font-medium">
-                  <input
-                    type="checkbox"
-                    name="scopusIndexed"
-                    checked={newBookChapter.scopusIndexed}
-                    onChange={handleBookChapterChange}
-                    className="mr-2"
-                  />
-                  Scopus Indexed
-                </label>
-              </div>
+             
             </div>
             <div className="flex space-x-2">
               <button onClick={addOrUpdateBookChapter} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -1245,7 +1056,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <ul className="mt-4 space-y-2">
                 {faculty.bookChapters.map((bc) => (
                   <li key={bc.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {bc.title} - {bc.bookTitle}
+                    {bc.bookChapterData}
                     <div className="flex space-x-2">
                       <button onClick={() => editBookChapter(bc.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
@@ -1266,75 +1077,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
             <h3 className="text-lg font-semibold mb-4">Certifications (Optional)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={newCertification.name}
+                <label className="block text-sm font-medium mb-1">Certifications</label>
+                <textarea
+                  name="certifications"
+                  value={newCertification.certifications}
                   onChange={handleCertificationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Issuing Organization *</label>
-                <input
-                  type="text"
-                  name="issuingOrganization"
-                  value={newCertification.issuingOrganization}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Issue Date *</label>
-                <input
-                  type="date"
-                  name="issueDate"
-                  value={newCertification.issueDate}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Expiry Date</label>
-                <input
-                  type="date"
-                  name="expiryDate"
-                  value={newCertification.expiryDate}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Credential ID</label>
-                <input
-                  type="text"
-                  name="credentialId"
-                  value={newCertification.credentialId}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Credential URL</label>
-                <input
-                  type="text"
-                  name="credentialUrl"
-                  value={newCertification.credentialUrl}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Credits</label>
-                <input
-                  type="text"
-                  name="credits"
-                  value={newCertification.credits}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              
             </div>
             <div className="flex space-x-2">
               <button onClick={addOrUpdateCertification} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -1350,7 +1101,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <ul className="mt-4 space-y-2">
                 {faculty.certifications.map((c) => (
                   <li key={c.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {c.name} - {c.issuingOrganization}
+                    {c.certifications}
                     <div className="flex space-x-2">
                       <button onClick={() => editCertification(c.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
@@ -1371,105 +1122,16 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
             <h3 className="text-lg font-semibold mb-4">Journal Publications (Optional)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newJournalPublication.title}
+                <label className="block text-sm font-medium mb-1">Journal Publications</label>
+                <textarea
+                  
+                  name="publicationsData"
+                  value={newJournalPublication.publicationsData}
                   onChange={handleJournalPublicationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Authors *</label>
-                <input
-                  type="text"
-                  name="authors"
-                  value={newJournalPublication.authors}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Journal Name *</label>
-                <input
-                  type="text"
-                  name="journalName"
-                  value={newJournalPublication.journalName}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Publication Date</label>
-                <input
-                  type="date"
-                  name="publicationDate"
-                  value={newJournalPublication.publicationDate}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Volume</label>
-                <input
-                  type="text"
-                  name="volume"
-                  value={newJournalPublication.volume}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Issue</label>
-                <input
-                  type="text"
-                  name="issue"
-                  value={newJournalPublication.issue}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Page Numbers</label>
-                <input
-                  type="text"
-                  name="pageNumbers"
-                  value={newJournalPublication.pageNumbers}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">DOI</label>
-                <input
-                  type="text"
-                  name="doi"
-                  value={newJournalPublication.doi}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">ISSN</label>
-                <input
-                  type="text"
-                  name="issn"
-                  value={newJournalPublication.issn}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Indexing</label>
-                <input
-                  type="text"
-                  name="indexing"
-                  value={newJournalPublication.indexing}
-                  onChange={handleJournalPublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+    
             </div>
             <div className="flex space-x-2">
               <button onClick={addOrUpdateJournalPublication} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -1485,7 +1147,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <ul className="mt-4 space-y-2">
                 {faculty.internationalJournalPublications.map((jp) => (
                   <li key={jp.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {jp.title} - {jp.journalName}
+                    {jp.publicationsData}
                     <div className="flex space-x-2">
                       <button onClick={() => editJournalPublication(jp.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
@@ -1506,95 +1168,16 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
             <h3 className="text-lg font-semibold mb-4">Conference Publications (Optional)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newConferencePublication.title}
+                <label className="block text-sm font-medium mb-1">Conference Publications</label>
+                <textarea
+                
+                  name="conferencePublications"
+                  value={newConferencePublication.conferencePublications}
                   onChange={handleConferencePublicationChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Authors *</label>
-                <input
-                  type="text"
-                  name="authors"
-                  value={newConferencePublication.authors}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Conference Name *</label>
-                <input
-                  type="text"
-                  name="conferenceName"
-                  value={newConferencePublication.conferenceName}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Conference Date</label>
-                <input
-                  type="date"
-                  name="conferenceDate"
-                  value={newConferencePublication.conferenceDate}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={newConferencePublication.location}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">DOI</label>
-                <input
-                  type="text"
-                  name="doi"
-                  value={newConferencePublication.doi}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Publisher</label>
-                <input
-                  type="text"
-                  name="publisher"
-                  value={newConferencePublication.publisher}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">ISBN</label>
-                <input
-                  type="text"
-                  name="isbn"
-                  value={newConferencePublication.isbn}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Page Numbers</label>
-                <input
-                  type="text"
-                  name="pageNumbers"
-                  value={newConferencePublication.pageNumbers}
-                  onChange={handleConferencePublicationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+          
             </div>
             <div className="flex space-x-2">
               <button onClick={addOrUpdateConferencePublication} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -1610,7 +1193,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <ul className="mt-4 space-y-2">
                 {faculty.internationalConferencePublications.map((cp) => (
                   <li key={cp.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {cp.title} - {cp.conferenceName}
+                    {cp.conferencePublications}
                     <div className="flex space-x-2">
                       <button onClick={() => editConferencePublication(cp.id)} className="text-blue-500 hover:text-blue-700">
                         Edit
@@ -1685,7 +1268,7 @@ const Page: React.FC = () => {
   };
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     const facultyData = { ...faculty, avatar: undefined }; // Remove avatar buffer from data
     const formData = new FormData();
     formData.append("data", JSON.stringify(facultyData));
@@ -1697,8 +1280,8 @@ const Page: React.FC = () => {
       fetch(`${API_BASE_URL}/faculty`, {
         method: "POST",
         body: formData,
-        headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
+         headers: {
+      Authorization: `Bearer ${token}`, 
     },
       })
         .then((res) => {
@@ -1725,7 +1308,7 @@ const Page: React.FC = () => {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
         method: "PATCH",
         body: formData,
-       headers: {
+        headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
     },
       })
@@ -1754,10 +1337,9 @@ const Page: React.FC = () => {
 
   const handleDeleteFaculty = (id: string) => {
     const token = localStorage.getItem("token");
-
     fetch(`${API_BASE_URL}/faculty/${id}`, {
       method: "DELETE",
-      headers: {
+  headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
     },
     })

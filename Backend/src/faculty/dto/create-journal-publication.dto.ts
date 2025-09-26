@@ -2,7 +2,7 @@ import { IsString, IsOptional } from 'class-validator';
 
 export class CreateJournalPublicationDto {
   @IsString()
-  title: string;
+  publicationsData: string;
 
   @IsString()
   authors: string;

@@ -10,7 +10,9 @@ async function bootstrap() {
   console.log('✅ NestJS application created');
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:9002', 'http://localhost:3001','http://localhost:3000'],
+    origin: ['http://localhost:9002', 'http://localhost:3001','http://localhost:3000',
+'https://canaradashboard-aooq-git-ft-prtocetedro-d9daaf-canaras-projects.vercel.app',
+'https://testapii.megamind.studio'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
