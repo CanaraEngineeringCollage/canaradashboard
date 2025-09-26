@@ -221,11 +221,14 @@ export default function DemoAdminUploadModal() {
     const formData = new FormData();
     formData.append("academicYear", payload.academicYear);
     formData.append("file", payload.file);
+     const token = localStorage.getItem("token");
 
     const res = await fetch(`https://testapi.megamind.studio/timetables`, {
       method: "POST",
       body: formData,
-      credentials: "include",
+      headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
     });
 
     if (!res.ok) {
@@ -252,8 +255,11 @@ export default function DemoAdminUploadModal() {
   }
 
   async function handleDelete(id: number) {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`https://testapi.megamind.studio/timetables/${id}`, { method: "DELETE", credentials: "include" });
+      const res = await fetch(`https://testapi.megamind.studio/timetables/${id}`, { method: "DELETE", headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    }, });
       if (!res.ok) throw new Error("Failed to delete timetable");
       toast({
         title: "Success",

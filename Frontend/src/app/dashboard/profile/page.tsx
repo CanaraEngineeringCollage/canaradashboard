@@ -37,12 +37,22 @@ export default function ProfilePage() {
     },
   });
 
-  const updateAdminProfile = async (data: any) => {
-    const response = await axios.patch(`https://testapi.megamind.studio/admin/update`, data, {
-      withCredentials: true, // send cookie
-    });
-    return response.data;
-  };
+ const updateAdminProfile = async (data: any) => {
+  const token = localStorage.getItem("token"); // ✅ fetch token
+
+  const response = await axios.patch(
+    `https://testapi.megamind.studio/admin/update`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ send JWT in headers
+      },
+    }
+  );
+
+  return response.data;
+};
+
 
   const onProfileSubmit = async (data: AdminProfileFormData) => {
     try {

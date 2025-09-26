@@ -12,6 +12,7 @@ const page = () => {
 
  useEffect(() => {
   const fetchData = async () => {
+    
     setLoading(true);
     try {
       const res = await getGrievances();

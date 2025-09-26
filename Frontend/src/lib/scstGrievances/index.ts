@@ -1,8 +1,11 @@
 import { apiFetch } from "../client";
 
 export async function getScStGrievances() {
+      const token = localStorage.getItem("token");
   return apiFetch('/scst-grievances', {
     method: 'GET',
-    credentials:"include"
+ headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
   });
 }

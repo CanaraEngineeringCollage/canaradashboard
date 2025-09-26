@@ -9,40 +9,33 @@ import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import { useAuth } from "@/utils/useAuth";
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
 
   const admin = useSelector((state: any) => state.admin);
 
+ 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
   
 const logoutHandler = async () => {
-  try {
-    const res = await axios.post(
-      `https://testapi.megamind.studio/admin/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-    console.log('Logout Response:', res.data);
-    if (res.data.message === 'Logged out') {
-      router.push('/login');
-      toast({
-        title: 'Success',
-        description: 'Logout successfully.',
-      });
-    } else {
-      throw new Error('Unexpected response from logout');
+
+ const token = localStorage.getItem("token");
+  localStorage.removeItem('token'); // ✅ clear JWT
+  await axios.post(`https://testapi.megamind.studio/admin/logout`,{headers: {
+        Authorization: `Bearer ${token}`, // ✅ send JWT in headers
+      },
     }
-  } catch (err) {
-    console.error('Logout Error:', err.response?.data?.message || err.message || 'Logout failed');
-    toast({
-      title: 'Error',
-      description: err.response?.data?.message || 'Failed to logout. Please try again.',
-      variant: 'destructive',
-    });
-  }
+
+  );
+  router.push('/login');
+
 };
 
 

@@ -24,6 +24,7 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+     const token = localStorage.getItem("token");
   const loadData = async () => {
     setLoading(true);
     try {
@@ -33,7 +34,9 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
       } else {
         const res = await fetch(`https://testapi.megamind.studio/counselling`, {
           method: "GET",
-          credentials: "include", 
+          headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
         });
         if (!res.ok) {
           throw new Error("Failed to fetch counselling data");

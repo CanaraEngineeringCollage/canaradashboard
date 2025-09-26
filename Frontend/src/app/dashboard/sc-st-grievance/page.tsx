@@ -16,6 +16,7 @@ const page = () => {
  useEffect(() => {
   const fetchData = async () => {
     setLoading(true);
+
     try {
       const res = await getScStGrievances();
       // sort by created_at descending (latest first)

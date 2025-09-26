@@ -22,9 +22,12 @@ const AlumniPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem("token");
       setLoading(true);
       try {
-  const res = await fetch(`https://testapi.megamind.studio/alumni`, { method: "GET",credentials:"include" });
+  const res = await fetch(`https://testapi.megamind.studio/alumni`, { method: "GET", headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    }, });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
         // sort by createdAt descending

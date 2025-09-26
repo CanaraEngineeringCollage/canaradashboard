@@ -1685,6 +1685,7 @@ const Page: React.FC = () => {
   };
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
+      const token = localStorage.getItem("token");
     const facultyData = { ...faculty, avatar: undefined }; // Remove avatar buffer from data
     const formData = new FormData();
     formData.append("data", JSON.stringify(facultyData));
@@ -1696,7 +1697,9 @@ const Page: React.FC = () => {
       fetch(`${API_BASE_URL}/faculty`, {
         method: "POST",
         body: formData,
-        credentials: "include",
+        headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
       })
         .then((res) => {
           if (!res.ok) {
@@ -1722,7 +1725,9 @@ const Page: React.FC = () => {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
         method: "PATCH",
         body: formData,
-        credentials: "include",
+       headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
       })
         .then((res) => {
           if (!res.ok) {
@@ -1748,9 +1753,13 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteFaculty = (id: string) => {
+    const token = localStorage.getItem("token");
+
     fetch(`${API_BASE_URL}/faculty/${id}`, {
       method: "DELETE",
-      credentials: "include",
+      headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
     })
       .then((res) => {
         if (!res.ok) {

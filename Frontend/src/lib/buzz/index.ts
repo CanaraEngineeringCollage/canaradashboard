@@ -16,29 +16,36 @@ export const getAllBuzz = () => {
 };
 
 export const deleteBuzz = (id: string) => {
+   const token = localStorage.getItem("token");
   return apiFetch(`/buzz/${id}`, {
     method: "DELETE",
-    credentials: "include",
+     headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
   });
 };
 
 export const createBuzz = (content: string, design: object, category: string,eventDate:string) => {
+  const token = localStorage.getItem("token");
   return apiFetch("/buzz", {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+       Authorization: `Bearer ${token}`
     },
     body: JSON.stringify({ content, design, category,eventDate }), // send category
   });
 };
 
 export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string) => {
+   const token = localStorage.getItem("token");
   return apiFetch(`/buzz/${id}`, {
     method: "PATCH",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+       Authorization: `Bearer ${token}`
     },
     body: JSON.stringify({ content, design, category,eventDate }), // send category
   });

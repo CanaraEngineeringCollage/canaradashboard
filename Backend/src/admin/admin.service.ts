@@ -38,7 +38,7 @@ domain: process.env.NODE_ENV === 'production' ? 'testapi.megamind.studio' : 'loc
 });
 
     
-    return res.json({ message: 'Login successful',admin });
+    return res.json({ message: 'Login successful',admin,token });
   }
 
  async getProfile(id: number) {
