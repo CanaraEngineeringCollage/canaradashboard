@@ -223,7 +223,7 @@ export default function DemoAdminUploadModal() {
     formData.append("file", payload.file);
      const token = localStorage.getItem("token");
 
-    const res = await fetch(`https://testapi.megamind.studio/timetables`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
       method: "POST",
       body: formData,
       headers: {
@@ -245,7 +245,7 @@ export default function DemoAdminUploadModal() {
 
   async function getTimetables() {
     try {
-      const res = await fetch(`https://testapi.megamind.studio/timetables`, { method: "GET" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, { method: "GET" });
       if (!res.ok) throw new Error("Failed to fetch timetables");
       const data = await res.json();
       setTimetables(data);
@@ -257,7 +257,7 @@ export default function DemoAdminUploadModal() {
   async function handleDelete(id: number) {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`https://testapi.megamind.studio/timetables/${id}`, { method: "DELETE", headers: {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables/${id}`, { method: "DELETE", headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
     }, });
       if (!res.ok) throw new Error("Failed to delete timetable");

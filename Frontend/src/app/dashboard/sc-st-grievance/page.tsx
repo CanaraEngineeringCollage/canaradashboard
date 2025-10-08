@@ -69,6 +69,13 @@ const page = () => {
                   <td className="px-4 py-2">{g.nature_of_grievance}</td>
                 </tr>
               ))}
+                    {grievances.length === 0 && (
+            <tr>
+              <td colSpan={9} className="border px-4 py-2 text-center">
+                Scst grievances not found.
+              </td>
+            </tr>
+          )}
             </tbody>
           </table>
         </div>

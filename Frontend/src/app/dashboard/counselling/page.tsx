@@ -32,7 +32,7 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
       if (fetchData) {
         data = await fetchData();
       } else {
-        const res = await fetch(`https://testapi.megamind.studio/counselling`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling`, {
           method: "GET",
           headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
@@ -43,6 +43,9 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
         }
         data = await res.json();
       }
+
+      
+      
 
       // Sort latest first
       const sorted = data.sort(
@@ -58,6 +61,9 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
 
   loadData();
 }, [fetchData]);
+
+
+
 
 
   return (
@@ -88,6 +94,13 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
                   <td className="px-4 py-2">{c.comments}</td>
                 </tr>
               ))}
+              {counsellingData.length === 0 && (
+            <tr>
+              <td colSpan={5} className="border px-4 py-2 text-center">
+                No counselling submissions found.
+              </td>
+            </tr>
+          )}
             </tbody>
           </table>
         </div>

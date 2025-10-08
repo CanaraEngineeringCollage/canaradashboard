@@ -13,19 +13,34 @@ export const getAllEvents = () => {
 };
 
 export const deleteEvent = (id: string) => {
-  return apiFetch(`/events/${id}`, { method: 'DELETE' });
+    const token = localStorage.getItem("token");
+  return apiFetch(`/events/${id}`, { method: 'DELETE',  headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    }, }
+   
+  );
 };
 
 export const createEvent = (formData: FormData) => {
+    const token = localStorage.getItem("token");
   return apiFetch('/events', {
     method: 'POST',
     body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
+
   });
 };
 
 export const editEvent = (id: string, formData: FormData) => {
+    const token = localStorage.getItem("token");
   return apiFetch(`/events/${id}`, {
     method: 'PUT', 
     body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ send token
+    },
+
   });
 };

@@ -7,6 +7,7 @@ import {
   ValidateNested,
   IsOptional,
   IsNotEmpty,
+  IsInt
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -76,6 +77,13 @@ export class CreateFacultyDto {
 
   @IsEnum(['Regular', 'Contract', 'Visiting'])
   employmentType: 'Regular' | 'Contract' | 'Visiting';
+
+  @IsEnum(['Teaching Staff', 'Technical Staff']) // New field
+  type: 'Teaching Staff' | 'Technical Staff';
+
+   @IsInt()
+  @IsOptional() // Allows null or undefined
+  priority: number | null; // Type updated to allow null
 
   @IsArray()
   @ValidateNested({ each: true })

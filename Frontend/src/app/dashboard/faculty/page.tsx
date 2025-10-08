@@ -13,9 +13,11 @@ interface Faculty {
   designation: string;
   department: string;
   email?: string;
+  priority: number | null;
   joiningDate: string;
   experience: string;
   employmentType: "Regular" | "Contract" | "Visiting";
+  type: "Teaching Staff" | "Technical Staff";
   qualifications: Qualification[];
   avatar?: { type: string; data: number[] } | null;
   patents?: Patent[];
@@ -68,6 +70,7 @@ interface FacultyModalProps {
   onSubmit: (faculty: Faculty, avatarFile: File | null) => void;
   mode: "add" | "edit";
   facultyToEdit?: Faculty;
+  facultyList:Faculty[];
 }
 
 const departments = [
@@ -77,8 +80,8 @@ const departments = [
   "Computer Science & Design",
   "Computer Science & Business System",
   "Artificial Intelligence & Machine Learning",
+  "Science & Humanities",
   "Placement Team",
-  "other",
 ];
 
 const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
@@ -87,7 +90,7 @@ const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
   return `data:image/jpeg;base64,${base64}`;
 };
 
-const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit }) => {
+const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit,facultyList }) => {
   const [step, setStep] = useState(1);
   const initialFaculty: Faculty = {
     id: Math.random().toString(36).substr(2, 9),
@@ -98,6 +101,8 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     joiningDate: "",
     experience: "",
     employmentType: "Regular",
+    type: "Teaching Staff",
+     priority: null,
     qualifications: [],
     avatar: null,
     patents: [],
@@ -109,6 +114,24 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const [faculty, setFaculty] = useState<Faculty>(initialFaculty);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+
+// Inside FacultyModal
+
+  const getAvailablePriorities = () => {
+    const usedPriorities = facultyList
+      .filter((f) => f.id !== faculty.id && f.priority !== null) // Exclude current faculty and null priorities
+      .map((f) => f.priority)
+      .filter((p): p is number => p !== null);
+    const maxPriority = facultyList.length + 5; // Allow one extra slot
+    const availablePriorities: (number | null)[] = [null]; // Include null as an option
+    for (let i = 1; i <= maxPriority; i++) {
+      if (!usedPriorities.includes(i)) {
+        availablePriorities.push(i);
+      }
+    }
+    return availablePriorities;
+  };
 
   // Initial states for each section
   const initialQualification: Qualification = {
@@ -246,13 +269,23 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
       if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
       if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
+      if (!faculty.type) newErrors.type = "Type is required";
     }
-    if (currentStep === 2) {
-      // Modal-style validation for qualification fields
+   if (currentStep === 2) {
+    // Only validate newQualification if the user is adding/updating a qualification
+    const isAddingOrUpdating =
+      newQualification.degree ||
+      newQualification.nameOfDigree ||
+      newQualification.passingYear ||
+      newQualification.college ||
+      newQualification.specialization ||
+      editQualificationId;
+
+    if (isAddingOrUpdating) {
       if (!newQualification.degree || newQualification.degree.trim() === "") {
         newErrors.degree = "Degree is required";
       }
-        if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
+      if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
         newErrors.nameOfDigree = "Name of degree is required";
       }
       if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
@@ -265,9 +298,21 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         newErrors.specialization = "Specialization is required";
       }
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
+    // In edit mode, allow proceeding if there are existing qualifications
+    if (mode === "edit" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
+      newErrors.qualifications = "At least one qualification is required";
+    }
+
+    // In add mode, require at least one qualification to be added
+    if (mode === "add" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
+      newErrors.qualifications = "At least one qualification is required";
+    }
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleNext = () => {
     if (step === 2 && newQualification.degree && newQualification.nameOfDigree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
@@ -426,26 +471,28 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     }
   };
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (name === "avatar") {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        setAvatarFile(file);
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = {
-          type: file.type,
-          data: Array.from(new Uint8Array(arrayBuffer)),
-        };
-        setFaculty({ ...faculty, avatar: buffer });
-      } else {
-        setAvatarFile(null);
-        setFaculty({ ...faculty, avatar: null });
-      }
+const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  if (name === 'avatar') {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = {
+        type: file.type,
+        data: Array.from(new Uint8Array(arrayBuffer)),
+      };
+      setFaculty({ ...faculty, avatar: buffer });
     } else {
-      setFaculty({ ...faculty, [name]: value });
+      setAvatarFile(null);
+      setFaculty({ ...faculty, avatar: null });
     }
-  };
+  } else if (name === 'priority') {
+    setFaculty({ ...faculty, priority: parseInt(value, 10) });
+  } else {
+    setFaculty({ ...faculty, [name]: value });
+  }
+};
 
   // Qualification Handlers
   const handleQualificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -827,7 +874,7 @@ const handlePatentChange = (
                 {errors.department && <p className="text-red-500 text-sm mt-1">{errors.department}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email *</label>
+                <label className="block text-sm font-medium mb-1">Email</label>
                 <input
                   type="email"
                   name="email"
@@ -872,6 +919,36 @@ const handlePatentChange = (
                   <option value="Visiting">Visiting</option>
                 </select>
                 {errors.employmentType && <p className="text-red-500 text-sm mt-1">{errors.employmentType}</p>}
+              </div>
+              <div>
+  <label className="block text-sm font-medium mb-1">Type *</label>
+  <select
+    name="type"
+    value={faculty.type}
+    onChange={handleInputChange}
+    className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  >
+    <option value="Teaching Staff">Teaching Staff</option>
+    <option value="Technical Staff">Technical Staff</option>
+  </select>
+  {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
+</div>
+     <div>
+                <label className="block text-sm font-medium mb-1">Priority (Higher appears first)</label>
+                <select
+                  name="priority"
+                  value={faculty.priority === null ? "null" : faculty.priority}
+                  onChange={handleInputChange}
+                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="null">No Priority</option>
+                  {getAvailablePriorities().filter(p => p !== null).map((priority) => (
+                    <option key={priority} value={priority}>
+                      {priority}
+                    </option>
+                  ))}
+                </select>
+                {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Avatar {mode === "add" ? "*" : "(Optional)"}</label>
@@ -1234,7 +1311,7 @@ const handlePatentChange = (
   );
 };
 
-const API_BASE_URL = "https://testapi.megamind.studio";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 const Page: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
@@ -1244,15 +1321,22 @@ const Page: React.FC = () => {
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
   const { toast } = useToast();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
 
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/faculty`)
+
+const fetchFaculties = () => {
+  fetch(`${API_BASE_URL}/faculty`)
       .then((res) => res.json())
       .then((data) => {
         const sorted = data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setFaculties(sorted);
       })
       .catch((error) => console.error("Error fetching faculties:", error));
+};
+
+  useEffect(() => {
+    fetchFaculties();
   }, []);
 
   const handleAddFaculty = () => {
@@ -1293,7 +1377,7 @@ const Page: React.FC = () => {
           return res.json();
         })
         .then((newFaculty) => {
-          setFaculties([...faculties, newFaculty]);
+           fetchFaculties();
           setIsModalOpen(false);
           toast({
             title: "Success",
@@ -1302,7 +1386,12 @@ const Page: React.FC = () => {
         })
         .catch((error) => {
           console.error("Error adding faculty:", error);
-          alert(`Failed to add faculty: ${error.message}`);
+         
+          toast({
+            title: "Error",
+            description: "Failed to add faculty.",
+              variant: "destructive",
+          });
         });
     } else {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
@@ -1321,7 +1410,8 @@ const Page: React.FC = () => {
           return res.json();
         })
         .then((updatedFaculty) => {
-          setFaculties(faculties.map((f) => (f.id === updatedFaculty.id ? updatedFaculty : f)));
+            fetchFaculties();
+
           setIsModalOpen(false);
           toast({
             title: "Success",
@@ -1330,7 +1420,11 @@ const Page: React.FC = () => {
         })
         .catch((error) => {
           console.error("Error updating faculty:", error);
-          alert(`Failed to update faculty: ${error.message}`);
+          toast({
+            title: "Error",
+            description: "Failed to update faculty.",
+              variant: "destructive",
+          });
         });
     }
   };
@@ -1357,7 +1451,12 @@ const Page: React.FC = () => {
       })
       .catch((error) => {
         console.error("Error deleting faculty:", error);
-        alert(`Failed to delete faculty: ${error.message}`);
+        
+         toast({
+          title: "Error",
+          description: "Failed to delete faculty.",
+            variant: "destructive",
+        });
       });
   };
 
@@ -1407,7 +1506,7 @@ const Page: React.FC = () => {
             <th className="border px-4 py-2">Name</th>
             <th className="border px-4 py-2">Designation</th>
             <th className="border px-4 py-2">Department</th>
-            <th className="border px-4 py-2">Email</th>
+            {/* <th className="border px-4 py-2">Email</th> */}
             <th className="border px-4 py-2">Joining Date</th>
             <th className="border px-4 py-2">Employment Type</th>
             <th className="border px-4 py-2">Actions</th>
@@ -1424,14 +1523,17 @@ const Page: React.FC = () => {
               <td className="border px-4 py-2">{faculty.name}</td>
               <td className="border px-4 py-2">{faculty.designation}</td>
               <td className="border px-4 py-2">{faculty.department}</td>
-              <td className="border px-4 py-2">{faculty.email}</td>
+              {/* <td className="border px-4 py-2">{faculty.email}</td> */}
               <td className="border px-4 py-2">{faculty.joiningDate}</td>
               <td className="border px-4 py-2">{faculty.employmentType}</td>
               <td className="border px-4 py-2 flex">
                 <button onClick={() => handleEditFaculty(faculty)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
                   Edit
                 </button>
-                <button onClick={() => handleDeleteFaculty(faculty.id)} className="bg-red-500 text-white px-2 py-1 rounded">
+                <button  onClick={() => {
+    setFacultyToDelete(faculty);
+    setIsDeleteModalOpen(true);
+  }} className="bg-red-500 text-white px-2 py-1 rounded">
                   Delete
                 </button>
               </td>
@@ -1452,9 +1554,45 @@ const Page: React.FC = () => {
         onSubmit={handleSubmit}
         mode={modalMode}
         facultyToEdit={selectedFaculty}
+       facultyList={faculties}
       />
+      <DeleteConfirmationModal
+  isOpen={isDeleteModalOpen}
+  id={facultyToDelete?.id || ""}
+  itemName={facultyToDelete?.name || "this faculty"}
+  onClose={() => setIsDeleteModalOpen(false)}
+  onConfirm={(id) => {
+    handleDeleteFaculty(id);
+    setIsDeleteModalOpen(false);
+    setFacultyToDelete(null);
+  }}
+/>
     </div>
   );
 };
 
 export default Page;
+
+
+function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "this item" }: DeleteConfirmationModalProps) {
+  if (!isOpen || !id) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h2>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete <strong>{itemName}</strong>? This action cannot be undone.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300">
+            Cancel
+          </button>
+          <button onClick={() => onConfirm(id)} className="px-4 py-2 rounded-md text-sm bg-red-600 text-white hover:bg-red-700">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

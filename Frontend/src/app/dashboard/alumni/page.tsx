@@ -25,7 +25,7 @@ const AlumniPage = () => {
       const token = localStorage.getItem("token");
       setLoading(true);
       try {
-  const res = await fetch(`https://testapi.megamind.studio/alumni`, { method: "GET", headers: {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`, { method: "GET", headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
     }, });
       if (!res.ok) throw new Error("Failed to fetch timetables");
@@ -83,6 +83,13 @@ const AlumniPage = () => {
                 </tr>
               ))}
             </tbody>
+               {alumniList.length === 0 && (
+            <tr>
+              <td colSpan={7} className="border px-4 py-2 text-center">
+                No alumni found.
+              </td>
+            </tr>
+          )}
           </table>
         </div>
       )}

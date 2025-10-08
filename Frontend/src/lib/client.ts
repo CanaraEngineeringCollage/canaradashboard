@@ -1,7 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
-  const baseUrl = 'https://testapi.megamind.studio';
+  const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}`;
   const url = `${baseUrl}${endpoint}`;
 
   try {

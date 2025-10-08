@@ -41,7 +41,7 @@ export default function ProfilePage() {
   const token = localStorage.getItem("token"); // ✅ fetch token
 
   const response = await axios.patch(
-    `https://testapi.megamind.studio/admin/update`,
+    `${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
     data,
     {
       headers: {

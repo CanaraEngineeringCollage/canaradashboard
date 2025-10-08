@@ -40,6 +40,13 @@ export class Faculty {
   @Column({ type: 'enum', enum: ['Regular', 'Contract', 'Visiting'] })
   employmentType: 'Regular' | 'Contract' | 'Visiting';
 
+  @Column({ type: 'enum', enum: ['Teaching Staff', 'Technical Staff'] }) // New field
+  type: 'Teaching Staff' | 'Technical Staff';
+
+
+ @Column({ type: 'int', nullable: true }) // Correctly defined as INT, nullable
+  priority: number | null;
+
   @Column({ type: 'longblob', nullable: true })
   avatar: Buffer;
 

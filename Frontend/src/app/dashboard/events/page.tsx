@@ -6,6 +6,7 @@ import { LandPlot, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/lib/types";
 import { createEvent, deleteEvent, editEvent, getAllEvents } from "@/lib/events";
+import { useToast } from "@/hooks/use-toast";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   id: string | null;
@@ -25,6 +26,7 @@ const EventsPage = () => {
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+    const { toast } = useToast();
 
   console.log(events, "events");
 
@@ -45,8 +47,18 @@ const EventsPage = () => {
     try {
       await deleteEvent(id);
       setEvents((prev) => prev.filter((e) => e.id !== id));
+       toast({
+            title: "Success",
+            description: "Event deleted successfully.",
+          });
+
     } catch (err) {
       console.error("Error deleting event:", err);
+        toast({
+            title: "Error",
+            description: "Failed to delete event.",
+              variant: "destructive",
+          });
     } finally {
       setDeleteModalOpen(false);
       setDeleteId(null);
@@ -73,6 +85,11 @@ const EventsPage = () => {
       } else {
         await createEvent(formData);
       }
+        toast({
+            title: "Success",
+            description: "Event submitted successfully.",
+          });
+
 
       setShowModal(false);
       setSelectedEvent({});
@@ -82,6 +99,11 @@ const EventsPage = () => {
       fetchEvents();
     } catch (err) {
       console.error("Error submitting event:", err);
+        toast({
+            title: "Error",
+            description: "Failed to submit event.",
+              variant: "destructive",
+          });
     }
   };
 
@@ -198,6 +220,13 @@ const EventsPage = () => {
                 </td>
               </tr>
             ))}
+              {filteredEvents.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-2 text-center text-gray-500">
+                  No timetables found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
