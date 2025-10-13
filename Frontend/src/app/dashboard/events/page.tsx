@@ -224,7 +224,7 @@ const EventsPage = () => {
               {filteredEvents.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-2 text-center text-gray-500">
-                  No timetables found.
+                  No Events found.
                 </td>
               </tr>
             )}

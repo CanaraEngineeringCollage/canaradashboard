@@ -11,7 +11,7 @@ export class Buzz {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('text')
+  @Column('longtext')
   content: string;
 
   @Column('json')
