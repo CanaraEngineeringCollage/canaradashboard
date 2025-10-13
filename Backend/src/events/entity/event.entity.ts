@@ -8,8 +8,8 @@ export class Event {
   @Column()
   title: string;
 
-  @Column()
-  tagline: string;
+  // @Column()
+  // tagline: string;
 
   @Column()
   description: string;

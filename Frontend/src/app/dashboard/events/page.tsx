@@ -70,7 +70,7 @@ const EventsPage = () => {
 
     const formData = new FormData();
     formData.append("title", selectedEvent.title || "");
-    formData.append("tagline", selectedEvent.tagline || "");
+    // formData.append("tagline", selectedEvent.tagline || "");
     formData.append("description", selectedEvent.description || "");
     formData.append("date", selectedEvent.date || "");
     formData.append("category", selectedEvent.category || "");
@@ -170,7 +170,6 @@ const EventsPage = () => {
               <th className="px-4 py-2 text-left">Date</th>
               <th className="px-4 py-2 text-left">Image</th>
               <th className="px-4 py-2 text-left">Title</th>
-              <th className="px-4 py-2 text-left">Tagline</th>
               <th className="px-4 py-2 text-left">Description</th>
               <th className="px-4 py-2 text-left">Category</th>
               <th className="px-4 py-2 text-left">Actions</th>
@@ -192,7 +191,6 @@ const EventsPage = () => {
                   <img src={bufferToBase64(event.image)} alt={event.title} className="w-32 h-20 object-cover rounded ml-4" />
                 </td>
                 <td className="px-4 py-2">{event.title}</td>
-                <td className="px-4 py-2">{event.tagline}</td>
                 <td className="px-4 py-2">{event.description}</td>
                 <td className="px-4 py-2">{event.category}</td>
                 <td className="px-4 py-2">

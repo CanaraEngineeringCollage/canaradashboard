@@ -40,7 +40,7 @@ const EventModal: React.FC<Props> = ({
             className="w-full p-2 border rounded"
             required
           />
-          <input
+          {/* <input
             type="text"
             name="tagline"
             placeholder="Tagline"
@@ -48,7 +48,7 @@ const EventModal: React.FC<Props> = ({
             onChange={onChange}
             className="w-full p-2 border rounded"
             required
-          />
+          /> */}
           <textarea
             name="description"
             placeholder="Description"
