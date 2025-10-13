@@ -24,6 +24,11 @@ export class CreateBuzzDto {
     'Alumni',
   ])
   category: string;
+  
+  @IsString()
+  @IsNotEmpty()
+  eventName: string;
+
 
 
 

@@ -17,6 +17,7 @@ interface Buzz {
   eventDate?: string;
   createdAt: string;
   updatedAt: string;
+  eventName?: string;
 }
 
 interface DeleteConfirmationModalProps {
@@ -245,12 +246,21 @@ export default function BuzzPage() {
         initialDesign={editingBuzz?.design}
         initialCategory={editingBuzz?.category}
         initialEventDate={editingBuzz?.eventDate}
-        onSave={async (html, design, category, eventDate) => {
+        initalEventName={editingBuzz?.eventName}
+        onSave={async (html, design, category, eventDate,eventName) => {
           try {
             if (editingBuzz) {
-              await editBuzz(editingBuzz.id, html, design, category, eventDate);
+              await editBuzz(editingBuzz.id, html, design, category, eventDate,eventName);
+              setEditingBuzz(null);
+              setIsEditorOpen(false);
+
+          
             } else {
-              await createBuzz(html, design, category, eventDate);
+              await createBuzz(html, design, category, eventDate,eventName);
+                  setEditingBuzz(null);
+              setIsEditorOpen(false);
+
+       
             }
             await fetchBuzzes();
             toast({
@@ -267,6 +277,7 @@ export default function BuzzPage() {
               description: `${editingBuzz ? "Update" : "Create"} buzz failed. Please try again.`,
               variant: "destructive",
             });
+            
           }
         }}
       />

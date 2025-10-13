@@ -1323,17 +1323,32 @@ const Page: React.FC = () => {
   const { toast } = useToast();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
+const [isLoading,setIsLoading]=useState(false);
+
 
 
 const fetchFaculties = () => {
+  setIsLoading(true);
   fetch(`${API_BASE_URL}/faculty`)
-      .then((res) => res.json())
-      .then((data) => {
-        const sorted = data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setFaculties(sorted);
-      })
-      .catch((error) => console.error("Error fetching faculties:", error));
+    .then((res) => res.json())
+    .then((data) => {
+      const sorted = data.sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setFaculties(sorted);
+    })
+    .catch((error) => {
+      console.error("Error fetching faculties:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load faculty data.",
+        variant: "destructive",
+      });
+    })
+    .finally(() => setIsLoading(false)); // ✅ correct place
 };
+
 
   useEffect(() => {
     fetchFaculties();
@@ -1539,13 +1554,27 @@ const fetchFaculties = () => {
               </td>
             </tr>
           ))}
-          {filteredFaculties.length === 0 && (
-            <tr>
-              <td colSpan={9} className="border px-4 py-2 text-center">
-                No faculties found.
-              </td>
-            </tr>
-          )}
+
+
+       {isLoading ? (
+    <tr>
+      <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+        Loading faculties...
+      </td>
+    </tr>
+  ) : filteredFaculties.length === 0 ? (
+    <tr>
+      <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+        No faculties found.
+      </td>
+    </tr>
+  ) : (
+    filteredFaculties.map((faculty) => (
+      <tr key={faculty.id}>
+        {/* existing row content */}
+      </tr>
+    ))
+  )}
         </tbody>
       </table>
       <FacultyModal

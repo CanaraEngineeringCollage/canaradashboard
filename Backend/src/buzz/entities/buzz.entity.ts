@@ -22,6 +22,10 @@ export class Buzz {
 
   @CreateDateColumn()
   createdAt: Date;
+  
+  @Column({ type: 'varchar', length: 50 })
+  eventName: string;
+
 
   @UpdateDateColumn()
   updatedAt: Date;

@@ -26,17 +26,20 @@ const EventsPage = () => {
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isLoading,setIsLoading]=useState(false);
     const { toast } = useToast();
 
   console.log(events, "events");
 
   const fetchEvents = async () => {
+    setIsLoading(true);
     const res = await getAllEvents();
 
     // Sort by createdAt descending (recent first)
     const sortedEvents = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     setEvents(sortedEvents);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -221,13 +224,21 @@ const EventsPage = () => {
                 </td>
               </tr>
             ))}
-              {filteredEvents.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-2 text-center text-gray-500">
-                  No Events found.
-                </td>
-              </tr>
-            )}
+               {isLoading ? (
+  <tr>
+    <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+      Loading Events...
+    </td>
+  </tr>
+) : filteredEvents.length === 0 && (
+  <tr>
+    <td colSpan={9} className="px-4 py-6 text-center text-gray-500">
+      No Events found.
+    </td>
+  </tr>
+) 
+}
+
           </tbody>
         </table>
       </div>

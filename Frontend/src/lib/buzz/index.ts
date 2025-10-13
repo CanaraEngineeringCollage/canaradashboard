@@ -25,7 +25,7 @@ export const deleteBuzz = (id: string) => {
   });
 };
 
-export const createBuzz = (content: string, design: object, category: string,eventDate:string) => {
+export const createBuzz = (content: string, design: object, category: string,eventDate:string, eventName:string) => {
   const token = localStorage.getItem("token");
   return apiFetch("/buzz", {
     method: "POST",
@@ -34,11 +34,11 @@ export const createBuzz = (content: string, design: object, category: string,eve
       "Content-Type": "application/json",
        Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ content, design, category,eventDate }), // send category
+    body: JSON.stringify({ content, design, category,eventDate ,eventName}), // send category
   });
 };
 
-export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string) => {
+export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string, eventName:string) => {
    const token = localStorage.getItem("token");
   return apiFetch(`/buzz/${id}`, {
     method: "PATCH",
@@ -47,6 +47,6 @@ export const editBuzz = (id: string, content: string, design: object, category: 
       "Content-Type": "application/json",
        Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ content, design, category,eventDate }), // send category
+    body: JSON.stringify({ content, design, category,eventDate,eventName }), // send category
   });
 };
