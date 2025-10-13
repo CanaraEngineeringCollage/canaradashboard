@@ -193,7 +193,9 @@ const EventsPage = () => {
                 <td className="px-4 py-2">{event.title}</td>
                 <td className="px-4 py-2">{event.description}</td>
                 <td className="px-4 py-2">{event.category}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 ">
+                    <div className="flex items-center justify-center">
+
                   <button
                     className="px-4 py-1 rounded bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 mr-2"
                     onClick={() => {
@@ -215,6 +217,7 @@ const EventsPage = () => {
                   >
                     Edit
                   </button>
+                   </div>
                 </td>
               </tr>
             ))}

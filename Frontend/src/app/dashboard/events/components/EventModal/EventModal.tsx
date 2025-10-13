@@ -56,6 +56,7 @@ const EventModal: React.FC<Props> = ({
             onChange={onChange}
             className="w-full p-2 border rounded"
             required
+            rows={8}
           />
             <select
             name="category"

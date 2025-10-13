@@ -11,7 +11,7 @@ export class Event {
   // @Column()
   // tagline: string;
 
-  @Column()
+   @Column({ type: 'longtext' }) 
   description: string;
 
   @Column()
