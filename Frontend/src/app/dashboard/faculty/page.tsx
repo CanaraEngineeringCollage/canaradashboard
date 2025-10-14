@@ -118,20 +118,22 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
 // Inside FacultyModal
 
-  const getAvailablePriorities = () => {
-    const usedPriorities = facultyList
-      .filter((f) => f.id !== faculty.id && f.priority !== null) // Exclude current faculty and null priorities
-      .map((f) => f.priority)
-      .filter((p): p is number => p !== null);
-    const maxPriority = facultyList.length + 5; // Allow one extra slot
-    const availablePriorities: (number | null)[] = [null]; // Include null as an option
-    for (let i = 1; i <= maxPriority; i++) {
-      if (!usedPriorities.includes(i)) {
-        availablePriorities.push(i);
-      }
+ const getAvailablePriorities = () => {
+  // Filter faculty list to include only those in the same department as the current faculty
+  const usedPriorities = facultyList
+    .filter((f) => f.id !== faculty.id && f.priority !== null && f.department === faculty.department) // Filter by department and exclude current faculty
+    .map((f) => f.priority)
+    .filter((p): p is number => p !== null);
+
+  const maxPriority = facultyList.filter((f) => f.department === faculty.department).length + 5; // Allow extra slots for the current department
+  const availablePriorities: (number | null)[] = [null]; // Include null as an option
+  for (let i = 1; i <= maxPriority; i++) {
+    if (!usedPriorities.includes(i)) {
+      availablePriorities.push(i);
     }
-    return availablePriorities;
-  };
+  }
+  return availablePriorities;
+};
 
   // Initial states for each section
   const initialQualification: Qualification = {
