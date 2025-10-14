@@ -76,16 +76,57 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <form onSubmit={handleSubmit} className="p-6 border rounded space-y-4 w-full max-w-sm">
-        <h2 className="text-xl font-bold">Admin Login</h2>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <input name="email" type="email" placeholder="Email" className="border p-2 w-full" value={form.email} onChange={handleChange} />
-        <input name="password" type="password" placeholder="Password" className="border p-2 w-full" value={form.password} onChange={handleChange} />
-        <button type="submit" disabled={isLoading} className={`w-full ${isLoading ? "bg-blue-300" : "bg-blue-600"} text-white p-2 rounded`}>
-          Login
-        </button>
-      </form>
-    </div>
+   <div className="min-h-screen flex flex-col relative bg-gray-50">
+  {/* Logo (top-left) */}
+  <div className="absolute top-6 left-1/2 transform -translate-x-1/2 md:left-6 md:translate-x-0">
+    <img src="/logo.svg" alt="Logo" className="w-56 h-auto" />
+  </div>
+
+  {/* Centered form */}
+  <div className="flex justify-center items-center flex-1">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-8 border rounded-xl shadow-md space-y-5 w-full max-w-sm"
+    >
+      <h2 className="text-2xl font-semibold text-center text-gray-800">
+        Admin Login
+      </h2>
+
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+      <div className="space-y-3">
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={form.email}
+          onChange={handleChange}
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={form.password}
+          onChange={handleChange}
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={isLoading}
+        className={`w-full p-3 rounded-lg text-white font-medium transition ${
+          isLoading
+            ? "bg-blue-300 cursor-not-allowed"
+            : "bg-[#2883c8] hover:bg-[#2883c8]"
+        }`}
+      >
+        {isLoading ? "Logging in..." : "Login"}
+      </button>
+    </form>
+  </div>
+</div>
+
   );
 }
