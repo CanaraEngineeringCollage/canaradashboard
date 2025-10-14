@@ -16,9 +16,7 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:9002', 'http://localhost:3001','http://localhost:3000',
-'https://canaradashboard-aooq-git-ft-prtocetedro-d9daaf-canaras-projects.vercel.app',
-'https://testapii.megamind.studio'],
+    origin: ['http://localhost:9002', 'http://localhost:3001','http://localhost:3000',"https://canaradashboard.vercel.app"],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
