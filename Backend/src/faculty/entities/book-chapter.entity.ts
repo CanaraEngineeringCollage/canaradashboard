@@ -7,11 +7,12 @@ export class BookChapter {
   id: string;
 
   @Column()
-  bookChapterData: string;
+  heading: string;
 
+  @Column('simple-array')
+  descriptions: string[];
 
-
-  @ManyToOne(() => Faculty, (faculty) => faculty.bookChapters,{
+  @ManyToOne(() => Faculty, (faculty) => faculty.bookChapters, {
     onDelete: 'CASCADE',
   })
   faculty: Faculty;

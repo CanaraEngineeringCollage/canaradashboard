@@ -7,11 +7,12 @@ export class Certification {
   id: string;
 
   @Column()
-  certifications: string;
+  heading: string;
 
-  
+  @Column('simple-array')
+  descriptions: string[];
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.certifications,{
+  @ManyToOne(() => Faculty, (faculty) => faculty.certifications, {
     onDelete: 'CASCADE',
   })
   faculty: Faculty;

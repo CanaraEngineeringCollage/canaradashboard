@@ -6,11 +6,12 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { Qualification } from './qualification.entity';
-import { Patent } from './patent.entity';
+// Make sure this points to correct entity
 import { BookChapter } from './book-chapter.entity';
 import { Certification } from './certification.entity';
 import { JournalPublication } from './journal-publication.entity';
 import { ConferencePublication } from './conference-publication.entity';
+import { Achievement } from './patent.entity';
 
 @Entity()
 export class Faculty {
@@ -26,25 +27,25 @@ export class Faculty {
   @Column()
   department: string;
 
-  @Column()
-  email: string;
+  @Column({ nullable: true })
+  email?: string;
 
   @Column({ type: 'date' })
   joiningDate: Date;
 
   @Column()
   experience: string;
+  
   @CreateDateColumn()
   createdAt: Date;
 
   @Column({ type: 'enum', enum: ['Regular', 'Contract', 'Visiting'] })
   employmentType: 'Regular' | 'Contract' | 'Visiting';
 
-  @Column({ type: 'enum', enum: ['Teaching Staff', 'Technical Staff'] }) // New field
+  @Column({ type: 'enum', enum: ['Teaching Staff', 'Technical Staff'] })
   type: 'Teaching Staff' | 'Technical Staff';
 
-
- @Column({ type: 'int', nullable: true }) // Correctly defined as INT, nullable
+  @Column({ type: 'int', nullable: true })
   priority: number | null;
 
   @Column({ type: 'longblob', nullable: true })
@@ -55,8 +56,10 @@ export class Faculty {
   })
   qualifications: Qualification[];
 
-  @OneToMany(() => Patent, (patent) => patent.faculty, { cascade: true })
-  patents: Patent[];
+  @OneToMany(() => Achievement, (achievement) => achievement.faculty, { 
+    cascade: true 
+  })
+  achievements: Achievement[];
 
   @OneToMany(() => BookChapter, (bookChapter) => bookChapter.faculty, {
     cascade: true,

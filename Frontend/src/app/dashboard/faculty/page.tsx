@@ -7,6 +7,12 @@ import { LandPlot, PlusCircle } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
 // Interfaces
+interface Achievement {
+  id: string;
+  heading: string;
+  descriptions: string[];
+}
+
 interface Faculty {
   id: string;
   name: string;
@@ -20,7 +26,7 @@ interface Faculty {
   type: "Teaching Staff" | "Technical Staff";
   qualifications: Qualification[];
   avatar?: { type: string; data: number[] } | null;
-  patents?: Patent[];
+  achievements?: Achievement[];
   bookChapters?: BookChapter[];
   certifications?: Certification[];
   internationalJournalPublications?: JournalPublication[];
@@ -32,25 +38,20 @@ interface Qualification {
   degree: string;
   passingYear: string;
   college: string;
-  nameOfDigree:string;
+  nameOfDigree: string;
   specialization: string;
-}
-
-interface Patent {
-  id: string;
-  patentData: string;
-  
 }
 
 interface BookChapter {
   id: string;
- bookChapterData:string
+  heading: string;
+  descriptions: string[];
 }
 
 interface Certification {
   id: string;
-  certifications: string;
- 
+  heading: string;
+  descriptions: string[];
 }
 
 interface JournalPublication {
@@ -61,7 +62,6 @@ interface JournalPublication {
 interface ConferencePublication {
   id: string;
   conferencePublications: string;
-  
 }
 
 interface FacultyModalProps {
@@ -70,7 +70,7 @@ interface FacultyModalProps {
   onSubmit: (faculty: Faculty, avatarFile: File | null) => void;
   mode: "add" | "edit";
   facultyToEdit?: Faculty;
-  facultyList:Faculty[];
+  facultyList: Faculty[];
 }
 
 const departments = [
@@ -90,7 +90,7 @@ const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
   return `data:image/jpeg;base64,${base64}`;
 };
 
-const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit,facultyList }) => {
+const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit, facultyList }) => {
   const [step, setStep] = useState(1);
   const initialFaculty: Faculty = {
     id: Math.random().toString(36).substr(2, 9),
@@ -102,10 +102,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     experience: "",
     employmentType: "Regular",
     type: "Teaching Staff",
-     priority: null,
+    priority: null,
     qualifications: [],
     avatar: null,
-    patents: [],
+    achievements: [],
     bookChapters: [],
     certifications: [],
     internationalJournalPublications: [],
@@ -115,12 +115,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-
-// Inside FacultyModal
-
-const getAvailablePriorities = () => {
+  const getAvailablePriorities = () => {
     if (!faculty.department) {
-      return [null]; // Return only null when no department is selected
+      return [null];
     }
 
     const usedPriorities = facultyList
@@ -148,7 +145,7 @@ const getAvailablePriorities = () => {
   const initialQualification: Qualification = {
     id: Math.random().toString(36).substr(2, 9),
     degree: "",
-    nameOfDigree:"",
+    nameOfDigree: "",
     passingYear: "",
     college: "",
     specialization: "",
@@ -156,34 +153,36 @@ const getAvailablePriorities = () => {
   const [newQualification, setNewQualification] = useState<Qualification>(initialQualification);
   const [editQualificationId, setEditQualificationId] = useState<string | null>(null);
 
-  const initialPatent: Patent = {
+  const initialAchievement: Achievement = {
     id: Math.random().toString(36).substr(2, 9),
-   
-    patentData:"",
+    heading: "",
+    descriptions: [""],
   };
-  const [newPatent, setNewPatent] = useState<Patent>(initialPatent);
-  const [editPatentId, setEditPatentId] = useState<string | null>(null);
+  const [newAchievement, setNewAchievement] = useState<Achievement>(initialAchievement);
+  const [editAchievementId, setEditAchievementId] = useState<string | null>(null);
+  const [currentDescriptionIndex, setCurrentDescriptionIndex] = useState(0);
 
   const initialBookChapter: BookChapter = {
     id: Math.random().toString(36).substr(2, 9),
-    bookChapterData: "",
-
+    heading: "",
+    descriptions: [""],
   };
   const [newBookChapter, setNewBookChapter] = useState<BookChapter>(initialBookChapter);
   const [editBookChapterId, setEditBookChapterId] = useState<string | null>(null);
+  const [currentBookChapterDescriptionIndex, setCurrentBookChapterDescriptionIndex] = useState(0);
 
   const initialCertification: Certification = {
     id: Math.random().toString(36).substr(2, 9),
-    certifications: "",
-   
+    heading: "",
+    descriptions: [""],
   };
   const [newCertification, setNewCertification] = useState<Certification>(initialCertification);
   const [editCertificationId, setEditCertificationId] = useState<string | null>(null);
+  const [currentCertificationDescriptionIndex, setCurrentCertificationDescriptionIndex] = useState(0);
 
   const initialJournal: JournalPublication = {
     id: Math.random().toString(36).substr(2, 9),
     publicationsData: "",
-    
   };
   const [newJournalPublication, setNewJournalPublication] = useState<JournalPublication>(initialJournal);
   const [editJournalPublicationId, setEditJournalPublicationId] = useState<string | null>(null);
@@ -191,7 +190,6 @@ const getAvailablePriorities = () => {
   const initialConference: ConferencePublication = {
     id: Math.random().toString(36).substr(2, 9),
     conferencePublications: "",
-   
   };
   const [newConferencePublication, setNewConferencePublication] = useState<ConferencePublication>(initialConference);
   const [editConferencePublicationId, setEditConferencePublicationId] = useState<string | null>(null);
@@ -202,12 +200,15 @@ const getAvailablePriorities = () => {
       setAvatarFile(null);
       setNewQualification(initialQualification);
       setEditQualificationId(null);
-      setNewPatent(initialPatent);
-      setEditPatentId(null);
+      setNewAchievement(initialAchievement);
+      setEditAchievementId(null);
+      setCurrentDescriptionIndex(0);
       setNewBookChapter(initialBookChapter);
       setEditBookChapterId(null);
+      setCurrentBookChapterDescriptionIndex(0);
       setNewCertification(initialCertification);
       setEditCertificationId(null);
+      setCurrentCertificationDescriptionIndex(0);
       setNewJournalPublication(initialJournal);
       setEditJournalPublicationId(null);
       setNewConferencePublication(initialConference);
@@ -219,12 +220,15 @@ const getAvailablePriorities = () => {
       setAvatarFile(null);
       setNewQualification(initialQualification);
       setEditQualificationId(null);
-      setNewPatent(initialPatent);
-      setEditPatentId(null);
+      setNewAchievement(initialAchievement);
+      setEditAchievementId(null);
+      setCurrentDescriptionIndex(0);
       setNewBookChapter(initialBookChapter);
       setEditBookChapterId(null);
+      setCurrentBookChapterDescriptionIndex(0);
       setNewCertification(initialCertification);
       setEditCertificationId(null);
+      setCurrentCertificationDescriptionIndex(0);
       setNewJournalPublication(initialJournal);
       setEditJournalPublicationId(null);
       setNewConferencePublication(initialConference);
@@ -234,38 +238,27 @@ const getAvailablePriorities = () => {
     }
   }, [mode, facultyToEdit, isOpen]);
 
-  const totalSteps = 7;
+  const totalSteps = 5;
 
-  // Auto-populate edit input with 0th item if available and not already editing
   useEffect(() => {
     if (step === 2 && faculty.qualifications.length > 0 && !editQualificationId) {
       setNewQualification(faculty.qualifications[0]);
       setEditQualificationId(faculty.qualifications[0].id);
     }
-    if (step === 3 && faculty.patents && faculty.patents.length > 0 && !editPatentId) {
-      setNewPatent(faculty.patents[0]);
-      setEditPatentId(faculty.patents[0].id);
+    if (step === 3 && faculty.achievements && faculty.achievements.length > 0 && !editAchievementId) {
+      setNewAchievement(faculty.achievements[0]);
+      setEditAchievementId(faculty.achievements[0].id);
+      setCurrentDescriptionIndex(0);
     }
     if (step === 4 && faculty.bookChapters && faculty.bookChapters.length > 0 && !editBookChapterId) {
       setNewBookChapter(faculty.bookChapters[0]);
       setEditBookChapterId(faculty.bookChapters[0].id);
+      setCurrentBookChapterDescriptionIndex(0);
     }
     if (step === 5 && faculty.certifications && faculty.certifications.length > 0 && !editCertificationId) {
       setNewCertification(faculty.certifications[0]);
       setEditCertificationId(faculty.certifications[0].id);
-    }
-    if (step === 6 && faculty.internationalJournalPublications && faculty.internationalJournalPublications.length > 0 && !editJournalPublicationId) {
-      setNewJournalPublication(faculty.internationalJournalPublications[0]);
-      setEditJournalPublicationId(faculty.internationalJournalPublications[0].id);
-    }
-    if (
-      step === 7 &&
-      faculty.internationalConferencePublications &&
-      faculty.internationalConferencePublications.length > 0 &&
-      !editConferencePublicationId
-    ) {
-      setNewConferencePublication(faculty.internationalConferencePublications[0]);
-      setEditConferencePublicationId(faculty.internationalConferencePublications[0].id);
+      setCurrentCertificationDescriptionIndex(0);
     }
   }, [step]);
 
@@ -275,55 +268,51 @@ const getAvailablePriorities = () => {
       if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
       if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
       if (!faculty.department) newErrors.department = "Department is required";
-      // if (!faculty.email || !/\S+@\S+\.\S+/.test(faculty.email)) newErrors.email = "Valid email is required";
       if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
       if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
       if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
       if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
       if (!faculty.type) newErrors.type = "Type is required";
     }
-   if (currentStep === 2) {
-    // Only validate newQualification if the user is adding/updating a qualification
-    const isAddingOrUpdating =
-      newQualification.degree ||
-      newQualification.nameOfDigree ||
-      newQualification.passingYear ||
-      newQualification.college ||
-      newQualification.specialization ||
-      editQualificationId;
+    if (currentStep === 2) {
+      const isAddingOrUpdating =
+        newQualification.degree ||
+        newQualification.nameOfDigree ||
+        newQualification.passingYear ||
+        newQualification.college ||
+        newQualification.specialization ||
+        editQualificationId;
 
-    if (isAddingOrUpdating) {
-      if (!newQualification.degree || newQualification.degree.trim() === "") {
-        newErrors.degree = "Degree is required";
+      if (isAddingOrUpdating) {
+        if (!newQualification.degree || newQualification.degree.trim() === "") {
+          newErrors.degree = "Degree is required";
+        }
+        if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
+          newErrors.nameOfDigree = "Name of degree is required";
+        }
+        if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
+          newErrors.passingYear = "Passing Year is required";
+        }
+        if (!newQualification.college || newQualification.college.trim() === "") {
+          newErrors.college = "College is required";
+        }
+        if (!newQualification.specialization || newQualification.specialization.trim() === "") {
+          newErrors.specialization = "Specialization is required";
+        }
       }
-      if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
-        newErrors.nameOfDigree = "Name of degree is required";
+
+      if (mode === "edit" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
+        newErrors.qualifications = "At least one qualification is required";
       }
-      if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
-        newErrors.passingYear = "Passing Year is required";
-      }
-      if (!newQualification.college || newQualification.college.trim() === "") {
-        newErrors.college = "College is required";
-      }
-      if (!newQualification.specialization || newQualification.specialization.trim() === "") {
-        newErrors.specialization = "Specialization is required";
+
+      if (mode === "add" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
+        newErrors.qualifications = "At least one qualification is required";
       }
     }
 
-    // In edit mode, allow proceeding if there are existing qualifications
-    if (mode === "edit" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
-      newErrors.qualifications = "At least one qualification is required";
-    }
-
-    // In add mode, require at least one qualification to be added
-    if (mode === "add" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
-      newErrors.qualifications = "At least one qualification is required";
-    }
-  }
-
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleNext = () => {
     if (step === 2 && newQualification.degree && newQualification.nameOfDigree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
@@ -342,54 +331,79 @@ const getAvailablePriorities = () => {
         setNewQualification(initialQualification);
       }
     }
-    if (step === 3 && newPatent.patentData) {
-      if (editPatentId) {
+    
+    if (step === 3 && newAchievement.heading.trim() && newAchievement.descriptions.some(desc => desc.trim())) {
+      if (editAchievementId) {
         setFaculty({
           ...faculty,
-          patents: (faculty.patents || []).map((p) => (p.id === editPatentId ? { ...newPatent, id: p.id } : p)),
+          achievements: (faculty.achievements || []).map((a) => 
+            a.id === editAchievementId ? { ...newAchievement, id: a.id } : a
+          ),
         });
-        setEditPatentId(null);
-        setNewPatent(initialPatent);
+        setEditAchievementId(null);
+        setNewAchievement(initialAchievement);
+        setCurrentDescriptionIndex(0);
       } else {
         setFaculty({
           ...faculty,
-          patents: [...(faculty.patents || []), { ...newPatent, id: Math.random().toString(36).substr(2, 9) }],
+          achievements: [...(faculty.achievements || []), { 
+            ...newAchievement, 
+            id: Math.random().toString(36).substr(2, 9) 
+          }],
         });
-        setNewPatent(initialPatent);
+        setNewAchievement(initialAchievement);
+        setCurrentDescriptionIndex(0);
       }
     }
-    if (step === 4 && newBookChapter.bookChapterData) {
+
+    if (step === 4 && newBookChapter.heading.trim() && newBookChapter.descriptions.some(desc => desc.trim())) {
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
-          bookChapters: (faculty.bookChapters || []).map((b) => (b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b)),
+          bookChapters: (faculty.bookChapters || []).map((b) => 
+            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
+          ),
         });
         setEditBookChapterId(null);
         setNewBookChapter(initialBookChapter);
+        setCurrentBookChapterDescriptionIndex(0);
       } else {
         setFaculty({
           ...faculty,
-          bookChapters: [...(faculty.bookChapters || []), { ...newBookChapter, id: Math.random().toString(36).substr(2, 9) }],
+          bookChapters: [...(faculty.bookChapters || []), { 
+            ...newBookChapter, 
+            id: Math.random().toString(36).substr(2, 9) 
+          }],
         });
         setNewBookChapter(initialBookChapter);
+        setCurrentBookChapterDescriptionIndex(0);
       }
     }
-    if (step === 5 && newCertification.certifications) {
+
+    if (step === 5 && newCertification.heading.trim() && newCertification.descriptions.some(desc => desc.trim())) {
       if (editCertificationId) {
         setFaculty({
           ...faculty,
-          certifications: (faculty.certifications || []).map((c) => (c.id === editCertificationId ? { ...newCertification, id: c.id } : c)),
+          certifications: (faculty.certifications || []).map((c) => 
+            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
+          ),
         });
         setEditCertificationId(null);
         setNewCertification(initialCertification);
+        setCurrentCertificationDescriptionIndex(0);
       } else {
         setFaculty({
           ...faculty,
-          certifications: [...(faculty.certifications || []), { ...newCertification, id: Math.random().toString(36).substr(2, 9) }],
+          certifications: [...(faculty.certifications || []), { 
+            ...newCertification, 
+            id: Math.random().toString(36).substr(2, 9) 
+          }],
         });
         setNewCertification(initialCertification);
+        setCurrentCertificationDescriptionIndex(0);
       }
     }
+
     if (step === 6 && newJournalPublication.publicationsData) {
       if (editJournalPublicationId) {
         setFaculty({
@@ -411,9 +425,9 @@ const getAvailablePriorities = () => {
         setNewJournalPublication(initialJournal);
       }
     }
+    
     let shouldSubmit = false;
     if (step === 7) {
-      // If the Conference Publication input is filled, add/update it before submit
       if (newConferencePublication.conferencePublications) {
         if (editConferencePublicationId) {
           setFaculty((prev) => ({
@@ -444,25 +458,8 @@ const getAvailablePriorities = () => {
       if (step < totalSteps) {
         setStep(step + 1);
       } else {
-        // Wait for state update if we just added a conference publication
-        if (step === 7 && newConferencePublication.conferencePublications) {
-          setTimeout(() => {
-            onSubmit(
-              {
-                ...faculty,
-                internationalConferencePublications: [
-                  ...(faculty.internationalConferencePublications || []),
-                  { ...newConferencePublication, id: Math.random().toString(36).substr(2, 9) },
-                ],
-              },
-              avatarFile
-            );
-            onClose();
-          }, 0);
-        } else {
-          onSubmit(faculty, avatarFile);
-          onClose();
-        }
+        onSubmit(faculty, avatarFile);
+        onClose();
       }
     }
   };
@@ -482,28 +479,286 @@ const getAvailablePriorities = () => {
     }
   };
 
-const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value } = e.target;
-  if (name === 'avatar') {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (file) {
-      setAvatarFile(file);
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = {
-        type: file.type,
-        data: Array.from(new Uint8Array(arrayBuffer)),
-      };
-      setFaculty({ ...faculty, avatar: buffer });
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === 'avatar') {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        setAvatarFile(file);
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = {
+          type: file.type,
+          data: Array.from(new Uint8Array(arrayBuffer)),
+        };
+        setFaculty({ ...faculty, avatar: buffer });
+      } else {
+        setAvatarFile(null);
+        setFaculty({ ...faculty, avatar: null });
+      }
+    } else if (name === 'priority') {
+      setFaculty({ ...faculty, priority: parseInt(value, 10) || null });
     } else {
-      setAvatarFile(null);
-      setFaculty({ ...faculty, avatar: null });
+      setFaculty({ ...faculty, [name]: value });
     }
-  } else if (name === 'priority') {
-    setFaculty({ ...faculty, priority: parseInt(value, 10) });
-  } else {
-    setFaculty({ ...faculty, [name]: value });
-  }
-};
+  };
+
+  // Achievement Handlers
+  const handleAchievementHeadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewAchievement({ ...newAchievement, heading: value });
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+    const value = e.target.value;
+    const updatedDescriptions = [...newAchievement.descriptions];
+    updatedDescriptions[index] = value;
+    setNewAchievement({ ...newAchievement, descriptions: updatedDescriptions });
+  };
+
+  const addDescription = () => {
+    setNewAchievement({
+      ...newAchievement,
+      descriptions: [...newAchievement.descriptions, ""]
+    });
+    setCurrentDescriptionIndex(newAchievement.descriptions.length);
+  };
+
+  const removeDescription = (index: number) => {
+    if (newAchievement.descriptions.length > 1) {
+      const updatedDescriptions = newAchievement.descriptions.filter((_, i) => i !== index);
+      setNewAchievement({ ...newAchievement, descriptions: updatedDescriptions });
+      if (currentDescriptionIndex > index && currentDescriptionIndex > 0) {
+        setCurrentDescriptionIndex(currentDescriptionIndex - 1);
+      }
+    }
+  };
+
+  const addOrUpdateAchievement = () => {
+    if (newAchievement.heading.trim() && newAchievement.descriptions.some(desc => desc.trim())) {
+      if (editAchievementId) {
+        setFaculty({
+          ...faculty,
+          achievements: (faculty.achievements || []).map((a) => 
+            a.id === editAchievementId ? { ...newAchievement, id: a.id } : a
+          ),
+        });
+        setEditAchievementId(null);
+        setNewAchievement(initialAchievement);
+        setCurrentDescriptionIndex(0);
+      } else {
+        setFaculty({
+          ...faculty,
+          achievements: [...(faculty.achievements || []), { 
+            ...newAchievement, 
+            id: Math.random().toString(36).substr(2, 9) 
+          }],
+        });
+        setNewAchievement(initialAchievement);
+        setCurrentDescriptionIndex(0);
+      }
+    } else {
+      alert("Please fill heading and at least one description.");
+    }
+  };
+
+  const editAchievement = (id: string) => {
+    const achievement = (faculty.achievements || []).find((a) => a.id === id);
+    if (achievement) {
+      setNewAchievement(achievement);
+      setEditAchievementId(id);
+      setCurrentDescriptionIndex(0);
+    }
+  };
+
+  const removeAchievement = (id: string) => {
+    setFaculty({
+      ...faculty,
+      achievements: (faculty.achievements || []).filter((a) => a.id !== id),
+    });
+    if (editAchievementId === id) {
+      setEditAchievementId(null);
+      setNewAchievement(initialAchievement);
+      setCurrentDescriptionIndex(0);
+    }
+  };
+
+  const cancelEditAchievement = () => {
+    setEditAchievementId(null);
+    setNewAchievement(initialAchievement);
+    setCurrentDescriptionIndex(0);
+  };
+
+  // Book Chapter Handlers
+  const handleBookChapterHeadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewBookChapter({ ...newBookChapter, heading: value });
+  };
+
+  const handleBookChapterDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+    const value = e.target.value;
+    const updatedDescriptions = [...newBookChapter.descriptions];
+    updatedDescriptions[index] = value;
+    setNewBookChapter({ ...newBookChapter, descriptions: updatedDescriptions });
+  };
+
+  const addBookChapterDescription = () => {
+    setNewBookChapter({
+      ...newBookChapter,
+      descriptions: [...newBookChapter.descriptions, ""]
+    });
+    setCurrentBookChapterDescriptionIndex(newBookChapter.descriptions.length);
+  };
+
+  const removeBookChapterDescription = (index: number) => {
+    if (newBookChapter.descriptions.length > 1) {
+      const updatedDescriptions = newBookChapter.descriptions.filter((_, i) => i !== index);
+      setNewBookChapter({ ...newBookChapter, descriptions: updatedDescriptions });
+      if (currentBookChapterDescriptionIndex > index && currentBookChapterDescriptionIndex > 0) {
+        setCurrentBookChapterDescriptionIndex(currentBookChapterDescriptionIndex - 1);
+      }
+    }
+  };
+
+  const addOrUpdateBookChapter = () => {
+    if (newBookChapter.heading.trim() && newBookChapter.descriptions.some(desc => desc.trim())) {
+      if (editBookChapterId) {
+        setFaculty({
+          ...faculty,
+          bookChapters: (faculty.bookChapters || []).map((b) => 
+            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
+          ),
+        });
+        setEditBookChapterId(null);
+        setNewBookChapter(initialBookChapter);
+        setCurrentBookChapterDescriptionIndex(0);
+      } else {
+        setFaculty({
+          ...faculty,
+          bookChapters: [...(faculty.bookChapters || []), { 
+            ...newBookChapter, 
+            id: Math.random().toString(36).substr(2, 9) 
+          }],
+        });
+        setNewBookChapter(initialBookChapter);
+        setCurrentBookChapterDescriptionIndex(0);
+      }
+    } else {
+      alert("Please fill heading and at least one description.");
+    }
+  };
+
+  const editBookChapter = (id: string) => {
+    const bookChapter = (faculty.bookChapters || []).find((b) => b.id === id);
+    if (bookChapter) {
+      setNewBookChapter(bookChapter);
+      setEditBookChapterId(id);
+      setCurrentBookChapterDescriptionIndex(0);
+    }
+  };
+
+  const removeBookChapter = (id: string) => {
+    setFaculty({
+      ...faculty,
+      bookChapters: (faculty.bookChapters || []).filter((b) => b.id !== id),
+    });
+    if (editBookChapterId === id) {
+      setEditBookChapterId(null);
+      setNewBookChapter(initialBookChapter);
+      setCurrentBookChapterDescriptionIndex(0);
+    }
+  };
+
+  const cancelEditBookChapter = () => {
+    setEditBookChapterId(null);
+    setNewBookChapter(initialBookChapter);
+    setCurrentBookChapterDescriptionIndex(0);
+  };
+
+  // Certification Handlers
+  const handleCertificationHeadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewCertification({ ...newCertification, heading: value });
+  };
+
+  const handleCertificationDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+    const value = e.target.value;
+    const updatedDescriptions = [...newCertification.descriptions];
+    updatedDescriptions[index] = value;
+    setNewCertification({ ...newCertification, descriptions: updatedDescriptions });
+  };
+
+  const addCertificationDescription = () => {
+    setNewCertification({
+      ...newCertification,
+      descriptions: [...newCertification.descriptions, ""]
+    });
+    setCurrentCertificationDescriptionIndex(newCertification.descriptions.length);
+  };
+
+  const removeCertificationDescription = (index: number) => {
+    if (newCertification.descriptions.length > 1) {
+      const updatedDescriptions = newCertification.descriptions.filter((_, i) => i !== index);
+      setNewCertification({ ...newCertification, descriptions: updatedDescriptions });
+      if (currentCertificationDescriptionIndex > index && currentCertificationDescriptionIndex > 0) {
+        setCurrentCertificationDescriptionIndex(currentCertificationDescriptionIndex - 1);
+      }
+    }
+  };
+
+  const addOrUpdateCertification = () => {
+    if (newCertification.heading.trim() && newCertification.descriptions.some(desc => desc.trim())) {
+      if (editCertificationId) {
+        setFaculty({
+          ...faculty,
+          certifications: (faculty.certifications || []).map((c) => 
+            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
+          ),
+        });
+        setEditCertificationId(null);
+        setNewCertification(initialCertification);
+        setCurrentCertificationDescriptionIndex(0);
+      } else {
+        setFaculty({
+          ...faculty,
+          certifications: [...(faculty.certifications || []), { 
+            ...newCertification, 
+            id: Math.random().toString(36).substr(2, 9) 
+          }],
+        });
+        setNewCertification(initialCertification);
+        setCurrentCertificationDescriptionIndex(0);
+      }
+    } else {
+      alert("Please fill heading and at least one description.");
+    }
+  };
+
+  const editCertification = (id: string) => {
+    const certification = (faculty.certifications || []).find((c) => c.id === id);
+    if (certification) {
+      setNewCertification(certification);
+      setEditCertificationId(id);
+      setCurrentCertificationDescriptionIndex(0);
+    }
+  };
+
+  const removeCertification = (id: string) => {
+    setFaculty({
+      ...faculty,
+      certifications: (faculty.certifications || []).filter((c) => c.id !== id),
+    });
+    if (editCertificationId === id) {
+      setEditCertificationId(null);
+      setNewCertification(initialCertification);
+      setCurrentCertificationDescriptionIndex(0);
+    }
+  };
+
+  const cancelEditCertification = () => {
+    setEditCertificationId(null);
+    setNewCertification(initialCertification);
+    setCurrentCertificationDescriptionIndex(0);
+  };
 
   // Qualification Handlers
   const handleQualificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -556,162 +811,6 @@ const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSel
     setNewQualification(initialQualification);
   };
 
-  // Patent Handlers
-const handlePatentChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-) => {
-  const { name, value } = e.target;
-  setNewPatent({ ...newPatent, [name]: value });
-};
-
-
-  const addOrUpdatePatent = () => {
-    if (newPatent.patentData) {
-      if (editPatentId) {
-        setFaculty({
-          ...faculty,
-          patents: (faculty.patents || []).map((p) => (p.id === editPatentId ? { ...newPatent, id: p.id } : p)),
-        });
-        setEditPatentId(null);
-        setNewPatent(initialPatent);
-      } else {
-        setFaculty({
-          ...faculty,
-          patents: [...(faculty.patents || []), { ...newPatent, id: Math.random().toString(36).substr(2, 9) }],
-        });
-        setNewPatent(initialPatent);
-      }
-    } else {
-      alert("Please fill all required fields for the patent.");
-    }
-  };
-
-  const editPatent = (id: string) => {
-    const patent = (faculty.patents || []).find((p) => p.id === id);
-    if (patent) {
-      setNewPatent(patent);
-      setEditPatentId(id);
-    }
-  };
-
-  const removePatent = (id: string) => {
-    setFaculty({
-      ...faculty,
-      patents: (faculty.patents || []).filter((p) => p.id !== id),
-    });
-    if (editPatentId === id) {
-      setEditPatentId(null);
-      setNewPatent(initialPatent);
-    }
-  };
-
-  const cancelEditPatent = () => {
-    setEditPatentId(null);
-    setNewPatent(initialPatent);
-  };
-
-  // Book Chapter Handlers
-  const handleBookChapterChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target as any;
-    setNewBookChapter({ ...newBookChapter, [name]: type === "checkbox" ? checked : value });
-  };
-
-  const addOrUpdateBookChapter = () => {
-    if (newBookChapter.bookChapterData) {
-      if (editBookChapterId) {
-        setFaculty({
-          ...faculty,
-          bookChapters: (faculty.bookChapters || []).map((b) => (b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b)),
-        });
-        setEditBookChapterId(null);
-        setNewBookChapter(initialBookChapter);
-      } else {
-        setFaculty({
-          ...faculty,
-          bookChapters: [...(faculty.bookChapters || []), { ...newBookChapter, id: Math.random().toString(36).substr(2, 9) }],
-        });
-        setNewBookChapter(initialBookChapter);
-      }
-    } else {
-      alert("Please fill all required fields for the book chapter.");
-    }
-  };
-
-  const editBookChapter = (id: string) => {
-    const bookChapter = (faculty.bookChapters || []).find((b) => b.id === id);
-    if (bookChapter) {
-      setNewBookChapter(bookChapter);
-      setEditBookChapterId(id);
-    }
-  };
-
-  const removeBookChapter = (id: string) => {
-    setFaculty({
-      ...faculty,
-      bookChapters: (faculty.bookChapters || []).filter((b) => b.id !== id),
-    });
-    if (editBookChapterId === id) {
-      setEditBookChapterId(null);
-      setNewBookChapter(initialBookChapter);
-    }
-  };
-
-  const cancelEditBookChapter = () => {
-    setEditBookChapterId(null);
-    setNewBookChapter(initialBookChapter);
-  };
-
-  // Certification Handlers
-  const handleCertificationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewCertification({ ...newCertification, [name]: value });
-  };
-
-  const addOrUpdateCertification = () => {
-    if (newCertification.certifications ) {
-      if (editCertificationId) {
-        setFaculty({
-          ...faculty,
-          certifications: (faculty.certifications || []).map((c) => (c.id === editCertificationId ? { ...newCertification, id: c.id } : c)),
-        });
-        setEditCertificationId(null);
-        setNewCertification(initialCertification);
-      } else {
-        setFaculty({
-          ...faculty,
-          certifications: [...(faculty.certifications || []), { ...newCertification, id: Math.random().toString(36).substr(2, 9) }],
-        });
-        setNewCertification(initialCertification);
-      }
-    } else {
-      alert("Please fill all required fields for the certification.");
-    }
-  };
-
-  const editCertification = (id: string) => {
-    const certification = (faculty.certifications || []).find((c) => c.id === id);
-    if (certification) {
-      setNewCertification(certification);
-      setEditCertificationId(id);
-    }
-  };
-
-  const removeCertification = (id: string) => {
-    setFaculty({
-      ...faculty,
-      certifications: (faculty.certifications || []).filter((c) => c.id !== id),
-    });
-    if (editCertificationId === id) {
-      setEditCertificationId(null);
-      setNewCertification(initialCertification);
-    }
-  };
-
-  const cancelEditCertification = () => {
-    setEditCertificationId(null);
-    setNewCertification(initialCertification);
-  };
-
   // Journal Publication Handlers
   const handleJournalPublicationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -719,7 +818,7 @@ const handlePatentChange = (
   };
 
   const addOrUpdateJournalPublication = () => {
-    if (newJournalPublication.publicationsData ) {
+    if (newJournalPublication.publicationsData) {
       if (editJournalPublicationId) {
         setFaculty({
           ...faculty,
@@ -775,7 +874,7 @@ const handlePatentChange = (
   };
 
   const addOrUpdateConferencePublication = () => {
-    if (newConferencePublication.conferencePublications ) {
+    if (newConferencePublication.conferencePublications) {
       if (editConferencePublicationId) {
         setFaculty({
           ...faculty,
@@ -889,11 +988,10 @@ const handlePatentChange = (
                 <input
                   type="email"
                   name="email"
-                  value={faculty.email}
+                  value={faculty.email || ""}
                   onChange={handleInputChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Joining Date *</label>
@@ -932,23 +1030,23 @@ const handlePatentChange = (
                 {errors.employmentType && <p className="text-red-500 text-sm mt-1">{errors.employmentType}</p>}
               </div>
               <div>
-  <label className="block text-sm font-medium mb-1">Type *</label>
-  <select
-    name="type"
-    value={faculty.type}
-    onChange={handleInputChange}
-    className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  >
-    <option value="Teaching Staff">Teaching Staff</option>
-    <option value="Technical Staff">Technical Staff</option>
-  </select>
-  {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
-</div>
-     <div>
+                <label className="block text-sm font-medium mb-1">Type *</label>
+                <select
+                  name="type"
+                  value={faculty.type}
+                  onChange={handleInputChange}
+                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Teaching Staff">Teaching Staff</option>
+                  <option value="Technical Staff">Technical Staff</option>
+                </select>
+                {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
+              </div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Priority (Higher appears first)</label>
                 <select
                   name="priority"
-                  value={faculty.priority === null ? "null" : faculty.priority}
+                  value={faculty.priority === null ? "null" : faculty.priority?.toString()}
                   onChange={handleInputChange}
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
@@ -959,7 +1057,6 @@ const handlePatentChange = (
                     </option>
                   ))}
                 </select>
-                {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Avatar {mode === "add" ? "*" : "(Optional)"}</label>
@@ -994,7 +1091,7 @@ const handlePatentChange = (
                 />
                 {errors.degree && <p className="text-red-500 text-sm mt-1">{errors.degree}</p>}
               </div>
-                     <div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Name of Degree *</label>
                 <input
                   type="text"
@@ -1072,140 +1169,335 @@ const handlePatentChange = (
 
         {step === 3 && (
           <div>
-            <h3 className="text-lg font-semibold mb-4">Patents (Optional)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
-                <textarea
-                  name="patentData"
-                  value={newPatent.patentData}
-                  onChange={handlePatentChange}
+            <h3 className="text-lg font-semibold mb-4">Achievements (Optional)</h3>
+            
+            {/* Achievement Form */}
+            <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Achievement Heading *</label>
+                <input
+                  type="text"
+                  value={newAchievement.heading}
+                  onChange={handleAchievementHeadingChange}
+                  placeholder="Enter achievement heading/title"
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               
-            </div>
-            <div className="flex space-x-2">
-              <button onClick={addOrUpdatePatent} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                {editPatentId ? "Update Patent" : "Add Patent"}
-              </button>
-              {editPatentId && (
-                <button onClick={cancelEditPatent} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
-                  Cancel Edit
-                </button>
-              )}
-            </div>
-            {faculty.patents && faculty.patents.length > 0 && (
-              <ul className="mt-4 space-y-2">
-                {faculty.patents.map((p) => (
-                  <li key={p.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {p.patentData}
-                    <div className="flex space-x-2">
-                      <button onClick={() => editPatent(p.id)} className="text-blue-500 hover:text-blue-700">
-                        Edit
-                      </button>
-                      <button onClick={() => removePatent(p.id)} className="text-red-500 hover:text-red-700">
-                        Remove
-                      </button>
+              <div>
+                <label className="block text-sm font-medium mb-2">Descriptions *</label>
+                <div className="space-y-3">
+                  {newAchievement.descriptions.map((desc, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <textarea
+                        value={desc}
+                        onChange={(e) => handleDescriptionChange(e, index)}
+                        placeholder={`Description ${index + 1}`}
+                        rows={3}
+                        className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      />
+                      {newAchievement.descriptions.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeDescription(index)}
+                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                        >
+                          ×
+                        </button>
+                      )}
                     </div>
-                  </li>
-                ))}
-              </ul>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={addDescription}
+                  className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
+                >
+                  + Add Description
+                </button>
+              </div>
+              
+              <div className="flex space-x-2 mt-4">
+                <button 
+                  onClick={addOrUpdateAchievement} 
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  disabled={!newAchievement.heading.trim() || !newAchievement.descriptions.some(desc => desc.trim())}
+                >
+                  {editAchievementId ? "Update Achievement" : "Add Achievement"}
+                </button>
+                {editAchievementId && (
+                  <button 
+                    onClick={cancelEditAchievement} 
+                    className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                  >
+                    Cancel Edit
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Existing Achievements List */}
+            {faculty.achievements && faculty.achievements.length > 0 && (
+              <div>
+                <h4 className="text-md font-medium mb-2">Added Achievements:</h4>
+                <div className="space-y-3">
+                  {faculty.achievements.map((achievement) => (
+                    <div key={achievement.id} className="bg-white border rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <h5 className="font-semibold text-lg">{achievement.heading}</h5>
+                        <div className="flex space-x-2">
+                          <button 
+                            onClick={() => editAchievement(achievement.id)} 
+                            className="text-blue-500 hover:text-blue-700 text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => removeAchievement(achievement.id)} 
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1 ml-4">
+                        {achievement.descriptions.map((desc, index) => (
+                          desc.trim() && (
+                            <p key={index} className="text-sm text-gray-700 pl-2 border-l-2 border-blue-300">
+                              • {desc}
+                            </p>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         )}
 
         {step === 4 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Book Chapters (Optional)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Book Chapters</label>
-                <textarea
-                  name="bookChapterData"
-                  value={newBookChapter.bookChapterData}
-                  onChange={handleBookChapterChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-             
-            </div>
-            <div className="flex space-x-2">
-              <button onClick={addOrUpdateBookChapter} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                {editBookChapterId ? "Update Book Chapter" : "Add Book Chapter"}
-              </button>
-              {editBookChapterId && (
-                <button onClick={cancelEditBookChapter} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
-                  Cancel Edit
+  <div>
+    <h3 className="text-lg font-semibold mb-4">Career Advancement (Optional)</h3>
+    
+    {/* Book Chapter Form */}
+    <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-2">Career Advancement *</label>
+        <input
+          type="text"
+          value={newBookChapter.heading}
+          onChange={handleBookChapterHeadingChange}
+          placeholder="Enter Career Advancement heading/title"
+          className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Descriptions *</label>
+        <div className="space-y-3">
+          {newBookChapter.descriptions.map((desc, index) => (
+            <div key={index} className="flex items-start space-x-2">
+              <textarea
+                value={desc}
+                onChange={(e) => handleBookChapterDescriptionChange(e, index)}
+                placeholder={`Description ${index + 1}`}
+                rows={3}
+                className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+              {newBookChapter.descriptions.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeBookChapterDescription(index)}
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                >
+                  ×
                 </button>
               )}
             </div>
-            {faculty.bookChapters && faculty.bookChapters.length > 0 && (
-              <ul className="mt-4 space-y-2">
-                {faculty.bookChapters.map((bc) => (
-                  <li key={bc.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {bc.bookChapterData}
-                    <div className="flex space-x-2">
-                      <button onClick={() => editBookChapter(bc.id)} className="text-blue-500 hover:text-blue-700">
-                        Edit
-                      </button>
-                      <button onClick={() => removeBookChapter(bc.id)} className="text-red-500 hover:text-red-700">
-                        Remove
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addBookChapterDescription}
+          className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
+        >
+          + Add Description
+        </button>
+      </div>
+      
+      <div className="flex space-x-2 mt-4">
+        <button 
+          onClick={addOrUpdateBookChapter} 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          disabled={!newBookChapter.heading.trim() || !newBookChapter.descriptions.some(desc => desc.trim())}
+        >
+          {editBookChapterId ? "Update Career Advancement" : "Add Career Advancement"}
+        </button>
+        {editBookChapterId && (
+          <button 
+            onClick={cancelEditBookChapter} 
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel Edit
+          </button>
         )}
+      </div>
+    </div>
 
-        {step === 5 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Certifications (Optional)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Certifications</label>
-                <textarea
-                  name="certifications"
-                  value={newCertification.certifications}
-                  onChange={handleCertificationChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+    {/* Existing Book Chapters List */}
+    {faculty.bookChapters && faculty.bookChapters.length > 0 && (
+      <div>
+        <h4 className="text-md font-medium mb-2">Added Career Advancement:</h4>
+        <div className="space-y-3">
+          {faculty.bookChapters.map((bookChapter) => (
+            <div key={bookChapter.id} className="bg-white border rounded-lg p-4 shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <h5 className="font-semibold text-lg">{bookChapter.heading}</h5>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => editBookChapter(bookChapter.id)} 
+                    className="text-blue-500 hover:text-blue-700 text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => removeBookChapter(bookChapter.id)} 
+                    className="text-red-500 hover:text-red-700 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
-              
+              <div className="space-y-1 ml-4">
+                {bookChapter.descriptions.map((desc, index) => (
+                  desc.trim() && (
+                    <p key={index} className="text-sm text-gray-700 pl-2 border-l-2 ">
+                      • {desc}
+                    </p>
+                  )
+                ))}
+              </div>
             </div>
-            <div className="flex space-x-2">
-              <button onClick={addOrUpdateCertification} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                {editCertificationId ? "Update Certification" : "Add Certification"}
-              </button>
-              {editCertificationId && (
-                <button onClick={cancelEditCertification} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
-                  Cancel Edit
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
+      {step === 5 && (
+  <div>
+    <h3 className="text-lg font-semibold mb-4">Publications (Optional)</h3>
+    
+    {/* Certification Form */}
+    <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-2">Publications Heading *</label>
+        <input
+          type="text"
+          value={newCertification.heading}
+          onChange={handleCertificationHeadingChange}
+          placeholder="Enter Publications heading/title"
+          className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Descriptions *</label>
+        <div className="space-y-3">
+          {newCertification.descriptions.map((desc, index) => (
+            <div key={index} className="flex items-start space-x-2">
+              <textarea
+                value={desc}
+                onChange={(e) => handleCertificationDescriptionChange(e, index)}
+                placeholder={`Description ${index + 1}`}
+                rows={3}
+                className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+              {newCertification.descriptions.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeCertificationDescription(index)}
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                >
+                  ×
                 </button>
               )}
             </div>
-            {faculty.certifications && faculty.certifications.length > 0 && (
-              <ul className="mt-4 space-y-2">
-                {faculty.certifications.map((c) => (
-                  <li key={c.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    {c.certifications}
-                    <div className="flex space-x-2">
-                      <button onClick={() => editCertification(c.id)} className="text-blue-500 hover:text-blue-700">
-                        Edit
-                      </button>
-                      <button onClick={() => removeCertification(c.id)} className="text-red-500 hover:text-red-700">
-                        Remove
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addCertificationDescription}
+          className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
+        >
+          + Add Description
+        </button>
+      </div>
+      
+      <div className="flex space-x-2 mt-4">
+        <button 
+          onClick={addOrUpdateCertification} 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          disabled={!newCertification.heading.trim() || !newCertification.descriptions.some(desc => desc.trim())}
+        >
+          {editCertificationId ? "Update Publications" : "Add Publications"}
+        </button>
+        {editCertificationId && (
+          <button 
+            onClick={cancelEditCertification} 
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel Edit
+          </button>
         )}
+      </div>
+    </div>
 
-        {step === 6 && (
+    {/* Existing Certifications List */}
+    {faculty.certifications && faculty.certifications.length > 0 && (
+      <div>
+        <h4 className="text-md font-medium mb-2">Added Publications:</h4>
+        <div className="space-y-3">
+          {faculty.certifications.map((certification) => (
+            <div key={certification.id} className="bg-white border rounded-lg p-4 shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <h5 className="font-semibold text-lg">{certification.heading}</h5>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => editCertification(certification.id)} 
+                    className="text-blue-500 hover:text-blue-700 text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => removeCertification(certification.id)} 
+                    className="text-red-500 hover:text-red-700 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-1 ml-4">
+                {certification.descriptions.map((desc, index) => (
+                  desc.trim() && (
+                    <p key={index} className="text-sm text-gray-700 pl-2  ">
+                      • {desc}
+                    </p>
+                  )
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
+        {/* {step === 6 && (
           <div>
             <h3 className="text-lg font-semibold mb-4">Journal Publications (Optional)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -1295,7 +1587,7 @@ const handlePatentChange = (
               </ul>
             )}
           </div>
-        )}
+        )} */}
 
         <div className="flex justify-between mt-6">
           <button onClick={onClose} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">

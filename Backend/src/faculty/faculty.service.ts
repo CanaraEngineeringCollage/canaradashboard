@@ -24,7 +24,7 @@ export class FacultyService {
     return this.facultyRepository.find({
       relations: [
         'qualifications',
-        'patents',
+        'achievements',
         'bookChapters',
         'certifications',
         'internationalJournalPublications',
@@ -38,7 +38,7 @@ export class FacultyService {
       where: { id },
       relations: [
         'qualifications',
-        'patents',
+        'achievements',
         'bookChapters',
         'certifications',
         'internationalJournalPublications',

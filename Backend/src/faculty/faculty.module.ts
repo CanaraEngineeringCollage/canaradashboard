@@ -4,7 +4,7 @@ import { FacultyController } from './faculty.controller';
 import { FacultyService } from './faculty.service';
 import { Faculty } from './entities/faculty.entity';
 import { Qualification } from './entities/qualification.entity';
-import { Patent } from './entities/patent.entity';
+import { Achievement } from './entities/patent.entity';
 import { BookChapter } from './entities/book-chapter.entity';
 import { Certification } from './entities/certification.entity';
 import { JournalPublication } from './entities/journal-publication.entity';
@@ -15,7 +15,7 @@ import { ConferencePublication } from './entities/conference-publication.entity'
     TypeOrmModule.forFeature([
       Faculty,
       Qualification,
-      Patent,
+      Achievement,
       BookChapter,
       Certification,
       JournalPublication,

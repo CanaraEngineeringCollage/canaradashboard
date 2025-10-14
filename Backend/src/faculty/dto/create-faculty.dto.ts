@@ -28,26 +28,41 @@ export class CreateQualificationDto {
   specialization: string;
 }
 
-export class CreatePatentDto {
-  
+export class CreateAchievementDto {
   @IsString()
-  patentData: string;
+  @IsNotEmpty()
+  heading: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  descriptions: string[];
 }
 
+// Updated BookChapter DTO to match frontend interface
 export class CreateBookChapterDto {
   @IsString()
-  bookChapterData: string;
+  @IsNotEmpty()
+  heading: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  descriptions: string[];
 }
 
+// Updated Certification DTO to match frontend interface
 export class CreateCertificationDto {
   @IsString()
-  certifications: string;
+  @IsNotEmpty()
+  heading: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  descriptions: string[];
 }
 
 export class CreateJournalPublicationDto {
   @IsString()
   publicationsData: string;
-
 }
 
 export class CreateConferencePublicationDto {
@@ -67,7 +82,8 @@ export class CreateFacultyDto {
   department: string;
 
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
 
   @IsDateString()
   joiningDate: string;
@@ -78,12 +94,12 @@ export class CreateFacultyDto {
   @IsEnum(['Regular', 'Contract', 'Visiting'])
   employmentType: 'Regular' | 'Contract' | 'Visiting';
 
-  @IsEnum(['Teaching Staff', 'Technical Staff']) // New field
+  @IsEnum(['Teaching Staff', 'Technical Staff'])
   type: 'Teaching Staff' | 'Technical Staff';
 
-   @IsInt()
-  @IsOptional() // Allows null or undefined
-  priority: number | null; // Type updated to allow null
+  @IsInt()
+  @IsOptional()
+  priority?: number | null;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -93,8 +109,82 @@ export class CreateFacultyDto {
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreatePatentDto)
-  patents?: CreatePatentDto[];
+  @Type(() => CreateAchievementDto)
+  achievements?: CreateAchievementDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateBookChapterDto)
+  bookChapters?: CreateBookChapterDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateCertificationDto)
+  certifications?: CreateCertificationDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateJournalPublicationDto)
+  internationalJournalPublications?: CreateJournalPublicationDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateConferencePublicationDto)
+  internationalConferencePublications?: CreateConferencePublicationDto[];
+}
+
+export class UpdateFacultyDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  designation?: string;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
+
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @IsDateString()
+  @IsOptional()
+  joiningDate?: string;
+
+  @IsString()
+  @IsOptional()
+  experience?: string;
+
+  @IsEnum(['Regular', 'Contract', 'Visiting'])
+  @IsOptional()
+  employmentType?: 'Regular' | 'Contract' | 'Visiting';
+
+  @IsEnum(['Teaching Staff', 'Technical Staff'])
+  @IsOptional()
+  type?: 'Teaching Staff' | 'Technical Staff';
+
+  @IsInt()
+  @IsOptional()
+  priority?: number | null;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateQualificationDto)
+  qualifications?: CreateQualificationDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateAchievementDto)
+  achievements?: CreateAchievementDto[];
 
   @IsOptional()
   @IsArray()
