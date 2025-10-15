@@ -73,6 +73,7 @@ const EventModal: React.FC<Props> = ({
             <option value="Computer Science & Business System">Computer Science & Business System</option>
             <option value="Artificial Intelligence & Machine Learning">Artificial Intelligence & Machine Learning</option>
             <option value="Science & Humanities">Science & Humanities</option>
+             <option value="Student Welfare Department">Student Welfare Department</option>
 
             {/* <option value="College Event">College Event</option> */}
           </select>

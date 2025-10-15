@@ -1263,7 +1263,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                       <div className="space-y-1 ml-4">
                         {achievement.descriptions.map((desc, index) => (
                           desc.trim() && (
-                            <p key={index} className="text-sm text-gray-700 pl-2 border-l-2 border-blue-300">
+                            <p key={index} className="text-sm text-gray-700 pl-2 ">
                               • {desc}
                             </p>
                           )
@@ -1373,7 +1373,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <div className="space-y-1 ml-4">
                 {bookChapter.descriptions.map((desc, index) => (
                   desc.trim() && (
-                    <p key={index} className="text-sm text-gray-700 pl-2 border-l-2 ">
+                    <p key={index} className="text-sm text-gray-700 pl-2  ">
                       • {desc}
                     </p>
                   )
