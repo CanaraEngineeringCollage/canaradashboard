@@ -80,6 +80,7 @@ const departments = [
   "Computer Science & Design",
   "Computer Science & Business System",
   "Artificial Intelligence & Machine Learning",
+  "Mechanical Engineering",
   "Science & Humanities",
   "Placement Team",
 ];
