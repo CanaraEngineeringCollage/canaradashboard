@@ -33,6 +33,25 @@ export class FacultyService {
     });
   }
 
+  async findByDepartment(department: string) {
+    return this.facultyRepository.find({
+      where: { department },
+      relations: [
+        'qualifications',
+        'achievements',
+        'bookChapters',
+        'certifications',
+        'internationalJournalPublications',
+        'internationalConferencePublications',
+      ],
+    });
+  }
+
+async getTotalCount() {
+  return await this.facultyRepository.count();
+}
+
+
   async findOne(id: string) {
     return this.facultyRepository.findOne({
       where: { id },

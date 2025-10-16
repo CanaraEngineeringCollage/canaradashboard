@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard } from "lucide-react";
-import { getAllFaculty } from "@/lib/faculty";
+import { getAllFaculty, getFacultyCount } from "@/lib/faculty";
 import { getGrievances } from "@/lib/grievance";
 import { getScStGrievances } from "@/lib/scstGrievances";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,8 +28,8 @@ useEffect(() => {
 
   const fetchAllData = async () => {
     try {
-      const faculties = await getAllFaculty();
-      setFacultyCount(faculties.length);
+      const res = await getFacultyCount();
+      setFacultyCount(res.count);
     } catch (error) {
       console.error(error);
     }

@@ -27,6 +27,10 @@ export async function updateFaculty(id: string, data: FormData) {
   });
 }
 
+export async function getFacultyCount() {
+  return apiFetch('/faculty/count', { method: 'GET' });
+}
+
 export async function deleteFaculty(id: string) {
   return apiFetch(`/faculty/${id}`, {
     method: 'DELETE',

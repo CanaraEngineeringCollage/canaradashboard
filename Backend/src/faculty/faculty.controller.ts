@@ -12,6 +12,7 @@ import {
   NotFoundException,
   BadRequestException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
@@ -45,10 +46,21 @@ export class FacultyController {
   }
 
   // Public – Anyone can view faculty list
-  @Get()
-  async findAll() {
+@Get()
+  async findAll(@Query('department') department?: string) {
+    if (department) {
+      return await this.facultyService.findByDepartment(department);
+    }
     return await this.facultyService.findAll();
   }
+
+
+@Get('count')
+async getFacultyCount() {
+  const count = await this.facultyService.getTotalCount();
+  return { count };
+}
+
 
   // Public – Anyone can view one faculty
   @Get(':id')
