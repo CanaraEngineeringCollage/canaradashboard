@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { LandPlot, PlusCircle } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import TablePagination from "@/components/ui/TablePagination";
 
 // Interfaces
 interface Achievement {
@@ -316,7 +317,14 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   const handleNext = () => {
-    if (step === 2 && newQualification.degree && newQualification.nameOfDigree && newQualification.passingYear && newQualification.college && newQualification.specialization) {
+    if (
+      step === 2 &&
+      newQualification.degree &&
+      newQualification.nameOfDigree &&
+      newQualification.passingYear &&
+      newQualification.college &&
+      newQualification.specialization
+    ) {
       if (editQualificationId) {
         setFaculty({
           ...faculty,
@@ -332,14 +340,12 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewQualification(initialQualification);
       }
     }
-    
-    if (step === 3 && newAchievement.heading.trim() && newAchievement.descriptions.some(desc => desc.trim())) {
+
+    if (step === 3 && newAchievement.heading.trim() && newAchievement.descriptions.some((desc) => desc.trim())) {
       if (editAchievementId) {
         setFaculty({
           ...faculty,
-          achievements: (faculty.achievements || []).map((a) => 
-            a.id === editAchievementId ? { ...newAchievement, id: a.id } : a
-          ),
+          achievements: (faculty.achievements || []).map((a) => (a.id === editAchievementId ? { ...newAchievement, id: a.id } : a)),
         });
         setEditAchievementId(null);
         setNewAchievement(initialAchievement);
@@ -347,23 +353,24 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       } else {
         setFaculty({
           ...faculty,
-          achievements: [...(faculty.achievements || []), { 
-            ...newAchievement, 
-            id: Math.random().toString(36).substr(2, 9) 
-          }],
+          achievements: [
+            ...(faculty.achievements || []),
+            {
+              ...newAchievement,
+              id: Math.random().toString(36).substr(2, 9),
+            },
+          ],
         });
         setNewAchievement(initialAchievement);
         setCurrentDescriptionIndex(0);
       }
     }
 
-    if (step === 4 && newBookChapter.heading.trim() && newBookChapter.descriptions.some(desc => desc.trim())) {
+    if (step === 4 && newBookChapter.heading.trim() && newBookChapter.descriptions.some((desc) => desc.trim())) {
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
-          bookChapters: (faculty.bookChapters || []).map((b) => 
-            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
-          ),
+          bookChapters: (faculty.bookChapters || []).map((b) => (b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b)),
         });
         setEditBookChapterId(null);
         setNewBookChapter(initialBookChapter);
@@ -371,23 +378,24 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       } else {
         setFaculty({
           ...faculty,
-          bookChapters: [...(faculty.bookChapters || []), { 
-            ...newBookChapter, 
-            id: Math.random().toString(36).substr(2, 9) 
-          }],
+          bookChapters: [
+            ...(faculty.bookChapters || []),
+            {
+              ...newBookChapter,
+              id: Math.random().toString(36).substr(2, 9),
+            },
+          ],
         });
         setNewBookChapter(initialBookChapter);
         setCurrentBookChapterDescriptionIndex(0);
       }
     }
 
-    if (step === 5 && newCertification.heading.trim() && newCertification.descriptions.some(desc => desc.trim())) {
+    if (step === 5 && newCertification.heading.trim() && newCertification.descriptions.some((desc) => desc.trim())) {
       if (editCertificationId) {
         setFaculty({
           ...faculty,
-          certifications: (faculty.certifications || []).map((c) => 
-            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
-          ),
+          certifications: (faculty.certifications || []).map((c) => (c.id === editCertificationId ? { ...newCertification, id: c.id } : c)),
         });
         setEditCertificationId(null);
         setNewCertification(initialCertification);
@@ -395,10 +403,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       } else {
         setFaculty({
           ...faculty,
-          certifications: [...(faculty.certifications || []), { 
-            ...newCertification, 
-            id: Math.random().toString(36).substr(2, 9) 
-          }],
+          certifications: [
+            ...(faculty.certifications || []),
+            {
+              ...newCertification,
+              id: Math.random().toString(36).substr(2, 9),
+            },
+          ],
         });
         setNewCertification(initialCertification);
         setCurrentCertificationDescriptionIndex(0);
@@ -426,7 +437,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setNewJournalPublication(initialJournal);
       }
     }
-    
+
     let shouldSubmit = false;
     if (step === 7) {
       if (newConferencePublication.conferencePublications) {
@@ -482,7 +493,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === 'avatar') {
+    if (name === "avatar") {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         setAvatarFile(file);
@@ -496,7 +507,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setAvatarFile(null);
         setFaculty({ ...faculty, avatar: null });
       }
-    } else if (name === 'priority') {
+    } else if (name === "priority") {
       setFaculty({ ...faculty, priority: parseInt(value, 10) || null });
     } else {
       setFaculty({ ...faculty, [name]: value });
@@ -519,7 +530,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const addDescription = () => {
     setNewAchievement({
       ...newAchievement,
-      descriptions: [...newAchievement.descriptions, ""]
+      descriptions: [...newAchievement.descriptions, ""],
     });
     setCurrentDescriptionIndex(newAchievement.descriptions.length);
   };
@@ -535,13 +546,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   const addOrUpdateAchievement = () => {
-    if (newAchievement.heading.trim() && newAchievement.descriptions.some(desc => desc.trim())) {
+    if (newAchievement.heading.trim() && newAchievement.descriptions.some((desc) => desc.trim())) {
       if (editAchievementId) {
         setFaculty({
           ...faculty,
-          achievements: (faculty.achievements || []).map((a) => 
-            a.id === editAchievementId ? { ...newAchievement, id: a.id } : a
-          ),
+          achievements: (faculty.achievements || []).map((a) => (a.id === editAchievementId ? { ...newAchievement, id: a.id } : a)),
         });
         setEditAchievementId(null);
         setNewAchievement(initialAchievement);
@@ -549,10 +558,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       } else {
         setFaculty({
           ...faculty,
-          achievements: [...(faculty.achievements || []), { 
-            ...newAchievement, 
-            id: Math.random().toString(36).substr(2, 9) 
-          }],
+          achievements: [
+            ...(faculty.achievements || []),
+            {
+              ...newAchievement,
+              id: Math.random().toString(36).substr(2, 9),
+            },
+          ],
         });
         setNewAchievement(initialAchievement);
         setCurrentDescriptionIndex(0);
@@ -605,7 +617,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const addBookChapterDescription = () => {
     setNewBookChapter({
       ...newBookChapter,
-      descriptions: [...newBookChapter.descriptions, ""]
+      descriptions: [...newBookChapter.descriptions, ""],
     });
     setCurrentBookChapterDescriptionIndex(newBookChapter.descriptions.length);
   };
@@ -621,13 +633,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   const addOrUpdateBookChapter = () => {
-    if (newBookChapter.heading.trim() && newBookChapter.descriptions.some(desc => desc.trim())) {
+    if (newBookChapter.heading.trim() && newBookChapter.descriptions.some((desc) => desc.trim())) {
       if (editBookChapterId) {
         setFaculty({
           ...faculty,
-          bookChapters: (faculty.bookChapters || []).map((b) => 
-            b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b
-          ),
+          bookChapters: (faculty.bookChapters || []).map((b) => (b.id === editBookChapterId ? { ...newBookChapter, id: b.id } : b)),
         });
         setEditBookChapterId(null);
         setNewBookChapter(initialBookChapter);
@@ -635,10 +645,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       } else {
         setFaculty({
           ...faculty,
-          bookChapters: [...(faculty.bookChapters || []), { 
-            ...newBookChapter, 
-            id: Math.random().toString(36).substr(2, 9) 
-          }],
+          bookChapters: [
+            ...(faculty.bookChapters || []),
+            {
+              ...newBookChapter,
+              id: Math.random().toString(36).substr(2, 9),
+            },
+          ],
         });
         setNewBookChapter(initialBookChapter);
         setCurrentBookChapterDescriptionIndex(0);
@@ -691,7 +704,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const addCertificationDescription = () => {
     setNewCertification({
       ...newCertification,
-      descriptions: [...newCertification.descriptions, ""]
+      descriptions: [...newCertification.descriptions, ""],
     });
     setCurrentCertificationDescriptionIndex(newCertification.descriptions.length);
   };
@@ -707,13 +720,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   const addOrUpdateCertification = () => {
-    if (newCertification.heading.trim() && newCertification.descriptions.some(desc => desc.trim())) {
+    if (newCertification.heading.trim() && newCertification.descriptions.some((desc) => desc.trim())) {
       if (editCertificationId) {
         setFaculty({
           ...faculty,
-          certifications: (faculty.certifications || []).map((c) => 
-            c.id === editCertificationId ? { ...newCertification, id: c.id } : c
-          ),
+          certifications: (faculty.certifications || []).map((c) => (c.id === editCertificationId ? { ...newCertification, id: c.id } : c)),
         });
         setEditCertificationId(null);
         setNewCertification(initialCertification);
@@ -721,10 +732,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       } else {
         setFaculty({
           ...faculty,
-          certifications: [...(faculty.certifications || []), { 
-            ...newCertification, 
-            id: Math.random().toString(36).substr(2, 9) 
-          }],
+          certifications: [
+            ...(faculty.certifications || []),
+            {
+              ...newCertification,
+              id: Math.random().toString(36).substr(2, 9),
+            },
+          ],
         });
         setNewCertification(initialCertification);
         setCurrentCertificationDescriptionIndex(0);
@@ -1052,11 +1066,13 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="null">No Priority</option>
-                  {getAvailablePriorities().filter(p => p !== null).map((priority) => (
-                    <option key={priority} value={priority}>
-                      {priority}
-                    </option>
-                  ))}
+                  {getAvailablePriorities()
+                    .filter((p) => p !== null)
+                    .map((priority) => (
+                      <option key={priority} value={priority}>
+                        {priority}
+                      </option>
+                    ))}
                 </select>
               </div>
               <div>
@@ -1171,7 +1187,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         {step === 3 && (
           <div>
             <h3 className="text-lg font-semibold mb-4">Achievements (Optional)</h3>
-            
+
             {/* Achievement Form */}
             <div className="mb-6 p-4 border rounded-lg bg-gray-50">
               <div className="mb-4">
@@ -1184,7 +1200,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Descriptions *</label>
                 <div className="space-y-3">
@@ -1209,28 +1225,21 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                     </div>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  onClick={addDescription}
-                  className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
-                >
+                <button type="button" onClick={addDescription} className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm">
                   + Add Description
                 </button>
               </div>
-              
+
               <div className="flex space-x-2 mt-4">
-                <button 
-                  onClick={addOrUpdateAchievement} 
+                <button
+                  onClick={addOrUpdateAchievement}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  disabled={!newAchievement.heading.trim() || !newAchievement.descriptions.some(desc => desc.trim())}
+                  disabled={!newAchievement.heading.trim() || !newAchievement.descriptions.some((desc) => desc.trim())}
                 >
                   {editAchievementId ? "Update Achievement" : "Add Achievement"}
                 </button>
                 {editAchievementId && (
-                  <button 
-                    onClick={cancelEditAchievement} 
-                    className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                  >
+                  <button onClick={cancelEditAchievement} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
                     Cancel Edit
                   </button>
                 )}
@@ -1247,28 +1256,23 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                       <div className="flex justify-between items-start mb-2">
                         <h5 className="font-semibold text-lg">{achievement.heading}</h5>
                         <div className="flex space-x-2">
-                          <button 
-                            onClick={() => editAchievement(achievement.id)} 
-                            className="text-blue-500 hover:text-blue-700 text-sm"
-                          >
+                          <button onClick={() => editAchievement(achievement.id)} className="text-blue-500 hover:text-blue-700 text-sm">
                             Edit
                           </button>
-                          <button 
-                            onClick={() => removeAchievement(achievement.id)} 
-                            className="text-red-500 hover:text-red-700 text-sm"
-                          >
+                          <button onClick={() => removeAchievement(achievement.id)} className="text-red-500 hover:text-red-700 text-sm">
                             Remove
                           </button>
                         </div>
                       </div>
                       <div className="space-y-1 ml-4">
-                        {achievement.descriptions.map((desc, index) => (
-                          desc.trim() && (
-                            <p key={index} className="text-sm text-gray-700 pl-2 ">
-                              • {desc}
-                            </p>
-                          )
-                        ))}
+                        {achievement.descriptions.map(
+                          (desc, index) =>
+                            desc.trim() && (
+                              <p key={index} className="text-sm text-gray-700 pl-2 ">
+                                • {desc}
+                              </p>
+                            )
+                        )}
                       </div>
                     </div>
                   ))}
@@ -1279,224 +1283,208 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         )}
 
         {step === 4 && (
-  <div>
-    <h3 className="text-lg font-semibold mb-4">Career Advancement (Optional)</h3>
-    
-    {/* Book Chapter Form */}
-    <div className="mb-6 p-4 border rounded-lg bg-gray-50">
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">Career Advancement *</label>
-        <input
-          type="text"
-          value={newBookChapter.heading}
-          onChange={handleBookChapterHeadingChange}
-          placeholder="Enter Career Advancement heading/title"
-          className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium mb-2">Descriptions *</label>
-        <div className="space-y-3">
-          {newBookChapter.descriptions.map((desc, index) => (
-            <div key={index} className="flex items-start space-x-2">
-              <textarea
-                value={desc}
-                onChange={(e) => handleBookChapterDescriptionChange(e, index)}
-                placeholder={`Description ${index + 1}`}
-                rows={3}
-                className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-              {newBookChapter.descriptions.length > 1 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Career Advancement (Optional)</h3>
+
+            {/* Book Chapter Form */}
+            <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Career Advancement *</label>
+                <input
+                  type="text"
+                  value={newBookChapter.heading}
+                  onChange={handleBookChapterHeadingChange}
+                  placeholder="Enter Career Advancement heading/title"
+                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Descriptions *</label>
+                <div className="space-y-3">
+                  {newBookChapter.descriptions.map((desc, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <textarea
+                        value={desc}
+                        onChange={(e) => handleBookChapterDescriptionChange(e, index)}
+                        placeholder={`Description ${index + 1}`}
+                        rows={3}
+                        className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      />
+                      {newBookChapter.descriptions.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeBookChapterDescription(index)}
+                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
                 <button
                   type="button"
-                  onClick={() => removeBookChapterDescription(index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                  onClick={addBookChapterDescription}
+                  className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
                 >
-                  ×
+                  + Add Description
                 </button>
-              )}
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={addBookChapterDescription}
-          className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
-        >
-          + Add Description
-        </button>
-      </div>
-      
-      <div className="flex space-x-2 mt-4">
-        <button 
-          onClick={addOrUpdateBookChapter} 
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          disabled={!newBookChapter.heading.trim() || !newBookChapter.descriptions.some(desc => desc.trim())}
-        >
-          {editBookChapterId ? "Update Career Advancement" : "Add Career Advancement"}
-        </button>
-        {editBookChapterId && (
-          <button 
-            onClick={cancelEditBookChapter} 
-            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-          >
-            Cancel Edit
-          </button>
-        )}
-      </div>
-    </div>
+              </div>
 
-    {/* Existing Book Chapters List */}
-    {faculty.bookChapters && faculty.bookChapters.length > 0 && (
-      <div>
-        <h4 className="text-md font-medium mb-2">Added Career Advancement:</h4>
-        <div className="space-y-3">
-          {faculty.bookChapters.map((bookChapter) => (
-            <div key={bookChapter.id} className="bg-white border rounded-lg p-4 shadow-sm">
-              <div className="flex justify-between items-start mb-2">
-                <h5 className="font-semibold text-lg">{bookChapter.heading}</h5>
-                <div className="flex space-x-2">
-                  <button 
-                    onClick={() => editBookChapter(bookChapter.id)} 
-                    className="text-blue-500 hover:text-blue-700 text-sm"
-                  >
-                    Edit
+              <div className="flex space-x-2 mt-4">
+                <button
+                  onClick={addOrUpdateBookChapter}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  disabled={!newBookChapter.heading.trim() || !newBookChapter.descriptions.some((desc) => desc.trim())}
+                >
+                  {editBookChapterId ? "Update Career Advancement" : "Add Career Advancement"}
+                </button>
+                {editBookChapterId && (
+                  <button onClick={cancelEditBookChapter} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
+                    Cancel Edit
                   </button>
-                  <button 
-                    onClick={() => removeBookChapter(bookChapter.id)} 
-                    className="text-red-500 hover:text-red-700 text-sm"
-                  >
-                    Remove
-                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Existing Book Chapters List */}
+            {faculty.bookChapters && faculty.bookChapters.length > 0 && (
+              <div>
+                <h4 className="text-md font-medium mb-2">Added Career Advancement:</h4>
+                <div className="space-y-3">
+                  {faculty.bookChapters.map((bookChapter) => (
+                    <div key={bookChapter.id} className="bg-white border rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <h5 className="font-semibold text-lg">{bookChapter.heading}</h5>
+                        <div className="flex space-x-2">
+                          <button onClick={() => editBookChapter(bookChapter.id)} className="text-blue-500 hover:text-blue-700 text-sm">
+                            Edit
+                          </button>
+                          <button onClick={() => removeBookChapter(bookChapter.id)} className="text-red-500 hover:text-red-700 text-sm">
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1 ml-4">
+                        {bookChapter.descriptions.map(
+                          (desc, index) =>
+                            desc.trim() && (
+                              <p key={index} className="text-sm text-gray-700 pl-2  ">
+                                • {desc}
+                              </p>
+                            )
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="space-y-1 ml-4">
-                {bookChapter.descriptions.map((desc, index) => (
-                  desc.trim() && (
-                    <p key={index} className="text-sm text-gray-700 pl-2  ">
-                      • {desc}
-                    </p>
-                  )
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-  </div>
-)}
+            )}
+          </div>
+        )}
 
-      {step === 5 && (
-  <div>
-    <h3 className="text-lg font-semibold mb-4">Publications (Optional)</h3>
-    
-    {/* Certification Form */}
-    <div className="mb-6 p-4 border rounded-lg bg-gray-50">
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">Publications Heading *</label>
-        <input
-          type="text"
-          value={newCertification.heading}
-          onChange={handleCertificationHeadingChange}
-          placeholder="Enter Publications heading/title"
-          className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium mb-2">Descriptions *</label>
-        <div className="space-y-3">
-          {newCertification.descriptions.map((desc, index) => (
-            <div key={index} className="flex items-start space-x-2">
-              <textarea
-                value={desc}
-                onChange={(e) => handleCertificationDescriptionChange(e, index)}
-                placeholder={`Description ${index + 1}`}
-                rows={3}
-                className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-              {newCertification.descriptions.length > 1 && (
+        {step === 5 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Publications (Optional)</h3>
+
+            {/* Certification Form */}
+            <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Publications Heading *</label>
+                <input
+                  type="text"
+                  value={newCertification.heading}
+                  onChange={handleCertificationHeadingChange}
+                  placeholder="Enter Publications heading/title"
+                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Descriptions *</label>
+                <div className="space-y-3">
+                  {newCertification.descriptions.map((desc, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <textarea
+                        value={desc}
+                        onChange={(e) => handleCertificationDescriptionChange(e, index)}
+                        placeholder={`Description ${index + 1}`}
+                        rows={3}
+                        className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      />
+                      {newCertification.descriptions.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCertificationDescription(index)}
+                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
                 <button
                   type="button"
-                  onClick={() => removeCertificationDescription(index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                  onClick={addCertificationDescription}
+                  className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
                 >
-                  ×
+                  + Add Description
                 </button>
-              )}
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={addCertificationDescription}
-          className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
-        >
-          + Add Description
-        </button>
-      </div>
-      
-      <div className="flex space-x-2 mt-4">
-        <button 
-          onClick={addOrUpdateCertification} 
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          disabled={!newCertification.heading.trim() || !newCertification.descriptions.some(desc => desc.trim())}
-        >
-          {editCertificationId ? "Update Publications" : "Add Publications"}
-        </button>
-        {editCertificationId && (
-          <button 
-            onClick={cancelEditCertification} 
-            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-          >
-            Cancel Edit
-          </button>
-        )}
-      </div>
-    </div>
+              </div>
 
-    {/* Existing Certifications List */}
-    {faculty.certifications && faculty.certifications.length > 0 && (
-      <div>
-        <h4 className="text-md font-medium mb-2">Added Publications:</h4>
-        <div className="space-y-3">
-          {faculty.certifications.map((certification) => (
-            <div key={certification.id} className="bg-white border rounded-lg p-4 shadow-sm">
-              <div className="flex justify-between items-start mb-2">
-                <h5 className="font-semibold text-lg">{certification.heading}</h5>
-                <div className="flex space-x-2">
-                  <button 
-                    onClick={() => editCertification(certification.id)} 
-                    className="text-blue-500 hover:text-blue-700 text-sm"
-                  >
-                    Edit
+              <div className="flex space-x-2 mt-4">
+                <button
+                  onClick={addOrUpdateCertification}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  disabled={!newCertification.heading.trim() || !newCertification.descriptions.some((desc) => desc.trim())}
+                >
+                  {editCertificationId ? "Update Publications" : "Add Publications"}
+                </button>
+                {editCertificationId && (
+                  <button onClick={cancelEditCertification} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
+                    Cancel Edit
                   </button>
-                  <button 
-                    onClick={() => removeCertification(certification.id)} 
-                    className="text-red-500 hover:text-red-700 text-sm"
-                  >
-                    Remove
-                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Existing Certifications List */}
+            {faculty.certifications && faculty.certifications.length > 0 && (
+              <div>
+                <h4 className="text-md font-medium mb-2">Added Publications:</h4>
+                <div className="space-y-3">
+                  {faculty.certifications.map((certification) => (
+                    <div key={certification.id} className="bg-white border rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <h5 className="font-semibold text-lg">{certification.heading}</h5>
+                        <div className="flex space-x-2">
+                          <button onClick={() => editCertification(certification.id)} className="text-blue-500 hover:text-blue-700 text-sm">
+                            Edit
+                          </button>
+                          <button onClick={() => removeCertification(certification.id)} className="text-red-500 hover:text-red-700 text-sm">
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1 ml-4">
+                        {certification.descriptions.map(
+                          (desc, index) =>
+                            desc.trim() && (
+                              <p key={index} className="text-sm text-gray-700 pl-2  ">
+                                • {desc}
+                              </p>
+                            )
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="space-y-1 ml-4">
-                {certification.descriptions.map((desc, index) => (
-                  desc.trim() && (
-                    <p key={index} className="text-sm text-gray-700 pl-2  ">
-                      • {desc}
-                    </p>
-                  )
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-  </div>
-)}
+            )}
+          </div>
+        )}
 
         {/* {step === 6 && (
           <div>
@@ -1626,37 +1614,38 @@ const Page: React.FC = () => {
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
   const { toast } = useToast();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
-const [isLoading,setIsLoading]=useState(false);
+  const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10); // show 10 faculties per page by default
 
-
-
-const fetchFaculties = () => {
-  setIsLoading(true);
-  fetch(`${API_BASE_URL}/faculty`)
-    .then((res) => res.json())
-    .then((data) => {
-      const sorted = data.sort(
-        (a: any, b: any) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setFaculties(sorted);
-    })
-    .catch((error) => {
-      console.error("Error fetching faculties:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load faculty data.",
-        variant: "destructive",
-      });
-    })
-    .finally(() => setIsLoading(false)); // ✅ correct place
-};
-
+  const fetchFaculties = () => {
+    setIsLoading(true);
+    fetch(`${API_BASE_URL}/faculty`)
+      .then((res) => res.json())
+      .then((data) => {
+        const sorted = data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setFaculties(sorted);
+      })
+      .catch((error) => {
+        console.error("Error fetching faculties:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load faculty data.",
+          variant: "destructive",
+        });
+      })
+      .finally(() => setIsLoading(false)); // ✅ correct place
+  };
 
   useEffect(() => {
     fetchFaculties();
   }, []);
+
+  // Reset to first page whenever filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, departmentFilter, faculties.length]);
 
   const handleAddFaculty = () => {
     setModalMode("add");
@@ -1683,9 +1672,9 @@ const fetchFaculties = () => {
       fetch(`${API_BASE_URL}/faculty`, {
         method: "POST",
         body: formData,
-         headers: {
-      Authorization: `Bearer ${token}`, 
-    },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
         .then((res) => {
           if (!res.ok) {
@@ -1696,7 +1685,7 @@ const fetchFaculties = () => {
           return res.json();
         })
         .then((newFaculty) => {
-           fetchFaculties();
+          fetchFaculties();
           setIsModalOpen(false);
           toast({
             title: "Success",
@@ -1705,11 +1694,11 @@ const fetchFaculties = () => {
         })
         .catch((error) => {
           console.error("Error adding faculty:", error);
-         
+
           toast({
             title: "Error",
             description: "Failed to add faculty.",
-              variant: "destructive",
+            variant: "destructive",
           });
         });
     } else {
@@ -1717,8 +1706,8 @@ const fetchFaculties = () => {
         method: "PATCH",
         body: formData,
         headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
-    },
+          Authorization: `Bearer ${token}`, // ✅ send token
+        },
       })
         .then((res) => {
           if (!res.ok) {
@@ -1729,7 +1718,7 @@ const fetchFaculties = () => {
           return res.json();
         })
         .then((updatedFaculty) => {
-            fetchFaculties();
+          fetchFaculties();
 
           setIsModalOpen(false);
           toast({
@@ -1742,7 +1731,7 @@ const fetchFaculties = () => {
           toast({
             title: "Error",
             description: "Failed to update faculty.",
-              variant: "destructive",
+            variant: "destructive",
           });
         });
     }
@@ -1752,9 +1741,9 @@ const fetchFaculties = () => {
     const token = localStorage.getItem("token");
     fetch(`${API_BASE_URL}/faculty/${id}`, {
       method: "DELETE",
-  headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
-    },
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ send token
+      },
     })
       .then((res) => {
         if (!res.ok) {
@@ -1770,11 +1759,11 @@ const fetchFaculties = () => {
       })
       .catch((error) => {
         console.error("Error deleting faculty:", error);
-        
-         toast({
+
+        toast({
           title: "Error",
           description: "Failed to delete faculty.",
-            variant: "destructive",
+          variant: "destructive",
         });
       });
   };
@@ -1785,6 +1774,16 @@ const fetchFaculties = () => {
     const matchesDept = departmentFilter ? faculty.department === departmentFilter : true;
     return matchesName && matchesDept;
   });
+
+  const totalFaculties = filteredFaculties.length;
+  const totalPages = Math.max(1, Math.ceil(totalFaculties / rowsPerPage));
+
+  // Ensure currentPage is within range
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const paginatedFaculties = filteredFaculties.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
   // Get unique departments for dropdown
   const departmentOptions = Array.from(new Set(faculties.map((f) => f.department))).filter(Boolean);
@@ -1832,7 +1831,7 @@ const fetchFaculties = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredFaculties.map((faculty) => (
+          {paginatedFaculties.map((faculty) => (
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
                 {faculty.avatar && (
@@ -1849,63 +1848,85 @@ const fetchFaculties = () => {
                 <button onClick={() => handleEditFaculty(faculty)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
                   Edit
                 </button>
-                <button  onClick={() => {
-    setFacultyToDelete(faculty);
-    setIsDeleteModalOpen(true);
-  }} className="bg-red-500 text-white px-2 py-1 rounded">
+                <button
+                  onClick={() => {
+                    setFacultyToDelete(faculty);
+                    setIsDeleteModalOpen(true);
+                  }}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                >
                   Delete
                 </button>
               </td>
             </tr>
           ))}
 
-
-       {isLoading ? (
-    <tr>
-      <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
-        Loading faculties...
-      </td>
-    </tr>
-  ) : filteredFaculties.length === 0 ? (
-    <tr>
-      <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
-        No faculties found.
-      </td>
-    </tr>
-  ) : (
-    filteredFaculties.map((faculty) => (
-      <tr key={faculty.id}>
-        {/* existing row content */}
-      </tr>
-    ))
-  )}
+          {isLoading ? (
+            <tr>
+              <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+                Loading faculties...
+              </td>
+            </tr>
+          ) : filteredFaculties.length === 0 ? (
+            <tr>
+              <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+                No faculties found.
+              </td>
+            </tr>
+          ) : // when not loading and there are some filtered results, the paginated rows are already rendered above
+          null}
         </tbody>
       </table>
+      {/* Pagination controls (replaced with reusable component) */}
+      <div className="mt-4">
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(p) => setCurrentPage(p)}
+          onRowsPerPageChange={(r) => {
+            setRowsPerPage(r);
+            setCurrentPage(1);
+          }}
+        />
+
+        <div className="text-sm text-gray-600 mt-2">
+          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalFaculties || 0)} - {Math.min(currentPage * rowsPerPage, totalFaculties)} of{" "}
+          {totalFaculties} faculties
+        </div>
+      </div>
       <FacultyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         mode={modalMode}
         facultyToEdit={selectedFaculty}
-       facultyList={faculties}
+        facultyList={faculties}
       />
       <DeleteConfirmationModal
-  isOpen={isDeleteModalOpen}
-  id={facultyToDelete?.id || ""}
-  itemName={facultyToDelete?.name || "this faculty"}
-  onClose={() => setIsDeleteModalOpen(false)}
-  onConfirm={(id) => {
-    handleDeleteFaculty(id);
-    setIsDeleteModalOpen(false);
-    setFacultyToDelete(null);
-  }}
-/>
+        isOpen={isDeleteModalOpen}
+        id={facultyToDelete?.id || ""}
+        itemName={facultyToDelete?.name || "this faculty"}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={(id: string) => {
+          handleDeleteFaculty(id);
+          setIsDeleteModalOpen(false);
+          setFacultyToDelete(null);
+        }}
+      />
     </div>
   );
 };
 
 export default Page;
 
+type DeleteConfirmationModalProps = {
+  isOpen: boolean;
+  id: string;
+  onClose: () => void;
+  onConfirm: (id: string) => void;
+  itemName?: string;
+};
 
 function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "this item" }: DeleteConfirmationModalProps) {
   if (!isOpen || !id) return null;
