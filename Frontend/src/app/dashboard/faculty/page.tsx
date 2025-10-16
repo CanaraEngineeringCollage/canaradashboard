@@ -1607,70 +1607,88 @@ const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 const Page: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [search, setSearch] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("");
+  const [search, setSearch] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
   const { toast } = useToast();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10); // show 10 faculties per page by default
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [totalFaculties, setTotalFaculties] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchFaculties = () => {
     setIsLoading(true);
-    fetch(`${API_BASE_URL}/faculty`)
+    const queryParams = new URLSearchParams({
+      page: currentPage.toString(),
+      limit: rowsPerPage.toString(),
+      ...(departmentFilter && { department: departmentFilter }),
+    });
+    fetch(`${API_BASE_URL}/faculty?${queryParams}`)
       .then((res) => res.json())
-      .then((data) => {
-        const sorted = data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setFaculties(sorted);
+      .then((response) => {
+        setFaculties(response.data);
+        setTotalFaculties(response.total);
+        setTotalPages(response.totalPages);
       })
       .catch((error) => {
-        console.error("Error fetching faculties:", error);
+        console.error('Error fetching faculties:', error);
         toast({
-          title: "Error",
-          description: "Failed to load faculty data.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to load faculty data.',
+          variant: 'destructive',
         });
       })
-      .finally(() => setIsLoading(false)); // ✅ correct place
+      .finally(() => setIsLoading(false));
+  };
+
+  // Fetch department options for dropdown
+  const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
+  const fetchDepartments = () => {
+    fetch(`${API_BASE_URL}/faculty`)
+      .then((res) => res.json())
+      .then((response) => {
+        const departments = Array.from(new Set(response.data.map((f: Faculty) => f.department))).filter(Boolean);
+        setDepartmentOptions(departments);
+      })
+      .catch((error) => {
+        console.error('Error fetching departments:', error);
+      });
   };
 
   useEffect(() => {
     fetchFaculties();
-  }, []);
-
-  // Reset to first page whenever filters/search change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, departmentFilter, faculties.length]);
+    fetchDepartments();
+  }, [currentPage, rowsPerPage, departmentFilter]);
 
   const handleAddFaculty = () => {
-    setModalMode("add");
+    setModalMode('add');
     setSelectedFaculty(undefined);
     setIsModalOpen(true);
   };
 
   const handleEditFaculty = (faculty: Faculty) => {
-    setModalMode("edit");
+    setModalMode('edit');
     setSelectedFaculty(faculty);
     setIsModalOpen(true);
   };
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
-    const token = localStorage.getItem("token");
-    const facultyData = { ...faculty, avatar: undefined }; // Remove avatar buffer from data
+    const token = localStorage.getItem('token');
+    const facultyData = { ...faculty, avatar: undefined };
     const formData = new FormData();
-    formData.append("data", JSON.stringify(facultyData));
+    formData.append('data', JSON.stringify(facultyData));
     if (avatarFile) {
-      formData.append("avatar", avatarFile);
+      formData.append('avatar', avatarFile);
     }
 
-    if (modalMode === "add") {
+    if (modalMode === 'add') {
       fetch(`${API_BASE_URL}/faculty`, {
-        method: "POST",
+        method: 'POST',
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1684,29 +1702,28 @@ const Page: React.FC = () => {
           }
           return res.json();
         })
-        .then((newFaculty) => {
+        .then(() => {
           fetchFaculties();
           setIsModalOpen(false);
           toast({
-            title: "Success",
-            description: "Faculty added successfully.",
+            title: 'Success',
+            description: 'Faculty added successfully.',
           });
         })
         .catch((error) => {
-          console.error("Error adding faculty:", error);
-
+          console.error('Error adding faculty:', error);
           toast({
-            title: "Error",
-            description: "Failed to add faculty.",
-            variant: "destructive",
+            title: 'Error',
+            description: 'Failed to add faculty.',
+            variant: 'destructive',
           });
         });
     } else {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
-        method: "PATCH",
+        method: 'PATCH',
         body: formData,
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ send token
+          Authorization: `Bearer ${token}`,
         },
       })
         .then((res) => {
@@ -1717,32 +1734,31 @@ const Page: React.FC = () => {
           }
           return res.json();
         })
-        .then((updatedFaculty) => {
+        .then(() => {
           fetchFaculties();
-
           setIsModalOpen(false);
           toast({
-            title: "Success",
-            description: "Faculty information updated successfully.",
+            title: 'Success',
+            description: 'Faculty information updated successfully.',
           });
         })
         .catch((error) => {
-          console.error("Error updating faculty:", error);
+          console.error('Error updating faculty:', error);
           toast({
-            title: "Error",
-            description: "Failed to update faculty.",
-            variant: "destructive",
+            title: 'Error',
+            description: 'Failed to update faculty.',
+            variant: 'destructive',
           });
         });
     }
   };
 
   const handleDeleteFaculty = (id: string) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     fetch(`${API_BASE_URL}/faculty/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`, // ✅ send token
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => {
@@ -1751,42 +1767,26 @@ const Page: React.FC = () => {
             throw new Error(err.message);
           });
         }
-        setFaculties(faculties.filter((f) => f.id !== id));
+        fetchFaculties();
         toast({
-          title: "Success",
-          description: "Faculty deleted successfully.",
+          title: 'Success',
+          description: 'Faculty deleted successfully.',
         });
       })
       .catch((error) => {
-        console.error("Error deleting faculty:", error);
-
+        console.error('Error deleting faculty:', error);
         toast({
-          title: "Error",
-          description: "Failed to delete faculty.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to delete faculty.',
+          variant: 'destructive',
         });
       });
   };
 
-  // Filter faculties by search and department
-  const filteredFaculties = faculties.filter((faculty) => {
-    const matchesName = faculty.name.toLowerCase().includes(search.toLowerCase());
-    const matchesDept = departmentFilter ? faculty.department === departmentFilter : true;
-    return matchesName && matchesDept;
-  });
-
-  const totalFaculties = filteredFaculties.length;
-  const totalPages = Math.max(1, Math.ceil(totalFaculties / rowsPerPage));
-
-  // Ensure currentPage is within range
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [currentPage, totalPages]);
-
-  const paginatedFaculties = filteredFaculties.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-
-  // Get unique departments for dropdown
-  const departmentOptions = Array.from(new Set(faculties.map((f) => f.department))).filter(Boolean);
+  // Filter faculties by search (client-side for name search)
+  const filteredFaculties = faculties.filter((faculty) =>
+    faculty.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="p-4">
@@ -1808,7 +1808,11 @@ const Page: React.FC = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="border outline-none rounded p-2 w-full md:w-1/3"
         />
-        <select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} className="border rounded p-2 w-full md:w-1/4">
+        <select
+          value={departmentFilter}
+          onChange={(e) => setDepartmentFilter(e.target.value)}
+          className="border rounded p-2 w-full md:w-1/4"
+        >
           <option value="">All Departments</option>
           {departmentOptions.map((dept) => (
             <option key={dept} value={dept}>
@@ -1824,28 +1828,33 @@ const Page: React.FC = () => {
             <th className="border px-4 py-2">Name</th>
             <th className="border px-4 py-2">Designation</th>
             <th className="border px-4 py-2">Department</th>
-            {/* <th className="border px-4 py-2">Email</th> */}
             <th className="border px-4 py-2">Joining Date</th>
             <th className="border px-4 py-2">Employment Type</th>
             <th className="border px-4 py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {paginatedFaculties.map((faculty) => (
+          {filteredFaculties.map((faculty) => (
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
                 {faculty.avatar && (
-                  <img src={bufferToBase64(faculty.avatar)} alt={`${faculty.name}'s avatar`} className="w-12 h-12 object-cover rounded" />
+                  <img
+                    src={bufferToBase64(faculty.avatar)}
+                    alt={`${faculty.name}'s avatar`}
+                    className="w-12 h-12 object-cover rounded"
+                  />
                 )}
               </td>
               <td className="border px-4 py-2">{faculty.name}</td>
               <td className="border px-4 py-2">{faculty.designation}</td>
               <td className="border px-4 py-2">{faculty.department}</td>
-              {/* <td className="border px-4 py-2">{faculty.email}</td> */}
               <td className="border px-4 py-2">{faculty.joiningDate}</td>
               <td className="border px-4 py-2">{faculty.employmentType}</td>
               <td className="border px-4 py-2 flex">
-                <button onClick={() => handleEditFaculty(faculty)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
+                <button
+                  onClick={() => handleEditFaculty(faculty)}
+                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                >
                   Edit
                 </button>
                 <button
@@ -1860,24 +1869,21 @@ const Page: React.FC = () => {
               </td>
             </tr>
           ))}
-
           {isLoading ? (
             <tr>
-              <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+              <td colSpan={7} className="border px-4 py-6 text-center text-gray-600">
                 Loading faculties...
               </td>
             </tr>
           ) : filteredFaculties.length === 0 ? (
             <tr>
-              <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+              <td colSpan={7} className="border px-4 py-6 text-center text-gray-600">
                 No faculties found.
               </td>
             </tr>
-          ) : // when not loading and there are some filtered results, the paginated rows are already rendered above
-          null}
+          ) : null}
         </tbody>
       </table>
-      {/* Pagination controls (replaced with reusable component) */}
       <div className="mt-4">
         <TablePagination
           currentPage={currentPage}
@@ -1889,10 +1895,9 @@ const Page: React.FC = () => {
             setCurrentPage(1);
           }}
         />
-
         <div className="text-sm text-gray-600 mt-2">
-          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalFaculties || 0)} - {Math.min(currentPage * rowsPerPage, totalFaculties)} of{" "}
-          {totalFaculties} faculties
+          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalFaculties || 0)} -{' '}
+          {Math.min(currentPage * rowsPerPage, totalFaculties)} of {totalFaculties} faculties
         </div>
       </div>
       <FacultyModal
@@ -1905,8 +1910,8 @@ const Page: React.FC = () => {
       />
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
-        id={facultyToDelete?.id || ""}
-        itemName={facultyToDelete?.name || "this faculty"}
+        id={facultyToDelete?.id || ''}
+        itemName={facultyToDelete?.name || 'this faculty'}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={(id: string) => {
           handleDeleteFaculty(id);

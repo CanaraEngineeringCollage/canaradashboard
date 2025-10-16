@@ -2,13 +2,15 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Param,
-  Delete,
   Put,
-  UploadedFile,
+  Delete,
+  Param,
+  Body,
   UseInterceptors,
+  UploadedFile,
   UseGuards,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EventService } from './events.service';
@@ -19,7 +21,8 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller('events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
-@UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   create(
@@ -30,15 +33,41 @@ export class EventController {
   }
 
   @Get()
-  findAll() {
-    return this.eventService.findAll();
+async findAll(
+  @Query('category') category?: string,
+  @Query('search') search?: string,
+  @Query('page') page: string = '1',
+  @Query('limit') limit: string = '10',
+  @Query('all') all?: string, // New query param
+) {
+  if (all === 'true') {
+    // Fetch all events for the category without pagination
+    return await this.eventService.findAll({ category, search, all: true });
+  }
+
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+
+  return await this.eventService.findAll({
+    category,
+    search,
+    page: pageNum,
+    limit: limitNum,
+  });
+}
+
+
+  @Get('categories')
+  async getCategories() {
+    return await this.eventService.getCategories();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eventService.findOne(id);
   }
-@UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(FileInterceptor('image'))
   update(
@@ -48,7 +77,8 @@ export class EventController {
   ) {
     return this.eventService.update(id, dto, file);
   }
-@UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventService.remove(id);

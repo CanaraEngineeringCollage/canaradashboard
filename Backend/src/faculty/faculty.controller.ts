@@ -18,16 +18,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';   // ✅ import guard
-
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('faculty')
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
   // ✅ Only logged-in admin can create
-
-    @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
@@ -45,22 +43,41 @@ export class FacultyController {
     }
   }
 
-  // Public – Anyone can view faculty list
-@Get()
-  async findAll(@Query('department') department?: string) {
-    if (department) {
-      return await this.facultyService.findByDepartment(department);
+  // Public – Anyone can view faculty list with pagination or all records
+  @Get()
+  async findAll(
+    @Query('department') department?: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('all') all?: string, // New query param to fetch all
+  ) {
+    if (all === 'true') {
+      // Fetch all faculties without pagination
+      return await this.facultyService.findAll({ department, all: true });
     }
-    return await this.facultyService.findAll();
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+
+    if (isNaN(pageNum) || pageNum < 1) {
+      throw new BadRequestException('Invalid page number');
+    }
+    if (isNaN(limitNum) || limitNum < 1) {
+      throw new BadRequestException('Invalid limit');
+    }
+
+    return await this.facultyService.findAll({
+      department,
+      page: pageNum,
+      limit: limitNum,
+    });
   }
 
-
-@Get('count')
-async getFacultyCount() {
-  const count = await this.facultyService.getTotalCount();
-  return { count };
-}
-
+  @Get('count')
+  async getFacultyCount(@Query('department') department?: string) {
+    const count = await this.facultyService.getTotalCount(department);
+    return { count };
+  }
 
   // Public – Anyone can view one faculty
   @Get(':id')

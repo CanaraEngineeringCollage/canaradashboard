@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 type Props = {
   currentPage: number;
@@ -9,7 +12,14 @@ type Props = {
   className?: string;
 };
 
-const TablePagination: React.FC<Props> = ({ currentPage, totalPages, rowsPerPage, onPageChange, onRowsPerPageChange, className = "" }) => {
+const TablePagination: React.FC<Props> = ({
+  currentPage,
+  totalPages,
+  rowsPerPage,
+  onPageChange,
+  onRowsPerPageChange,
+  className = "",
+}) => {
   const rowsOptions = [10, 25, 50, 100];
 
   const gotoFirst = () => onPageChange(1);
@@ -50,42 +60,42 @@ const TablePagination: React.FC<Props> = ({ currentPage, totalPages, rowsPerPage
             onClick={gotoFirst}
             disabled={disabledFirstPrev}
             aria-label="first page"
-            className={`px-2 py-1 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`p-2 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
               disabledFirstPrev ? "" : "shadow-sm"
             }`}
           >
-            &laquo;
+            <ChevronsLeft size={16} />
           </button>
           <button
             onClick={gotoPrev}
             disabled={disabledFirstPrev}
             aria-label="previous page"
-            className={`px-2 py-1 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`p-2 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
               disabledFirstPrev ? "" : "shadow-sm"
             }`}
           >
-            &lsaquo;
+            <ChevronLeft size={16} />
           </button>
 
           <button
             onClick={gotoNext}
             disabled={disabledNextLast}
             aria-label="next page"
-            className={`px-2 py-1 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`p-2 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
               disabledNextLast ? "" : "shadow-sm"
             }`}
           >
-            &rsaquo;
+            <ChevronRight size={16} />
           </button>
           <button
             onClick={gotoLast}
             disabled={disabledNextLast}
             aria-label="last page"
-            className={`px-2 py-1 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`p-2 rounded text-sm border bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed ${
               disabledNextLast ? "" : "shadow-sm"
             }`}
           >
-            &raquo;
+            <ChevronsRight size={16} />
           </button>
         </div>
       </div>
@@ -94,17 +104,3 @@ const TablePagination: React.FC<Props> = ({ currentPage, totalPages, rowsPerPage
 };
 
 export default TablePagination;
-
-/*
-Usage example:
-
-import TablePagination from "@/components/ui/TablePagination";
-
-<TablePagination
-  currentPage={currentPage}
-  totalPages={totalPages}
-  rowsPerPage={rowsPerPage}
-  onPageChange={(p) => setCurrentPage(p)}
-  onRowsPerPageChange={(r) => { setRowsPerPage(r); setCurrentPage(1); }}
-/>
-*/

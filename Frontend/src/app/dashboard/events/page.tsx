@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Event } from "@/lib/types";
 import { createEvent, deleteEvent, editEvent, getAllEvents } from "@/lib/events";
 import { useToast } from "@/hooks/use-toast";
+import TablePagination from "@/components/ui/TablePagination";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   id: string | null;
@@ -17,51 +18,107 @@ interface DeleteConfirmationModalProps {
 
 const EventsPage = () => {
   const [events, setEvents] = useState<Event[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event>>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isLoading,setIsLoading]=useState(false);
-    const { toast } = useToast();
-
-  console.log(events, "events");
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const { toast } = useToast();
 
   const fetchEvents = async () => {
     setIsLoading(true);
-    const res = await getAllEvents();
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/events?page=${currentPage}&limit=${rowsPerPage}${selectedCategory !== 'All' ? `&category=${encodeURIComponent(selectedCategory)}` : ''}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch events: ${res.statusText}`);
+      }
+      const { data, total } = await res.json();
+      setEvents(data || []);
+      setTotalEvents(total || 0);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to load events.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // Sort by createdAt descending (recent first)
-    const sortedEvents = res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    setEvents(sortedEvents);
-    setIsLoading(false);
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/categories`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch categories: ${res.statusText}`);
+      }
+      const data = await res.json();
+      console.log('Fetched categories:', data); // Debug log
+      if (Array.isArray(data)) {
+        const validCategories = ['All', ...data.filter((cat: string) => cat && typeof cat === 'string' && cat.trim() !== '')];
+        setCategories(validCategories);
+        if (validCategories.length <= 1) {
+          toast({
+            title: 'Warning',
+            description: 'No categories available.',
+            variant: 'default',
+          });
+        }
+      } else {
+        console.error('Categories response is not an array:', data);
+        setCategories(['All']);
+        toast({
+          title: 'Error',
+          description: 'Invalid categories data received.',
+          variant: 'destructive',
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setCategories(['All']);
+      toast({
+        title: 'Error',
+        description: 'Failed to load categories.',
+        variant: 'destructive',
+      });
+    }
   };
 
   useEffect(() => {
     fetchEvents();
+  }, [currentPage, rowsPerPage, selectedCategory, search]);
+
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
   const handleDelete = async (id: string) => {
     try {
       await deleteEvent(id);
-      setEvents((prev) => prev.filter((e) => e.id !== id));
-       toast({
-            title: "Success",
-            description: "Event deleted successfully.",
-          });
-
+      fetchEvents();
+      toast({
+        title: 'Success',
+        description: 'Event deleted successfully.',
+      });
+      fetchCategories();
     } catch (err) {
-      console.error("Error deleting event:", err);
-        toast({
-            title: "Error",
-            description: "Failed to delete event.",
-              variant: "destructive",
-          });
+      console.error('Error deleting event:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete event.',
+        variant: 'destructive',
+      });
     } finally {
       setDeleteModalOpen(false);
       setDeleteId(null);
@@ -70,50 +127,44 @@ const EventsPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const formData = new FormData();
-    formData.append("title", selectedEvent.title || "");
-    // formData.append("tagline", selectedEvent.tagline || "");
-    formData.append("description", selectedEvent.description || "");
-    formData.append("date", selectedEvent.date || "");
-    formData.append("category", selectedEvent.category || "");
-
+    formData.append('title', selectedEvent.title || '');
+    formData.append('description', selectedEvent.description || '');
+    formData.append('date', selectedEvent.date || '');
+    formData.append('category', selectedEvent.category || '');
     if (selectedFile) {
-      formData.append("image", selectedFile);
+      formData.append('image', selectedFile);
     }
-
     try {
       if (isEdit && selectedEvent.id) {
         await editEvent(selectedEvent.id, formData);
       } else {
         await createEvent(formData);
       }
-        toast({
-            title: "Success",
-            description: "Event submitted successfully.",
-          });
-
-
+      toast({
+        title: 'Success',
+        description: 'Event submitted successfully.',
+      });
       setShowModal(false);
       setSelectedEvent({});
       setSelectedFile(null);
       setPreviewUrl(null);
       setIsEdit(false);
       fetchEvents();
+      fetchCategories();
     } catch (err) {
-      console.error("Error submitting event:", err);
-        toast({
-            title: "Error",
-            description: "Failed to submit event.",
-              variant: "destructive",
-          });
+      console.error('Error submitting event:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to submit event.',
+        variant: 'destructive',
+      });
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
-
-    if (name === "image" && files && files.length > 0) {
+    if (name === 'image' && files && files.length > 0) {
       const file = files[0];
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
@@ -126,14 +177,17 @@ const EventsPage = () => {
   };
 
   const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
-    const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
+    const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
     const base64 = btoa(binary);
     return `data:image/jpeg;base64,${base64}`;
   };
 
-  const categories = ["All", ...Array.from(new Set(events.map((e) => e.category)))];
+  const totalPages = Math.max(1, Math.ceil(totalEvents / rowsPerPage));
 
-  const filteredEvents = selectedCategory === "All" ? events : events.filter((e) => e.category === selectedCategory);
+  // Ensure currentPage is within range
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   return (
     <div className="p-6">
@@ -155,9 +209,19 @@ const EventsPage = () => {
           </Button>
         }
       />
-
       <div className="flex items-center mb-4 gap-4">
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="border rounded px-3 py-2">
+        <input
+          type="text"
+          placeholder="Search by event title"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border rounded px-3 py-2"
+        />
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="border rounded px-3 py-2"
+        >
           {categories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -165,7 +229,6 @@ const EventsPage = () => {
           ))}
         </select>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 rounded-lg">
           <thead className="bg-gray-100">
@@ -179,13 +242,13 @@ const EventsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredEvents.map((event) => (
+            {events.map((event) => (
               <tr key={event.id} className="border-t border-gray-200 hover:bg-gray-50">
                 <td className="px-4 py-2">
                   {(() => {
                     const d = new Date(event.date);
-                    const day = String(d.getDate()).padStart(2, "0"); // 2-digit day
-                    const month = String(d.getMonth() + 1).padStart(2, "0"); // 2-digit month
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
                     const year = d.getFullYear();
                     return `${day}/${month}/${year}`;
                   })()}
@@ -196,54 +259,65 @@ const EventsPage = () => {
                 <td className="px-4 py-2">{event.title}</td>
                 <td className="px-4 py-2">{event.description}</td>
                 <td className="px-4 py-2">{event.category}</td>
-                <td className="px-4 py-2 ">
-                    <div className="flex items-center justify-center">
-
-                  <button
-                    className="px-4 py-1 rounded bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 mr-2"
-                    onClick={() => {
-                      setDeleteId(event.id);
-                      setDeleteModalOpen(true);
-                    }}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    className="px-4 py-1 rounded bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
-                    onClick={() => {
-                      setIsEdit(true);
-                      setSelectedEvent(event);
-                      setSelectedFile(null);
-                      setPreviewUrl(bufferToBase64(event.image));
-                      setShowModal(true);
-                    }}
-                  >
-                    Edit
-                  </button>
-                   </div>
+                <td className="px-4 py-2">
+                  <div className="flex items-center justify-center">
+                    <button
+                      className="px-4 py-1 rounded bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 mr-2"
+                      onClick={() => {
+                        setDeleteId(event.id);
+                        setDeleteModalOpen(true);
+                      }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className="px-4 py-1 rounded bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                      onClick={() => {
+                        setIsEdit(true);
+                        setSelectedEvent(event);
+                        setSelectedFile(null);
+                        setPreviewUrl(bufferToBase64(event.image));
+                        setShowModal(true);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
-               {isLoading ? (
-  <tr>
-    <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
-      Loading Events...
-    </td>
-  </tr>
-) : filteredEvents.length === 0 && (
-  <tr>
-    <td colSpan={9} className="px-4 py-6 text-center text-gray-500">
-      No Events found.
-    </td>
-  </tr>
-) 
-}
-
+            {isLoading ? (
+              <tr>
+                <td colSpan={9} className="border px-4 py-6 text-center text-gray-600">
+                  Loading Events...
+                </td>
+              </tr>
+            ) : events.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="px-4 py-6 text-center text-gray-500">
+                  No Events found.
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </div>
-
-      {/* Event Modal */}
+      <div className="mt-4">
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(p) => setCurrentPage(p)}
+          onRowsPerPageChange={(r) => {
+            setRowsPerPage(r);
+            setCurrentPage(1);
+          }}
+        />
+        <div className="text-sm text-gray-600 mt-2">
+          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalEvents || 0)} -{' '}
+          {Math.min(currentPage * rowsPerPage, totalEvents)} of {totalEvents} events
+        </div>
+      </div>
       <EventModal
         isOpen={showModal}
         isEdit={isEdit}
@@ -259,11 +333,9 @@ const EventsPage = () => {
         onChange={handleInputChange}
         onSubmit={handleSubmit}
       />
-
-      {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}
-        id={deleteId || ""}
+        id={deleteId || ''}
         itemName="this event"
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}

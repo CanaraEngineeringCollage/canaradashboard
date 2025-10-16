@@ -1,3 +1,4 @@
+// src/faculty/faculty.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,17 +21,37 @@ export class FacultyService {
     return this.facultyRepository.save(faculty);
   }
 
-  async findAll() {
-    return this.facultyRepository.find({
-      relations: [
-        'qualifications',
-        'achievements',
-        'bookChapters',
-        'certifications',
-        'internationalJournalPublications',
-        'internationalConferencePublications',
-      ],
-    });
+  async findAll({ department, page, limit, all }: { department?: string; page?: number; limit?: number; all?: boolean }) {
+    const query = this.facultyRepository.createQueryBuilder('faculty')
+      .leftJoinAndSelect('faculty.qualifications', 'qualifications')
+      .leftJoinAndSelect('faculty.achievements', 'achievements')
+      .leftJoinAndSelect('faculty.bookChapters', 'bookChapters')
+      .leftJoinAndSelect('faculty.certifications', 'certifications')
+      .leftJoinAndSelect('faculty.internationalJournalPublications', 'internationalJournalPublications')
+      .leftJoinAndSelect('faculty.internationalConferencePublications', 'internationalConferencePublications')
+      .orderBy('faculty.createdAt', 'DESC');
+
+    if (department) {
+      query.where('faculty.department = :department', { department });
+    }
+
+    if (all) {
+      // Return all records as an array (no pagination)
+      return await query.getMany();
+    }
+
+    const [faculties, total] = await query
+      .skip((page! - 1) * limit!)
+      .take(limit!)
+      .getManyAndCount();
+
+    return {
+      data: faculties,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit!),
+    };
   }
 
   async findByDepartment(department: string) {
@@ -44,13 +65,16 @@ export class FacultyService {
         'internationalJournalPublications',
         'internationalConferencePublications',
       ],
+      order: { createdAt: 'DESC' },
     });
   }
 
-async getTotalCount() {
-  return await this.facultyRepository.count();
-}
-
+  async getTotalCount(department?: string) {
+    if (department) {
+      return this.facultyRepository.count({ where: { department } });
+    }
+    return this.facultyRepository.count();
+  }
 
   async findOne(id: string) {
     return this.facultyRepository.findOne({
