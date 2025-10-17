@@ -125,12 +125,12 @@ const fetchCounsellingCount = async () => {
           count={facultyCount}
           description="Number of faculty members currently active"
         />
-        <StatCard
+        {/* <StatCard
           title="SC/ST Grievance Received"
           icon={ShieldCheck}
           count={scstGrievanceCount}
           description="Grievances submitted by SC/ST category users"
-        />
+        /> */}
         <StatCard
           title="Counselling Received"
           icon={Brain}
@@ -143,12 +143,12 @@ const fetchCounsellingCount = async () => {
           count={alumniCount}
           description="Total queries received from alumni"
         />
-        <StatCard
+        {/* <StatCard
           title="Grievance Received"
           icon={ShieldCheck}
           count={grievanceCount}
           description="Total grievances submitted by website visitors"
-        />
+        /> */}
       </div>
     </>
   );
