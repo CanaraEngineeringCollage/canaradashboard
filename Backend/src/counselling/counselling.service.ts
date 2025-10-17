@@ -20,4 +20,8 @@ export class CounsellingService {
   async findAll() {
     return this.repo.find({ order: { createdAt: 'DESC' } });
   }
+  async countAll () {
+  return this.repo.count();
 }
+}
+

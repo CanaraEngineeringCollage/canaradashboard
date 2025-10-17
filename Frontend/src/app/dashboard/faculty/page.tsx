@@ -1648,34 +1648,52 @@ const Page: React.FC = () => {
 
   // Fetch department options for dropdown
   const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
-  const fetchDepartments = () => {
-    fetch(`${API_BASE_URL}/faculty`)
-      .then((res) => res.json())
-      .then((response) => {
-        const departments = Array.from(new Set(response.data.map((f: Faculty) => f.department))).filter(Boolean);
-        setDepartmentOptions(departments);
-      })
-      .catch((error) => {
-        console.error('Error fetching departments:', error);
-      });
-  };
+ const fetchDepartments = () => {
+  fetch(`${API_BASE_URL}/faculty/departments`)
+    .then((res) => res.json())
+    .then((departments: string[]) => {
+      setDepartmentOptions(departments);
+    })
+    .catch((error) => {
+      console.error('Error fetching departments:', error);
+    });
+};
 
   useEffect(() => {
     fetchFaculties();
     fetchDepartments();
   }, [currentPage, rowsPerPage, departmentFilter]);
 
-  const handleAddFaculty = () => {
-    setModalMode('add');
-    setSelectedFaculty(undefined);
-    setIsModalOpen(true);
-  };
+  const handleAddFaculty = async () => {
+  setModalMode('add');
+  setSelectedFaculty(undefined);
 
-  const handleEditFaculty = (faculty: Faculty) => {
-    setModalMode('edit');
-    setSelectedFaculty(faculty);
-    setIsModalOpen(true);
-  };
+  // ✅ Fetch all faculties (for priority calculation)
+  const response = await fetch(`${API_BASE_URL}/faculty?all=true`);
+  const data = await response.json();
+  setFaculties(data); // update your faculties state temporarily
+
+  setIsModalOpen(true);
+};
+
+const handleEditFaculty = async (faculty: Faculty) => {
+  setModalMode('edit');
+  setSelectedFaculty(faculty);
+
+  try {
+    // ✅ Fetch faculties only from the same department
+    const response = await fetch(
+      `${API_BASE_URL}/faculty?department=${faculty.department}&all=true`
+    );
+    const departmentFaculties = await response.json();
+    setFaculties(departmentFaculties);
+  } catch (error) {
+    console.error('Error fetching department faculties:', error);
+  }
+
+  setIsModalOpen(true);
+};
+
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
     const token = localStorage.getItem('token');
@@ -1704,6 +1722,7 @@ const Page: React.FC = () => {
         })
         .then(() => {
           fetchFaculties();
+          fetchDepartments()
           setIsModalOpen(false);
           toast({
             title: 'Success',
@@ -1736,6 +1755,7 @@ const Page: React.FC = () => {
         })
         .then(() => {
           fetchFaculties();
+          fetchDepartments()
           setIsModalOpen(false);
           toast({
             title: 'Success',
@@ -1902,7 +1922,7 @@ const Page: React.FC = () => {
       </div>
       <FacultyModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {setIsModalOpen(false),fetchFaculties();}}
         onSubmit={handleSubmit}
         mode={modalMode}
         facultyToEdit={selectedFaculty}

@@ -17,4 +17,12 @@ export class CounsellingController {
   async findAll() {
     return this.counsellingService.findAll();
   }
+@UseGuards(JwtAuthGuard)
+@Get('count')
+async getCount() {
+  const count = await this.counsellingService.countAll();
+  return { count };
+}
+
+
 }

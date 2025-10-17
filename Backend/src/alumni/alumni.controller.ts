@@ -17,4 +17,11 @@ export class AlumniController {
   findAll() {
     return this.alumniService.findAll();
   }
+  @UseGuards(JwtAuthGuard)
+@Get('count')
+async getCount() {
+  const count = await this.alumniService.countAll();
+  return { count };
+}
+
 }

@@ -72,12 +72,18 @@ export class FacultyController {
       limit: limitNum,
     });
   }
-
+  @Get('departments')
+  async getDepartments() {
+    return await this.facultyService.getDepartments();
+  }
   @Get('count')
   async getFacultyCount(@Query('department') department?: string) {
     const count = await this.facultyService.getTotalCount(department);
     return { count };
   }
+
+
+  
 
   // Public – Anyone can view one faculty
   @Get(':id')

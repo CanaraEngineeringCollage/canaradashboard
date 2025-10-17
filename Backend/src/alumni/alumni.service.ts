@@ -20,4 +20,8 @@ export class AlumniService {
   findAll() {
     return this.alumniRepo.find({ order: { createdAt: 'DESC' } });
   }
+  async countAll() {
+  return this.alumniRepo.count();
+}
+
 }

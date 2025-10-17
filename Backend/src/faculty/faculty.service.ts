@@ -53,7 +53,13 @@ export class FacultyService {
       totalPages: Math.ceil(total / limit!),
     };
   }
-
+  async getDepartments(): Promise<string[]> {
+    const faculties = await this.facultyRepository.find({ select: ['department'] });
+    const departments = Array.from(
+      new Set(faculties.map((f) => f.department).filter(Boolean)),
+    );
+    return departments;
+  }
   async findByDepartment(department: string) {
     return this.facultyRepository.find({
       where: { department },

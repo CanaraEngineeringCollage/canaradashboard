@@ -47,33 +47,33 @@ useEffect(() => {
     }
   };
 
-  const fetchCounsellingCount = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setCounsellingCount(data.length);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const fetchCounsellingCount = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling/count`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setCounsellingCount(data.count);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   const fetchAlumniCount = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setAlumniCount(data.length);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni/count`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setAlumniCount(data.count);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   useEffect(() => {
     fetchAllData();
