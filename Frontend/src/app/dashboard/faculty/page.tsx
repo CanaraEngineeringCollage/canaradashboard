@@ -4,7 +4,7 @@ import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { LandPlot, PlusCircle } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TablePagination from "@/components/ui/TablePagination";
 
 // Interfaces
@@ -71,7 +71,8 @@ interface FacultyModalProps {
   onSubmit: (faculty: Faculty, avatarFile: File | null) => void;
   mode: "add" | "edit";
   facultyToEdit?: Faculty;
-  facultyList: Faculty[];
+  facultyList?: Faculty[];
+  API_BASE_URL: string;
 }
 
 const departments = [
@@ -92,8 +93,10 @@ const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
   return `data:image/jpeg;base64,${base64}`;
 };
 
-const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit, facultyList }) => {
+const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit, API_BASE_URL,facultyList }) => {
   const [step, setStep] = useState(1);
+  const [availablePriorities, setAvailablePriorities] = useState<(number | null)[]>([null]);
+  const [isLoadingPriorities, setIsLoadingPriorities] = useState(false);
   const initialFaculty: Faculty = {
     id: Math.random().toString(36).substr(2, 9),
     name: "",
@@ -117,25 +120,51 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const getAvailablePriorities = () => {
-    if (!faculty.department) {
-      return [null];
-    }
-
-    const usedPriorities = facultyList
-      .filter((f) => f.id !== faculty.id && f.priority !== null && f.department === faculty.department)
-      .map((f) => f.priority)
-      .filter((p): p is number => p !== null);
-
-    const maxPriority = facultyList.filter((f) => f.department === faculty.department).length + 5;
-    const availablePriorities: (number | null)[] = [null];
-    for (let i = 1; i <= maxPriority; i++) {
-      if (!usedPriorities.includes(i)) {
-        availablePriorities.push(i);
+  useEffect(() => {
+    const loadAvailablePriorities = async () => {
+      if (!faculty.department) {
+        setAvailablePriorities([null]);
+        setIsLoadingPriorities(false);
+        return;
       }
-    }
-    return availablePriorities;
-  };
+
+      setIsLoadingPriorities(true);
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/faculty?department=${encodeURIComponent(faculty.department)}&all=true`
+        );
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch department faculties');
+        }
+        
+        const departmentFaculties: Faculty[] = await response.json();
+        
+        const usedPriorities = departmentFaculties
+          .filter((f) => f.id !== faculty.id && f.priority !== null)
+          .map((f) => f.priority)
+          .filter((p): p is number => p !== null);
+
+        const maxPriority = departmentFaculties.length + 5;
+        const availablePrioritiesList: (number | null)[] = [null];
+        
+        for (let i = 1; i <= maxPriority; i++) {
+          if (!usedPriorities.includes(i)) {
+            availablePrioritiesList.push(i);
+          }
+        }
+        
+        setAvailablePriorities(availablePrioritiesList);
+      } catch (error) {
+        console.error('Error fetching priorities:', error);
+        setAvailablePriorities([null]);
+      } finally {
+        setIsLoadingPriorities(false);
+      }
+    };
+
+    loadAvailablePriorities();
+  }, [faculty.department, faculty.id, API_BASE_URL]);
 
   useEffect(() => {
     if (mode === "add" && faculty.department) {
@@ -981,7 +1010,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
                 {errors.designation && <p className="text-red-500 text-sm mt-1">{errors.designation}</p>}
               </div>
-              <div>
+            <div>
                 <label className="block text-sm font-medium mb-1">Department *</label>
                 <select
                   name="department"
@@ -1057,16 +1086,17 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 </select>
                 {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
               </div>
-              <div>
+          <div>
                 <label className="block text-sm font-medium mb-1">Priority (Higher appears first)</label>
                 <select
                   name="priority"
                   value={faculty.priority === null ? "null" : faculty.priority?.toString()}
                   onChange={handleInputChange}
-                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoadingPriorities}
+                  className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                 >
                   <option value="null">No Priority</option>
-                  {getAvailablePriorities()
+                  {availablePriorities
                     .filter((p) => p !== null)
                     .map((priority) => (
                       <option key={priority} value={priority}>
@@ -1074,6 +1104,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                       </option>
                     ))}
                 </select>
+                {isLoadingPriorities && <p className="text-sm text-blue-500 mt-1">Loading priorities...</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Avatar {mode === "add" ? "*" : "(Optional)"}</label>
@@ -1664,35 +1695,17 @@ const Page: React.FC = () => {
     fetchDepartments();
   }, [currentPage, rowsPerPage, departmentFilter]);
 
-  const handleAddFaculty = async () => {
-  setModalMode('add');
-  setSelectedFaculty(undefined);
+const handleAddFaculty = () => {
+    setModalMode('add');
+    setSelectedFaculty(undefined);
+    setIsModalOpen(true);
+  };
 
-  // ✅ Fetch all faculties (for priority calculation)
-  const response = await fetch(`${API_BASE_URL}/faculty?all=true`);
-  const data = await response.json();
-  setFaculties(data); // update your faculties state temporarily
-
-  setIsModalOpen(true);
-};
-
-const handleEditFaculty = async (faculty: Faculty) => {
-  setModalMode('edit');
-  setSelectedFaculty(faculty);
-
-  try {
-    // ✅ Fetch faculties only from the same department
-    const response = await fetch(
-      `${API_BASE_URL}/faculty?department=${faculty.department}&all=true`
-    );
-    const departmentFaculties = await response.json();
-    setFaculties(departmentFaculties);
-  } catch (error) {
-    console.error('Error fetching department faculties:', error);
-  }
-
-  setIsModalOpen(true);
-};
+  const handleEditFaculty = (faculty: Faculty) => {
+    setModalMode('edit');
+    setSelectedFaculty(faculty);
+    setIsModalOpen(true);
+  };
 
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
@@ -1920,13 +1933,16 @@ const handleEditFaculty = async (faculty: Faculty) => {
           {Math.min(currentPage * rowsPerPage, totalFaculties)} of {totalFaculties} faculties
         </div>
       </div>
-      <FacultyModal
+    <FacultyModal
         isOpen={isModalOpen}
-        onClose={() => {setIsModalOpen(false),fetchFaculties();}}
+        onClose={() => 
+          setIsModalOpen(false)
+          
+        }
         onSubmit={handleSubmit}
         mode={modalMode}
         facultyToEdit={selectedFaculty}
-        facultyList={faculties}
+        API_BASE_URL={API_BASE_URL}
       />
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}

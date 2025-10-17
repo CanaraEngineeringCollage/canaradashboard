@@ -25,8 +25,8 @@ const EventModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex overflow-y-auto  items-center justify-center z-50">
+      <div className="bg-white p-6 rounded shadow-lg  mt-20 mb-10 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">
           {isEdit ? "Update Event" : "Create Event"}
         </h2>
