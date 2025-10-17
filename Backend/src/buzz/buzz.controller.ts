@@ -17,6 +17,16 @@ export class BuzzController {
   async createBuzz(@Body() createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     return this.buzzService.createBuzz(createBuzzDto);
   }
+
+
+
+@Get('count')
+async getCount() {
+  const count = await this.buzzService.countAll();
+  return { count };
+}
+
+
 @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateBuzz(

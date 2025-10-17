@@ -19,6 +19,11 @@ export class BuzzService {
     });
   }
 
+async countAll() {
+  return this.buzzRepository.count();
+}
+
+
   async createBuzz(createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     const buzz = this.buzzRepository.create(createBuzzDto);
     return this.buzzRepository.save(buzz);

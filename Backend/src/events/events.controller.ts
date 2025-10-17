@@ -55,6 +55,11 @@ async findAll(
     limit: limitNum,
   });
 }
+@Get('count')
+async getCount() {
+  const count = await this.eventService.countAll();
+  return { count };
+}
 
 
   @Get('categories')

@@ -78,6 +78,11 @@ export class EventService {
     return this.eventRepo.findOneBy({ id });
   }
 
+ async countAll() {
+  return this.eventRepo.count();
+}
+
+
   async update(id: string, dto: UpdateEventDto, file?: Express.Multer.File) {
     const existing = await this.eventRepo.findOneBy({ id });
     if (!existing) {

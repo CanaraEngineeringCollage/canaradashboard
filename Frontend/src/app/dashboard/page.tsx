@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard } from "lucide-react";
+import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper } from "lucide-react";
 import { getAllFaculty, getFacultyCount } from "@/lib/faculty";
 import { getGrievances } from "@/lib/grievance";
 import { getScStGrievances } from "@/lib/scstGrievances";
@@ -16,6 +16,9 @@ export default function DashboardPage() {
   const [scstGrievanceCount, setScstGrievanceCount] = useState<number | null>(null);
   const [counsellingCount, setCounsellingCount] = useState<number | null>(null);
   const [alumniCount, setAlumniCount] = useState<number | null>(null);
+  const [eventsCount, setEventsCount] = useState<number | null>(null);
+  const [buzzCount, setBuzzCount] = useState<number | null>(null);
+
 
 const router = useRouter();
 
@@ -45,6 +48,32 @@ useEffect(() => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const fetchBuzzCounts = async () => {
+     const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/buzz/count`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setBuzzCount(data.count);
+  } catch (error) {
+    console.error(error);
+  }
+  };
+
+    const fetchEventsCounts = async () => {
+    const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/count`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setEventsCount(data.count);
+  } catch (error) {
+    console.error(error);
+  }
   };
 
 const fetchCounsellingCount = async () => {
@@ -80,6 +109,8 @@ const fetchCounsellingCount = async () => {
     fetchGrievanceCounts();
     fetchCounsellingCount();
     fetchAlumniCount();
+    fetchEventsCounts();
+    fetchBuzzCounts();
   }, []);
 
   // 🔹 Reusable card with skeleton
@@ -132,6 +163,18 @@ const fetchCounsellingCount = async () => {
           description="Grievances submitted by SC/ST category users"
         /> */}
         <StatCard
+          title="Events"
+          icon={PartyPopper}
+          count={eventsCount}
+          description="Number of Events"
+        />
+          <StatCard
+          title="Buzz"
+          icon={Brain}
+          count={buzzCount}
+          description="Number of Buzz"
+        />
+            <StatCard
           title="Counselling Received"
           icon={Brain}
           count={counsellingCount}
