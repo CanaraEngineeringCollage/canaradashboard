@@ -50,11 +50,11 @@ export class FacultyController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('all') all?: string, // New query param to fetch all
+    @Query('search') search?: string,
   ) {
-    if (all === 'true') {
-      // Fetch all faculties without pagination
-      return await this.facultyService.findAll({ department, all: true });
-    }
+     if (all === 'true') {
+    return await this.facultyService.findAll({ department, all: true, search });
+  }
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
@@ -70,6 +70,7 @@ export class FacultyController {
       department,
       page: pageNum,
       limit: limitNum,
+      search 
     });
   }
   @Get('departments')

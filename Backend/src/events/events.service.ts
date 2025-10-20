@@ -40,9 +40,10 @@ export class EventService {
     query.andWhere('event.category = :category', { category });
   }
 
-  if (search) {
-    query.andWhere('event.title ILIKE :search', { search: `%${search}%` });
-  }
+ if (search) {
+  query.andWhere('LOWER(event.title) LIKE LOWER(:search)', { search: `%${search}%` });
+}
+
 
   if (all) {
     // Return all events without pagination

@@ -8,6 +8,7 @@ import { Event } from "@/lib/types";
 import { createEvent, deleteEvent, editEvent, getAllEvents } from "@/lib/events";
 import { useToast } from "@/hooks/use-toast";
 import TablePagination from "@/components/ui/TablePagination";
+import { useRouter } from "next/navigation";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   id: string | null;
@@ -33,6 +34,18 @@ const EventsPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalEvents, setTotalEvents] = useState(0);
   const { toast } = useToast();
+
+
+
+const router = useRouter();
+
+useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
+
 
   const fetchEvents = async () => {
     setIsLoading(true);

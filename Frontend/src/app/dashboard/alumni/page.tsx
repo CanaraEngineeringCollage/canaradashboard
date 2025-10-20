@@ -1,6 +1,7 @@
 "use client";
 import { PageTitle } from "@/components/page-title";
 import { GraduationCap, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 // your API fetch function
 
@@ -19,6 +20,16 @@ export interface Alumni {
 const AlumniPage = () => {
   const [alumniList, setAlumniList] = useState<Alumni[]>([]);
   const [loading, setLoading] = useState(true);
+
+
+  const router = useRouter();
+  
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+      }
+    }, [router]);
 
   useEffect(() => {
     const fetchData = async () => {

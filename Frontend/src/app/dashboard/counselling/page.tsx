@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Brain, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Define the type for counselling entries
 export type CounsellingType = {
@@ -22,6 +23,16 @@ interface CounsellingTableProps {
 const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
   const [counsellingData, setCounsellingData] = useState<CounsellingType[]>([]);
   const [loading, setLoading] = useState(true);
+
+
+  const router = useRouter();
+  
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+      }
+    }, [router]);
 
   useEffect(() => {
      const token = localStorage.getItem("token");

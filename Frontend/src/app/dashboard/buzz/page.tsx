@@ -8,6 +8,7 @@ import { PlusCircle, Megaphone } from "lucide-react";
 import { BuzzEditor } from "./components/buzz-editor";
 import { useToast } from "@/hooks/use-toast";
 import { createBuzz, deleteBuzz, editBuzz, getAllBuzz } from "@/lib/buzz";
+import { useRouter } from "next/navigation";
 
 interface Buzz {
   id: string;
@@ -90,6 +91,15 @@ export default function BuzzPage() {
   const [editingBuzz, setEditingBuzz] = useState<Buzz | null>(null);
   const [deleteBuzzId, setDeleteBuzzId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const router = useRouter();
+  
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+      }
+    }, [router]);
 
   useEffect(() => {
     fetchBuzzes();

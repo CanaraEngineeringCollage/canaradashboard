@@ -14,11 +14,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setAdmin } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function ProfilePage() {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const admin = useSelector((state: any) => state.admin);
+
+const router = useRouter();
+
+useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
+
 
   const profileForm = useForm<AdminProfileFormData>({
     resolver: zodResolver(AdminProfileSchema),
@@ -36,6 +48,9 @@ export default function ProfilePage() {
       confirmPassword: "",
     },
   });
+
+
+  
 
  const updateAdminProfile = async (data: any) => {
   const token = localStorage.getItem("token"); // ✅ fetch token

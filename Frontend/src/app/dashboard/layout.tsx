@@ -10,16 +10,19 @@ import { toast, useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useAuth } from "@/utils/useAuth";
+import ProtectedRoute from "@/ProtectedRoute";
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
    const { toast } = useToast();
 
   const admin = useSelector((state: any) => state.admin);
 
+ 
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login");
+      router.replace("/login"); // redirect if not logged in
     }
   }, [router]);
 
@@ -40,6 +43,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   };
 
   return (
+    <ProtectedRoute>
     <SidebarProvider defaultOpen>
       <Sidebar collapsible="icon" variant="sidebar" side="left" className="border-r">
         <SidebarHeader className="h-16 flex items-center justify-between p-4">
@@ -96,5 +100,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>
+    </ProtectedRoute>
   );
 }

@@ -21,7 +21,7 @@ export class FacultyService {
     return this.facultyRepository.save(faculty);
   }
 
-  async findAll({ department, page, limit, all }: { department?: string; page?: number; limit?: number; all?: boolean }) {
+  async findAll({ department, page, limit, all,search }: { department?: string; page?: number; limit?: number; all?: boolean ;search?: string;}) {
     const query = this.facultyRepository.createQueryBuilder('faculty')
       .leftJoinAndSelect('faculty.qualifications', 'qualifications')
       .leftJoinAndSelect('faculty.achievements', 'achievements')
@@ -34,6 +34,10 @@ export class FacultyService {
     if (department) {
       query.where('faculty.department = :department', { department });
     }
+
+     if (search) {
+    query.andWhere('faculty.name LIKE :search', { search: `%${search}%` });
+  }
 
     if (all) {
       // Return all records as an array (no pagination)

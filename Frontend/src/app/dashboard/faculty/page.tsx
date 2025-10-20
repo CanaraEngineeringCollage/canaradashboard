@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LandPlot, PlusCircle } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import TablePagination from "@/components/ui/TablePagination";
+import { useRouter } from "next/navigation";
 
 // Interfaces
 interface Achievement {
@@ -1651,13 +1652,21 @@ const Page: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalFaculties, setTotalFaculties] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+const router = useRouter();
 
+useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
   const fetchFaculties = () => {
     setIsLoading(true);
     const queryParams = new URLSearchParams({
       page: currentPage.toString(),
       limit: rowsPerPage.toString(),
       ...(departmentFilter && { department: departmentFilter }),
+       ...(search && { search }),
     });
     fetch(`${API_BASE_URL}/faculty?${queryParams}`)
       .then((res) => res.json())
@@ -1693,7 +1702,7 @@ const Page: React.FC = () => {
   useEffect(() => {
     fetchFaculties();
     fetchDepartments();
-  }, [currentPage, rowsPerPage, departmentFilter]);
+  }, [currentPage, rowsPerPage, departmentFilter,search]);
 
 const handleAddFaculty = () => {
     setModalMode('add');
