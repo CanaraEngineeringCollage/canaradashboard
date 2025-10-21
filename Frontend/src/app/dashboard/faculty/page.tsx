@@ -66,6 +66,8 @@ interface ConferencePublication {
   conferencePublications: string;
 }
 
+
+
 interface FacultyModalProps {
   isOpen: boolean;
   onClose: () => void;
