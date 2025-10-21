@@ -1662,6 +1662,9 @@ useEffect(() => {
       router.push("/login");
     }
   }, [router]);
+
+
+  
   const fetchFaculties = () => {
     setIsLoading(true);
     const queryParams = new URLSearchParams({
@@ -1828,9 +1831,9 @@ const handleAddFaculty = () => {
   };
 
   // Filter faculties by search (client-side for name search)
-  const filteredFaculties = faculties.filter((faculty) =>
-    faculty.name.toLowerCase().includes(search.toLowerCase())
-  );
+// ✅ Use data directly from backend
+const displayedFaculties = faculties;
+
 
   return (
     <div className="p-4">
@@ -1849,7 +1852,7 @@ const handleAddFaculty = () => {
           type="text"
           placeholder="Search by faculty name"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {setSearch(e.target.value); setCurrentPage(1);}}
           className="border outline-none rounded p-2 w-full md:w-1/3"
         />
         <select
@@ -1878,7 +1881,7 @@ const handleAddFaculty = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredFaculties.map((faculty) => (
+          {displayedFaculties .map((faculty) => (
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
                 {faculty.avatar && (
@@ -1919,7 +1922,7 @@ const handleAddFaculty = () => {
                 Loading faculties...
               </td>
             </tr>
-          ) : filteredFaculties.length === 0 ? (
+          ) : displayedFaculties.length === 0 ? (
             <tr>
               <td colSpan={7} className="border px-4 py-6 text-center text-gray-600">
                 No faculties found.
