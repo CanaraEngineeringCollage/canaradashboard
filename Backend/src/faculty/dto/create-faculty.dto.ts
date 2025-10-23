@@ -81,6 +81,10 @@ export class CreateFacultyDto {
   @IsString()
   department: string;
 
+   @IsString()
+  @IsOptional()
+  subDepartment?: string;
+
   @IsEmail()
   @IsOptional()
   email?: string;
@@ -149,6 +153,10 @@ export class UpdateFacultyDto {
   @IsString()
   @IsOptional()
   department?: string;
+
+   @IsString()
+  @IsOptional()
+  subDepartment?: string;
 
   @IsEmail()
   @IsOptional()

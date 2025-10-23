@@ -20,6 +20,7 @@ interface Faculty {
   name: string;
   designation: string;
   department: string;
+  subDepartment?: string; // New field for sub-department
   email?: string;
   priority: number | null;
   joiningDate: string;
@@ -66,8 +67,6 @@ interface ConferencePublication {
   conferencePublications: string;
 }
 
-
-
 interface FacultyModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -90,13 +89,15 @@ const departments = [
   "Placement Team",
 ];
 
+const subDepartments = ["Chemistry", "Physics", "Mathematics","Humanities & Management","Computintg Science","Engineering Science","Civil"];
+
 const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
   const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
   const base64 = btoa(binary);
   return `data:image/jpeg;base64,${base64}`;
 };
 
-const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit, API_BASE_URL,facultyList }) => {
+const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit, API_BASE_URL, facultyList }) => {
   const [step, setStep] = useState(1);
   const [availablePriorities, setAvailablePriorities] = useState<(number | null)[]>([null]);
   const [isLoadingPriorities, setIsLoadingPriorities] = useState(false);
@@ -105,6 +106,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     name: "",
     designation: "",
     department: "",
+    subDepartment: "", // Initialize new field
     email: "",
     joiningDate: "",
     experience: "",
@@ -171,7 +173,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
   useEffect(() => {
     if (mode === "add" && faculty.department) {
-      setFaculty((prev) => ({ ...prev, priority: null }));
+      setFaculty((prev) => ({ ...prev, priority: null, subDepartment: "" }));
     }
   }, [faculty.department, mode]);
 
@@ -302,6 +304,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
       if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
       if (!faculty.department) newErrors.department = "Department is required";
+      if (faculty.department === "Science & Humanities" && !faculty.subDepartment) {
+        newErrors.subDepartment = "Sub-department is required for Science & Humanities";
+      }
       if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
       if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
       if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
@@ -543,6 +548,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       setFaculty({ ...faculty, priority: parseInt(value, 10) || null });
     } else {
       setFaculty({ ...faculty, [name]: value });
+      if (name === "department" && value !== "Science & Humanities") {
+        setFaculty((prev) => ({ ...prev, subDepartment: "" }));
+      }
     }
   };
 
@@ -1013,7 +1021,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
                 {errors.designation && <p className="text-red-500 text-sm mt-1">{errors.designation}</p>}
               </div>
-            <div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Department *</label>
                 <select
                   name="department"
@@ -1030,6 +1038,26 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 </select>
                 {errors.department && <p className="text-red-500 text-sm mt-1">{errors.department}</p>}
               </div>
+              {faculty.department === "Science & Humanities" && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Sub-Department *</label>
+                  <select
+                    name="subDepartment"
+                    value={faculty.subDepartment || ""}
+                    onChange={handleInputChange}
+                    className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Sub-Department</option>
+                    {subDepartments.map((subDept) => (
+                      <option key={subDept} value={subDept}>
+                        {subDept}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.subDepartment && <p className="text-red-500 text-sm mt-1">{errors.subDepartment}</p>}
+                </div>
+              )}
+              
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
                 <input

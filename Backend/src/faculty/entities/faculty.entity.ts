@@ -39,6 +39,10 @@ export class Faculty {
   @CreateDateColumn()
   createdAt: Date;
 
+
+   @Column({ nullable: true })
+  subDepartment?: string; // New field for sub-department
+
   @Column({ type: 'enum', enum: ['Regular', 'Contract', 'Visiting'] })
   employmentType: 'Regular' | 'Contract' | 'Visiting';
 
