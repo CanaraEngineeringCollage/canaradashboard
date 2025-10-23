@@ -11,6 +11,7 @@ import { TimetableModule } from './exam-time-table/timetable.module';
 import { CounsellingModule } from './counselling/counselling.module';
 import { AlumniModule } from './alumni/alumni.module';
 import { AuthModule } from './auth/auth.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { AuthModule } from './auth/auth.module';
     ScstGrievanceModule,
     TimetableModule,
     CounsellingModule,
-    AlumniModule
+    AlumniModule,
+    FilesModule
   ],
 })
 export class AppModule {}
