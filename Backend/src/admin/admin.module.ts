@@ -11,7 +11,7 @@ dotenv.config();
 @Module({
   imports: [
     TypeOrmModule.forFeature([Admin]),
-    JwtModule.register({ secret: process.env.JWT_SECRET, signOptions: { expiresIn: '1d' } }),
+    JwtModule.register({ secret: process.env.JWT_SECRET }),
   ],
   controllers: [AdminController],
   providers: [AdminService],
