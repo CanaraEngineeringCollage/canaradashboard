@@ -24,7 +24,11 @@ export class EventController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+ @UseInterceptors(
+  FileInterceptor('image', {
+    limits: { fileSize: 10 * 1024 * 1024 }, 
+  }),
+)
   create(
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: CreateEventDto,
@@ -74,7 +78,11 @@ async getCount() {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+  FileInterceptor('image', {
+    limits: { fileSize: 10 * 1024 * 1024 },
+  }),
+)
   update(
     @Param('id') id: string,
     @Body() dto: UpdateEventDto,
