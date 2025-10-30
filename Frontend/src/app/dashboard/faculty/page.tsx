@@ -89,7 +89,7 @@ const departments = [
   "Placement Team",
 ];
 
-const subDepartments = ["Chemistry", "Physics", "Mathematics","Humanities & Management","Computintg Science","Engineering Science","Civil"];
+const subDepartments = ["Chemistry", "Physics", "Mathematics", "Humanities & Management", "Computintg Science", "Engineering Science", "Civil"];
 
 const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
   const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
@@ -135,16 +135,14 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
       setIsLoadingPriorities(true);
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/faculty?department=${encodeURIComponent(faculty.department)}&all=true`
-        );
-        
+        const response = await fetch(`${API_BASE_URL}/faculty?department=${encodeURIComponent(faculty.department)}&all=true`);
+
         if (!response.ok) {
-          throw new Error('Failed to fetch department faculties');
+          throw new Error("Failed to fetch department faculties");
         }
-        
+
         const departmentFaculties: Faculty[] = await response.json();
-        
+
         const usedPriorities = departmentFaculties
           .filter((f) => f.id !== faculty.id && f.priority !== null)
           .map((f) => f.priority)
@@ -152,16 +150,16 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
         const maxPriority = departmentFaculties.length + 5;
         const availablePrioritiesList: (number | null)[] = [null];
-        
+
         for (let i = 1; i <= maxPriority; i++) {
           if (!usedPriorities.includes(i)) {
             availablePrioritiesList.push(i);
           }
         }
-        
+
         setAvailablePriorities(availablePrioritiesList);
       } catch (error) {
-        console.error('Error fetching priorities:', error);
+        console.error("Error fetching priorities:", error);
         setAvailablePriorities([null]);
       } finally {
         setIsLoadingPriorities(false);
@@ -1057,7 +1055,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   {errors.subDepartment && <p className="text-red-500 text-sm mt-1">{errors.subDepartment}</p>}
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
                 <input
@@ -1117,7 +1115,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 </select>
                 {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
               </div>
-          <div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Priority (Higher appears first)</label>
                 <select
                   name="priority"
@@ -1669,10 +1667,10 @@ const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 const Page: React.FC = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [search, setSearch] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [search, setSearch] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedFaculty, setSelectedFaculty] = useState<Faculty | undefined>(undefined);
   const { toast } = useToast();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -1682,24 +1680,22 @@ const Page: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalFaculties, setTotalFaculties] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-const router = useRouter();
+  const router = useRouter();
 
-useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
     }
   }, [router]);
 
-
-  
   const fetchFaculties = () => {
     setIsLoading(true);
     const queryParams = new URLSearchParams({
       page: currentPage.toString(),
       limit: rowsPerPage.toString(),
       ...(departmentFilter && { department: departmentFilter }),
-       ...(search && { search }),
+      ...(search && { search }),
     });
     fetch(`${API_BASE_URL}/faculty?${queryParams}`)
       .then((res) => res.json())
@@ -1709,11 +1705,11 @@ useEffect(() => {
         setTotalPages(response.totalPages);
       })
       .catch((error) => {
-        console.error('Error fetching faculties:', error);
+        console.error("Error fetching faculties:", error);
         toast({
-          title: 'Error',
-          description: 'Failed to load faculty data.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to load faculty data.",
+          variant: "destructive",
         });
       })
       .finally(() => setIsLoading(false));
@@ -1721,47 +1717,46 @@ useEffect(() => {
 
   // Fetch department options for dropdown
   const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
- const fetchDepartments = () => {
-  fetch(`${API_BASE_URL}/faculty/departments`)
-    .then((res) => res.json())
-    .then((departments: string[]) => {
-      setDepartmentOptions(departments);
-    })
-    .catch((error) => {
-      console.error('Error fetching departments:', error);
-    });
-};
+  const fetchDepartments = () => {
+    fetch(`${API_BASE_URL}/faculty/departments`)
+      .then((res) => res.json())
+      .then((departments: string[]) => {
+        setDepartmentOptions(departments);
+      })
+      .catch((error) => {
+        console.error("Error fetching departments:", error);
+      });
+  };
 
   useEffect(() => {
     fetchFaculties();
     fetchDepartments();
-  }, [currentPage, rowsPerPage, departmentFilter,search]);
+  }, [currentPage, rowsPerPage, departmentFilter, search]);
 
-const handleAddFaculty = () => {
-    setModalMode('add');
+  const handleAddFaculty = () => {
+    setModalMode("add");
     setSelectedFaculty(undefined);
     setIsModalOpen(true);
   };
 
   const handleEditFaculty = (faculty: Faculty) => {
-    setModalMode('edit');
+    setModalMode("edit");
     setSelectedFaculty(faculty);
     setIsModalOpen(true);
   };
 
-
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     const facultyData = { ...faculty, avatar: undefined };
     const formData = new FormData();
-    formData.append('data', JSON.stringify(facultyData));
+    formData.append("data", JSON.stringify(facultyData));
     if (avatarFile) {
-      formData.append('avatar', avatarFile);
+      formData.append("avatar", avatarFile);
     }
 
-    if (modalMode === 'add') {
+    if (modalMode === "add") {
       fetch(`${API_BASE_URL}/faculty`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1777,24 +1772,24 @@ const handleAddFaculty = () => {
         })
         .then(() => {
           fetchFaculties();
-          fetchDepartments()
+          fetchDepartments();
           setIsModalOpen(false);
           toast({
-            title: 'Success',
-            description: 'Faculty added successfully.',
+            title: "Success",
+            description: "Faculty added successfully.",
           });
         })
         .catch((error) => {
-          console.error('Error adding faculty:', error);
+          console.error("Error adding faculty:", error);
           toast({
-            title: 'Error',
-            description: 'Failed to add faculty.',
-            variant: 'destructive',
+            title: "Error",
+            description: "Failed to add faculty.",
+            variant: "destructive",
           });
         });
     } else {
       fetch(`${API_BASE_URL}/faculty/${faculty.id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1810,28 +1805,28 @@ const handleAddFaculty = () => {
         })
         .then(() => {
           fetchFaculties();
-          fetchDepartments()
+          fetchDepartments();
           setIsModalOpen(false);
           toast({
-            title: 'Success',
-            description: 'Faculty information updated successfully.',
+            title: "Success",
+            description: "Faculty information updated successfully.",
           });
         })
         .catch((error) => {
-          console.error('Error updating faculty:', error);
+          console.error("Error updating faculty:", error);
           toast({
-            title: 'Error',
-            description: 'Failed to update faculty.',
-            variant: 'destructive',
+            title: "Error",
+            description: "Failed to update faculty.",
+            variant: "destructive",
           });
         });
     }
   };
 
   const handleDeleteFaculty = (id: string) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     fetch(`${API_BASE_URL}/faculty/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -1844,24 +1839,23 @@ const handleAddFaculty = () => {
         }
         fetchFaculties();
         toast({
-          title: 'Success',
-          description: 'Faculty deleted successfully.',
+          title: "Success",
+          description: "Faculty deleted successfully.",
         });
       })
       .catch((error) => {
-        console.error('Error deleting faculty:', error);
+        console.error("Error deleting faculty:", error);
         toast({
-          title: 'Error',
-          description: 'Failed to delete faculty.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to delete faculty.",
+          variant: "destructive",
         });
       });
   };
 
   // Filter faculties by search (client-side for name search)
-// ✅ Use data directly from backend
-const displayedFaculties = faculties;
-
+  // ✅ Use data directly from backend
+  const displayedFaculties = faculties;
 
   return (
     <div className="p-4">
@@ -1880,14 +1874,13 @@ const displayedFaculties = faculties;
           type="text"
           placeholder="Search by faculty name"
           value={search}
-          onChange={(e) => {setSearch(e.target.value); setCurrentPage(1);}}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
           className="border outline-none rounded p-2 w-full md:w-1/3"
         />
-        <select
-          value={departmentFilter}
-          onChange={(e) => setDepartmentFilter(e.target.value)}
-          className="border rounded p-2 w-full md:w-1/4"
-        >
+        <select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} className="border rounded p-2 w-full md:w-1/4">
           <option value="">All Departments</option>
           {departmentOptions.map((dept) => (
             <option key={dept} value={dept}>
@@ -1909,15 +1902,11 @@ const displayedFaculties = faculties;
           </tr>
         </thead>
         <tbody>
-          {displayedFaculties .map((faculty) => (
+          {displayedFaculties.map((faculty) => (
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
                 {faculty.avatar && (
-                  <img
-                    src={bufferToBase64(faculty.avatar)}
-                    alt={`${faculty.name}'s avatar`}
-                    className="w-12 h-12 object-cover rounded"
-                  />
+                  <img src={bufferToBase64(faculty.avatar)} alt={`${faculty.name}'s avatar`} className="w-12 h-12 object-cover rounded" />
                 )}
               </td>
               <td className="border px-4 py-2">{faculty.name}</td>
@@ -1926,10 +1915,7 @@ const displayedFaculties = faculties;
               <td className="border px-4 py-2">{faculty.joiningDate}</td>
               <td className="border px-4 py-2">{faculty.employmentType}</td>
               <td className="border px-4 py-2 flex">
-                <button
-                  onClick={() => handleEditFaculty(faculty)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                >
+                <button onClick={() => handleEditFaculty(faculty)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
                   Edit
                 </button>
                 <button
@@ -1971,16 +1957,13 @@ const displayedFaculties = faculties;
           }}
         />
         <div className="text-sm text-gray-600 mt-2">
-          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalFaculties || 0)} -{' '}
-          {Math.min(currentPage * rowsPerPage, totalFaculties)} of {totalFaculties} faculties
+          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalFaculties || 0)} - {Math.min(currentPage * rowsPerPage, totalFaculties)} of{" "}
+          {totalFaculties} faculties
         </div>
       </div>
-    <FacultyModal
+      <FacultyModal
         isOpen={isModalOpen}
-        onClose={() => 
-          setIsModalOpen(false)
-          
-        }
+        onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         mode={modalMode}
         facultyToEdit={selectedFaculty}
@@ -1988,8 +1971,8 @@ const displayedFaculties = faculties;
       />
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
-        id={facultyToDelete?.id || ''}
-        itemName={facultyToDelete?.name || 'this faculty'}
+        id={facultyToDelete?.id || ""}
+        itemName={facultyToDelete?.name || "this faculty"}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={(id: string) => {
           handleDeleteFaculty(id);

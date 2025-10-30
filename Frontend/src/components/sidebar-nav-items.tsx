@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, UsersRound, Newspaper, FileText, UserCog, type LucideIcon, ShieldCheck, BookOpenCheck, Brain, GraduationCap } from "lucide-react";
+import {
+  LayoutDashboard,
+  UsersRound,
+  Newspaper,
+  FileText,
+  UserCog,
+  type LucideIcon,
+  ShieldCheck,
+  BookOpenCheck,
+  Brain,
+  GraduationCap,
+} from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -20,10 +31,10 @@ const navItems: NavItem[] = [
   //  { href: "/dashboard/exam-timetable", label: "Exam Timetable", icon: BookOpenCheck },
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
-    { href: "/dashboard/alumni", label: "alumni", icon: GraduationCap },
-   { href: "/dashboard/counselling", label: "Counselling", icon: Brain },
+  { href: "/dashboard/alumni", label: "alumni", icon: GraduationCap },
+  { href: "/dashboard/counselling", label: "Counselling", icon: Brain },
   // { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
-    // { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
+  // { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
   // { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },
   { href: "/dashboard/profile", label: "Profile", icon: UserCog },
 ];

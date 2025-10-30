@@ -272,5 +272,7 @@ function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "t
         </div>
       </div>
     </div>
+
+    
   );
 }
