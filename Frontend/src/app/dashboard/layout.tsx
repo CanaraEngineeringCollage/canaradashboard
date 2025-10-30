@@ -70,6 +70,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
           <Button
+          onClick={logoutHandler}
             variant="ghost"
             size="icon"
             className="h-9 w-9 group-data-[collapsible=icon]:flex hidden mx-auto text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

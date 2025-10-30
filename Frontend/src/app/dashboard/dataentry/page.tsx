@@ -251,7 +251,15 @@ export default function UploadPage() {
   );
 }
 
-function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "this item" }) {
+interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  id: number | null;
+  onClose: () => void;
+  onConfirm: (id: number) => void;
+  itemName?: string;
+}
+
+function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "this item" }: DeleteConfirmationModalProps) {
   if (!isOpen || id === null) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
