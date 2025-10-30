@@ -24,8 +24,9 @@ async uploadFile(
   @UploadedFile() file: Express.Multer.File,
   @Query('type') type: 'pdf' | 'image',
   @Query('name') name?: string,
+  @Query('department') department: string = 'Common',
 ) {
-  return this.filesService.uploadFile(file, type, name);
+  return this.filesService.uploadFile(file, type, name,department);
 }
 
 // files.controller.ts
@@ -46,10 +47,15 @@ async getFileByName(@Param('name') name: string, @Res() res: Response) {
   }
 
   // Get all files
-  @Get()
-  async getAll() {
-    return this.filesService.getAllFiles();
-  }
+ @Get()
+async getAll(
+  @Query('search') search?: string,
+  @Query('type') type?: 'pdf' | 'image',
+  @Query('department') department?: string,
+) {
+  return this.filesService.getAllFiles(search, type, department);
+}
+
 
   // Delete file
   @Delete(':id')

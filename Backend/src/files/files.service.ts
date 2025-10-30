@@ -14,11 +14,13 @@ export class FilesService {
     file: Express.Multer.File,
     type: 'pdf' | 'image',
     customName?: string,
+    department: string = 'Common',
   ) {
     const newFile = this.fileRepo.create({
       name: customName || file.originalname, // <-- use custom name if provided
       mimetype: file.mimetype,
       type,
+       department,
       file: type === 'pdf' ? file.buffer : undefined,
       avatar: type === 'image' ? file.buffer : undefined,
     });
@@ -39,9 +41,30 @@ export class FilesService {
     return file;
   }
 
-  async getAllFiles() {
-    return this.fileRepo.find();
+ async getAllFiles(
+  search?: string,
+  type?: 'pdf' | 'image',
+  department?: string,
+) {
+  const qb = this.fileRepo.createQueryBuilder('file');
+
+  if (search) {
+    qb.andWhere('file.name LIKE :search', { search: `%${search}%` });
   }
+
+  if (type) {
+    qb.andWhere('file.type = :type', { type });
+  }
+
+  if (department) {
+    qb.andWhere('file.department = :department', { department });
+  }
+
+  qb.orderBy('file.id', 'DESC');
+
+  return await qb.getMany();
+}
+
 
   async deleteFile(id: number) {
     const file = await this.fileRepo.findOne({ where: { id } });

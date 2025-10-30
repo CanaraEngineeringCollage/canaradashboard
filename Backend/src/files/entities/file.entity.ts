@@ -21,4 +21,7 @@ export class FileEntity {
 
   @Column({ nullable: true })
   type: 'pdf' | 'image';
+  
+  @Column({ default: 'Common' })
+  department: string;
 }
