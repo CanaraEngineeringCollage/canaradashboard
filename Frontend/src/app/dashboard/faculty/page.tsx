@@ -87,6 +87,12 @@ const departments = [
   "Mechanical Engineering",
   "Science & Humanities",
   "Placement Team",
+  "Admin",
+  "General",
+  "Student Welfare Department",
+  "Dean Office",
+  "Hostel",
+  "Library"
 ];
 
 const subDepartments = ["Chemistry", "Physics", "Mathematics", "Humanities & Management", "Computintg Science", "Engineering Science", "Civil"];
@@ -312,6 +318,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (!faculty.type) newErrors.type = "Type is required";
     }
     if (currentStep === 2) {
+       const isAdminOrGeneral = faculty.department === "Admin" || faculty.department === "General" || faculty.department === "Student Welfare Department" || faculty.department === "Dean Office" || faculty.department === "Hostel" || faculty.department === "Library";
+
+    // Only validate if NOT Admin/General
+  if (!isAdminOrGeneral) {
       const isAddingOrUpdating =
         newQualification.degree ||
         newQualification.nameOfDigree ||
@@ -346,10 +356,11 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         newErrors.qualifications = "At least one qualification is required";
       }
     }
+  }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleNext = () => {
     if (
