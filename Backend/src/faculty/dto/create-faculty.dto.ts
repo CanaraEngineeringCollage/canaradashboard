@@ -90,6 +90,7 @@ export class CreateFacultyDto {
   email?: string;
 
   @IsDateString()
+   @IsOptional()
   joiningDate: string;
 
   @IsString()

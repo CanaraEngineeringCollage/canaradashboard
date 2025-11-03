@@ -30,7 +30,7 @@ export class Faculty {
   @Column({ nullable: true })
   email?: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date',nullable: true })
   joiningDate: Date;
 
   @Column()

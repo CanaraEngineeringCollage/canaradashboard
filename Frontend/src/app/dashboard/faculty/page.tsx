@@ -91,6 +91,7 @@ const departments = [
   "General",
   "Student Welfare Department",
   "Dean Office",
+  "Physical Education",
   "Hostel",
   "Library"
 ];
