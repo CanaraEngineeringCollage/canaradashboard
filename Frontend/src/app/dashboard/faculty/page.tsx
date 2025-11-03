@@ -305,7 +305,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const validateStep = (currentStep: number) => {
     const newErrors: { [key: string]: string } = {};
     if (currentStep === 1) {
-      if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
+       const isAdminOrGeneral = faculty.department === "Admin" || faculty.department === "General" || faculty.department === "Student Welfare Department" || faculty.department === "Dean Office" || faculty.department === "Hostel" || faculty.department === "Library";
+       if (!isAdminOrGeneral) {
+       if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
       if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
       if (!faculty.department) newErrors.department = "Department is required";
       if (faculty.department === "Science & Humanities" && !faculty.subDepartment) {
@@ -317,6 +319,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
       if (!faculty.type) newErrors.type = "Type is required";
     }
+  }
     if (currentStep === 2) {
        const isAdminOrGeneral = faculty.department === "Admin" || faculty.department === "General" || faculty.department === "Student Welfare Department" || faculty.department === "Dean Office" || faculty.department === "Hostel" || faculty.department === "Library";
 
