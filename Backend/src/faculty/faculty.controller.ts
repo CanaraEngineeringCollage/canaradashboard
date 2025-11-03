@@ -37,6 +37,14 @@ export class FacultyController {
       if (!createFacultyDto.name || createFacultyDto.name.trim() === '') {
         throw new BadRequestException('Name is required and cannot be empty');
       }
+      // If frontend sent an empty string for joiningDate, remove it so DB won't receive ''
+      if (
+        Object.prototype.hasOwnProperty.call(createFacultyDto, 'joiningDate') &&
+        createFacultyDto.joiningDate === ''
+      ) {
+        // @ts-ignore
+        delete createFacultyDto.joiningDate;
+      }
       return await this.facultyService.create(createFacultyDto, avatar);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -52,9 +60,13 @@ export class FacultyController {
     @Query('all') all?: string, // New query param to fetch all
     @Query('search') search?: string,
   ) {
-     if (all === 'true') {
-    return await this.facultyService.findAll({ department, all: true, search });
-  }
+    if (all === 'true') {
+      return await this.facultyService.findAll({
+        department,
+        all: true,
+        search,
+      });
+    }
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
@@ -70,7 +82,7 @@ export class FacultyController {
       department,
       page: pageNum,
       limit: limitNum,
-      search 
+      search,
     });
   }
   @Get('departments')
@@ -82,9 +94,6 @@ export class FacultyController {
     const count = await this.facultyService.getTotalCount(department);
     return { count };
   }
-
-
-  
 
   // Public – Anyone can view one faculty
   @Get(':id')
@@ -109,6 +118,14 @@ export class FacultyController {
       const updateFacultyDto: UpdateFacultyDto = JSON.parse(data);
       if (!updateFacultyDto.name || updateFacultyDto.name.trim() === '') {
         throw new BadRequestException('Name is required and cannot be empty');
+      }
+      // If frontend sent an empty string for joiningDate on update, remove it to avoid DB errors
+      if (
+        Object.prototype.hasOwnProperty.call(updateFacultyDto, 'joiningDate') &&
+        (updateFacultyDto as any).joiningDate === ''
+      ) {
+        // @ts-ignore
+        delete (updateFacultyDto as any).joiningDate;
       }
       return await this.facultyService.update(id, updateFacultyDto, avatar);
     } catch (error) {
