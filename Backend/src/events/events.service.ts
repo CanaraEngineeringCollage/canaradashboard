@@ -26,15 +26,21 @@ export class EventService {
   page,
   limit,
   all,
+  sortBy = 'createdAt',
 }: {
   category?: string;
   search?: string;
   page?: number;
   limit?: number;
   all?: boolean;
+  sortBy?: 'date' | 'createdAt';
 }) {
   const query = this.eventRepo.createQueryBuilder('event')
-    .orderBy('event.createdAt', 'DESC');
+  if (sortBy === 'date') {
+    query.orderBy('event.date', 'DESC');
+  } else {
+    query.orderBy('event.createdAt', 'DESC');
+  }
 
   if (category && category !== 'All') {
     query.andWhere('event.category = :category', { category });
