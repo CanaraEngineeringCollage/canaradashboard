@@ -1,5 +1,6 @@
 "use client";
 
+import TablePagination from "@/components/ui/TablePagination";
 import { useState, useEffect } from "react";
 
 interface FileItem {
@@ -20,6 +21,8 @@ const departments = [
   "Artificial Intelligence & Machine Learning",
   "Mechanical Engineering",
   "Science & Humanities",
+  "Mandatory Disclosure"
+
 ];
 
 export default function UploadPage() {
@@ -36,17 +39,26 @@ export default function UploadPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
 
-  // ✅ Fetch files WITH backend filters
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // ✅ Fetch files WITH backend filters + pagination
   const fetchFiles = async () => {
     try {
       const query = new URLSearchParams();
+      query.append("page", String(currentPage));
+      query.append("limit", String(rowsPerPage));
       if (searchTerm.trim()) query.append("search", searchTerm.trim());
       if (typeFilter !== "all") query.append("type", typeFilter);
       if (departmentFilter !== "All") query.append("department", departmentFilter);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files?${query.toString()}`);
       const data = await res.json();
-      setFiles(Array.isArray(data) ? data : data?.data || []);
+
+      setFiles(Array.isArray(data.data) ? data.data : []);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching files:", error);
     }
@@ -54,7 +66,7 @@ export default function UploadPage() {
 
   useEffect(() => {
     fetchFiles();
-  }, [searchTerm, typeFilter, departmentFilter]);
+  }, [searchTerm, typeFilter, departmentFilter, currentPage, rowsPerPage]);
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,12 +118,10 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
-
       {/* Upload UI */}
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow">
         <h1 className="text-2xl font-bold mb-4 text-gray-700">📁 Upload Files</h1>
         <form onSubmit={handleUpload} className="flex flex-col gap-4">
-
           <select
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
@@ -239,6 +249,20 @@ export default function UploadPage() {
         )}
       </div>
 
+      {/* ✅ Pagination */}
+      <div className="max-w-4xl mx-auto mt-6">
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          onRowsPerPageChange={(rows) => {
+            setRowsPerPage(rows);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+
       {/* Delete Modal */}
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}
@@ -272,7 +296,5 @@ function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "t
         </div>
       </div>
     </div>
-
-    
   );
 }

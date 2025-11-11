@@ -45,25 +45,34 @@ export class FilesService {
   search?: string,
   type?: 'pdf' | 'image',
   department?: string,
+  page: number = 1,
+  limit: number = 10,
 ) {
   const qb = this.fileRepo.createQueryBuilder('file');
 
   if (search) {
     qb.andWhere('file.name LIKE :search', { search: `%${search}%` });
   }
-
   if (type) {
     qb.andWhere('file.type = :type', { type });
   }
-
   if (department) {
     qb.andWhere('file.department = :department', { department });
   }
 
   qb.orderBy('file.id', 'DESC');
 
-  return await qb.getMany();
+  const total = await qb.getCount();
+  const data = await qb.skip((page - 1) * limit).take(limit).getMany();
+
+  return {
+    data,
+    total,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
+
 
 
   async deleteFile(id: number) {

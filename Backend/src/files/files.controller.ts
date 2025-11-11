@@ -47,14 +47,17 @@ async getFileByName(@Param('name') name: string, @Res() res: Response) {
   }
 
   // Get all files
- @Get()
+@Get()
 async getAll(
   @Query('search') search?: string,
   @Query('type') type?: 'pdf' | 'image',
   @Query('department') department?: string,
+  @Query('page') page: number = 1,
+  @Query('limit') limit: number = 10,
 ) {
-  return this.filesService.getAllFiles(search, type, department);
+  return this.filesService.getAllFiles(search, type, department, page, limit);
 }
+
 
 
   // Delete file
