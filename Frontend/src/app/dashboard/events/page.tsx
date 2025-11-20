@@ -9,6 +9,7 @@ import { createEvent, deleteEvent, editEvent, getAllEvents } from "@/lib/events"
 import { useToast } from "@/hooks/use-toast";
 import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   id: string | null;
@@ -40,11 +41,27 @@ const EventsPage = () => {
 const router = useRouter();
 
 useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const encrypted = localStorage.getItem("token");
+
+  if (!encrypted) {
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const decrypted = decryptToken(encrypted);
+
+    if (!decrypted || decrypted.length < 10) {
+      localStorage.removeItem("token");
       router.push("/login");
     }
-  }, [router]);
+
+  } catch (err) {
+    localStorage.removeItem("token");
+    router.push("/login");
+  }
+}, []);
+
 
 
   const fetchEvents = async () => {

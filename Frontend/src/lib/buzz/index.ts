@@ -1,4 +1,5 @@
 import { apiFetch } from "../client";
+import { decryptToken } from "../encrypt";
 
 export interface Buzz {
   id: string;
@@ -16,7 +17,8 @@ export const getAllBuzz = () => {
 };
 
 export const deleteBuzz = (id: string) => {
-   const token = localStorage.getItem("token");
+   const encrypted = localStorage.getItem("token");
+     const token = encrypted ? decryptToken(encrypted) : null;
   return apiFetch(`/buzz/${id}`, {
     method: "DELETE",
      headers: {
@@ -26,7 +28,8 @@ export const deleteBuzz = (id: string) => {
 };
 
 export const createBuzz = (content: string, design: object, category: string,eventDate:string, eventName:string) => {
-  const token = localStorage.getItem("token");
+  const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
   return apiFetch("/buzz", {
     method: "POST",
     credentials: "include",
@@ -39,7 +42,8 @@ export const createBuzz = (content: string, design: object, category: string,eve
 };
 
 export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string, eventName:string) => {
-   const token = localStorage.getItem("token");
+   const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
   return apiFetch(`/buzz/${id}`, {
     method: "PATCH",
     credentials: "include",

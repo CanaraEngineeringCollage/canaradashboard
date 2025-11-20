@@ -7,6 +7,7 @@ import { LandPlot, PlusCircle } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 
 // Interfaces
 interface Achievement {
@@ -1697,12 +1698,26 @@ const Page: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+ useEffect(() => {
+  const encrypted = localStorage.getItem("token");
+
+  if (!encrypted) {
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const decrypted = decryptToken(encrypted);
+    if (!decrypted || decrypted.length < 10) {
+      localStorage.removeItem("token");
       router.push("/login");
     }
-  }, [router]);
+  } catch (err) {
+    localStorage.removeItem("token");
+    router.push("/login");
+  }
+}, []);
+
 
   const fetchFaculties = () => {
     setIsLoading(true);
@@ -1761,7 +1776,8 @@ const Page: React.FC = () => {
   };
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
-    const token = localStorage.getItem("token");
+      const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
     const facultyData = { ...faculty, avatar: undefined };
     const formData = new FormData();
     formData.append("data", JSON.stringify(facultyData));
@@ -1839,7 +1855,8 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteFaculty = (id: string) => {
-    const token = localStorage.getItem("token");
+      const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
     fetch(`${API_BASE_URL}/faculty/${id}`, {
       method: "DELETE",
       headers: {

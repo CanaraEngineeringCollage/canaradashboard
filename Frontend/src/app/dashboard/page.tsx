@@ -9,6 +9,8 @@ import { getGrievances } from "@/lib/grievance";
 import { getScStGrievances } from "@/lib/scstGrievances";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
+import { getToken } from "@/lib/token";
 
 export default function DashboardPage() {
   const [facultyCount, setFacultyCount] = useState<number | null>(null);
@@ -23,11 +25,26 @@ export default function DashboardPage() {
 const router = useRouter();
 
 useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const encrypted = localStorage.getItem("token");
+
+  if (!encrypted) {
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const decrypted = decryptToken(encrypted);
+
+    // Token invalid or empty → logout
+    if (!decrypted || decrypted.length < 10) {
+      localStorage.removeItem("token");
       router.push("/login");
     }
-  }, [router]);
+  } catch {
+    localStorage.removeItem("token");
+    router.push("/login");
+  }
+}, []);
 
   const fetchAllData = async () => {
     try {
@@ -51,7 +68,8 @@ useEffect(() => {
   };
 
   const fetchBuzzCounts = async () => {
-     const token = localStorage.getItem("token");
+       const token = getToken();
+    if (!token) return router.push("/login");
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/buzz/count`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -64,7 +82,8 @@ useEffect(() => {
   };
 
     const fetchEventsCounts = async () => {
-    const token = localStorage.getItem("token");
+     const token = getToken();
+    if (!token) return router.push("/login");
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/count`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -77,7 +96,8 @@ useEffect(() => {
   };
 
 const fetchCounsellingCount = async () => {
-  const token = localStorage.getItem("token");
+   const token = getToken();
+    if (!token) return router.push("/login");
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling/count`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +111,8 @@ const fetchCounsellingCount = async () => {
 
 
   const fetchAlumniCount = async () => {
-  const token = localStorage.getItem("token");
+   const token = getToken();
+    if (!token) return router.push("/login");
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni/count`, {
       headers: { Authorization: `Bearer ${token}` },

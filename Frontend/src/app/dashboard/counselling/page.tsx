@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Brain, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 
 // Define the type for counselling entries
 export type CounsellingType = {
@@ -28,14 +29,29 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
   const router = useRouter();
   
   useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-      }
-    }, [router]);
+  const encrypted = localStorage.getItem("token");
+
+  if (!encrypted) {
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const decrypted = decryptToken(encrypted);
+    if (!decrypted || decrypted.length < 10) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  } catch (err) {
+    localStorage.removeItem("token");
+    router.push("/login");
+  }
+}, []);
+
 
   useEffect(() => {
-     const token = localStorage.getItem("token");
+      const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
   const loadData = async () => {
     setLoading(true);
     try {

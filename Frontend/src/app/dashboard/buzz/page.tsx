@@ -9,6 +9,7 @@ import { BuzzEditor } from "./components/buzz-editor";
 import { useToast } from "@/hooks/use-toast";
 import { createBuzz, deleteBuzz, editBuzz, getAllBuzz } from "@/lib/buzz";
 import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 
 interface Buzz {
   id: string;
@@ -94,12 +95,25 @@ export default function BuzzPage() {
 
   const router = useRouter();
   
-  useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-      }
-    }, [router]);
+   useEffect(() => {
+   const encrypted = localStorage.getItem("token");
+ 
+   if (!encrypted) {
+     router.push("/login");
+     return;
+   }
+ 
+   try {
+     const decrypted = decryptToken(encrypted);
+     if (!decrypted || decrypted.length < 10) {
+       localStorage.removeItem("token");
+       router.push("/login");
+     }
+   } catch (err) {
+     localStorage.removeItem("token");
+     router.push("/login");
+   }
+ }, []);
 
   useEffect(() => {
     fetchBuzzes();

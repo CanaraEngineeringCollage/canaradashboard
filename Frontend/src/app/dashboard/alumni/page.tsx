@@ -1,5 +1,6 @@
 "use client";
 import { PageTitle } from "@/components/page-title";
+import { decryptToken } from "@/lib/encrypt";
 import { GraduationCap, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -24,16 +25,30 @@ const AlumniPage = () => {
 
   const router = useRouter();
   
-  useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-      }
-    }, [router]);
+ useEffect(() => {
+   const encrypted = localStorage.getItem("token");
+ 
+   if (!encrypted) {
+     router.push("/login");
+     return;
+   }
+ 
+   try {
+     const decrypted = decryptToken(encrypted);
+     if (!decrypted || decrypted.length < 10) {
+       localStorage.removeItem("token");
+       router.push("/login");
+     }
+   } catch (err) {
+     localStorage.removeItem("token");
+     router.push("/login");
+   }
+ }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+         const encrypted = localStorage.getItem("token");
+     const token = encrypted ? decryptToken(encrypted) : null;
       setLoading(true);
       try {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`, { method: "GET", headers: {

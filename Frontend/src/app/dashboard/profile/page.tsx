@@ -71,19 +71,21 @@ useEffect(() => {
 
   
 
- const updateAdminProfile = async (data: any) => {
- const encrypted = localStorage.getItem("token");
-const token = encrypted ? decryptToken(encrypted) : null;
+const updateAdminProfile = async (data: any) => {
+  const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
 
-axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
-  data,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  return await axios.patch(
+    `${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }
-);
+  );
 };
+
 
 
   const onProfileSubmit = async (data: AdminProfileFormData) => {

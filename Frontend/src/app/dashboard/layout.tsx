@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useAuth } from "@/utils/useAuth";
 import ProtectedRoute from "@/ProtectedRoute";
+import { decryptToken } from "@/lib/encrypt";
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -20,33 +21,61 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+  const encrypted = localStorage.getItem("token");
 
-    if (!token) {
+  if (!encrypted) {
+    router.replace("/login");
+    return;
+  }
+
+  try {
+    const decrypted = decryptToken(encrypted);
+
+    if (!decrypted || decrypted.length < 10) {
+      // Invalid or fake token
+      localStorage.removeItem("token");
       router.replace("/login");
-    } else {
-      setIsAuthorized(true); // Allow rendering
+      return;
     }
-  }, [router]);
+
+    setIsAuthorized(true); // Valid token — allow UI
+
+  } catch {
+    localStorage.removeItem("token");
+    router.replace("/login");
+  }
+}, []);
+
 
   if (!isAuthorized) {
     return null; // Prevents flashing UI
   }
 
-  const logoutHandler = async () => {
-    const token = localStorage.getItem("token");
-    localStorage.removeItem("token"); // ✅ clear JWT
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/logout`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // ✅ send JWT in headers
-      },
-    });
-    toast({
-      title: "Success",
-      description: "Logged out successfully.",
-    });
-    router.push("/login");
-  };
+const logoutHandler = async () => {
+  const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
+
+  localStorage.removeItem("token");
+
+  if (token) {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  toast({
+    title: "Success",
+    description: "Logged out successfully.",
+  });
+
+  router.push("/login");
+};
 
   return (
     <ProtectedRoute>

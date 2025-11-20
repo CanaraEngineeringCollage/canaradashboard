@@ -6,7 +6,7 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch } from "react-redux";
 import { setAdmin } from "@/redux/slices/authSlice";
-import { encryptToken } from "@/lib/encrypt";
+import { decryptToken, encryptToken } from "@/lib/encrypt";
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -19,12 +19,25 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+ useEffect(() => {
+  const encrypted = localStorage.getItem("token");
+
+  if (!encrypted) return; // No token = stay on login
+
+  try {
+    const decrypted = decryptToken(encrypted); // 🔓 decrypt
+
+    // If decrypted token exists and is valid → redirect
+    if (decrypted && decrypted.length > 10) {
       router.push("/dashboard");
     }
-  }, [router]);
+  } catch (err) {
+    console.error("Token decryption failed:", err);
+    // Invalid token → remove it
+    localStorage.removeItem("token");
+  }
+}, []);
+
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();

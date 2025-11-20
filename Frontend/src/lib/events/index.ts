@@ -1,4 +1,5 @@
 import { apiFetch } from "../client";
+import { decryptToken } from "../encrypt";
 
 export interface Buzz {
   id: string;
@@ -13,7 +14,8 @@ export const getAllEvents = () => {
 };
 
 export const deleteEvent = (id: string) => {
-    const token = localStorage.getItem("token");
+     const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
   return apiFetch(`/events/${id}`, { method: 'DELETE',  headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
     }, }
@@ -22,7 +24,8 @@ export const deleteEvent = (id: string) => {
 };
 
 export const createEvent = (formData: FormData) => {
-    const token = localStorage.getItem("token");
+     const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
   return apiFetch('/events', {
     method: 'POST',
     body: formData,
@@ -34,7 +37,8 @@ export const createEvent = (formData: FormData) => {
 };
 
 export const editEvent = (id: string, formData: FormData) => {
-    const token = localStorage.getItem("token");
+     const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
   return apiFetch(`/events/${id}`, {
     method: 'PUT', 
     body: formData,
