@@ -1,29 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-
+export async function POST(req: Request) {
   try {
-    const nestRes = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/login`,
-      body,
-      { withCredentials: true }
-    );
+    const body = await req.json();
 
-    const cookie = nestRes.headers['set-cookie']?.[0];
+    // 🔥 Call your NestJS backend
+    const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
 
-    if (cookie) {
-      return new NextResponse(JSON.stringify({ message: 'Login successful',data:nestRes.data }), {
-        status: 200,
-        headers: {
-          'Set-Cookie': cookie,
-        },
-      });
+    const data = await backendRes.json();
+
+    if (!backendRes.ok || !data.token) {
+      return NextResponse.json({ error: data.message }, { status: 401 });
     }
 
-    return NextResponse.json({ message: 'No cookie received' }, { status: 500 });
-  } catch (err: any) {
-    return NextResponse.json({ message: err?.response?.data?.message || 'Login failed' }, { status: 401 });
+    // 🔥 Response object back to frontend
+    const response = NextResponse.json({
+      message: "Login successful",
+      admin: data.admin
+    });
+
+    // 🔐 Set HttpOnly cookie on NEXT.JS DOMAIN (localhost:9002)
+ response.cookies.set({
+  name: "token",
+  value: data.token,
+  httpOnly: true,
+  secure: true,            // HTTPS required
+  sameSite: "none",        // for cross-site
+  domain: "cec.edu.in",    // <-- put YOUR backend domain
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60,
+});
+
+
+    return response;
+
+  } catch (error) {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -24,12 +24,12 @@ export default function ProfilePage() {
 
 const router = useRouter();
 
-useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
-  }, [router]);
+// useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//       router.push("/login");
+//     }
+//   }, [router]);
 
 
   const profileForm = useForm<AdminProfileFormData>({
@@ -55,15 +55,14 @@ useEffect(() => {
  const updateAdminProfile = async (data: any) => {
   const token = localStorage.getItem("token"); // ✅ fetch token
 
-  const response = await axios.patch(
-    `${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`, // ✅ send JWT in headers
-      },
-    }
-  );
+ const response = await axios.patch(
+  `${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
+  data,
+  {
+    withCredentials: true, // 🔥 send HttpOnly cookie automatically
+  }
+);
+
 
   return response.data;
 };

@@ -22,12 +22,12 @@ export default function DashboardPage() {
 
 const router = useRouter();
 
-useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
-  }, [router]);
+// useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//       router.push("/login");
+//     }
+//   }, [router]);
 
   const fetchAllData = async () => {
     try {
