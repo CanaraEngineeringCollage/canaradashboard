@@ -10,14 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   console.log('✅ NestJS application created');
 
-  // 🚀 Redirect base URL ("/") to main website
-  app.use((req: Request, res: Response, next) => {
-    // If someone hits "/", redirect to main site
-    if (req.originalUrl === '/' || req.originalUrl === '') {
-      return res.redirect(301, 'https://www.canaraengineering.in/');
-    }
-    next();
-  });
+  
 
   // Middleware setup
   app.use(bodyParser.json({ limit: '50mb' }));
