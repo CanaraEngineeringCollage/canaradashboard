@@ -30,7 +30,6 @@ export async function POST(req: Request) {
   httpOnly: true,
   secure: true,            // HTTPS required
   sameSite: "none",        // for cross-site
-  domain: "cec.edu.in",    // <-- put YOUR backend domain
   path: "/",
   maxAge: 7 * 24 * 60 * 60,
 });
