@@ -16,6 +16,7 @@ import axios from "axios";
 import { setAdmin } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { decryptToken } from "@/lib/encrypt";
 
 export default function ProfilePage() {
   const { toast } = useToast();
@@ -25,11 +26,29 @@ export default function ProfilePage() {
 const router = useRouter();
 
 useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const encrypted = localStorage.getItem("token");
+
+  if (!encrypted) {
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const decrypted = decryptToken(encrypted);
+
+    if (!decrypted || decrypted.length < 10) {
+      // Token corrupted or fake → logout
+      localStorage.removeItem("token");
       router.push("/login");
     }
-  }, [router]);
+
+  } catch (err) {
+
+    localStorage.removeItem("token");
+    router.push("/login");
+  }
+}, []);
+
 
 
   const profileForm = useForm<AdminProfileFormData>({
@@ -53,19 +72,17 @@ useEffect(() => {
   
 
  const updateAdminProfile = async (data: any) => {
-  const token = localStorage.getItem("token"); // ✅ fetch token
+ const encrypted = localStorage.getItem("token");
+const token = encrypted ? decryptToken(encrypted) : null;
 
-  const response = await axios.patch(
-    `${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`, // ✅ send JWT in headers
-      },
+axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
+  data,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
     }
-  );
-
-  return response.data;
+  }
+);
 };
 
 

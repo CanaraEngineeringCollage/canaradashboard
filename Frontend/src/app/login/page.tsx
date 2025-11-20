@@ -6,6 +6,7 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch } from "react-redux";
 import { setAdmin } from "@/redux/slices/authSlice";
+import { encryptToken } from "@/lib/encrypt";
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -30,46 +31,30 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     setIsLoading(true);
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/login`, form, {
-    });
 
-    console.log('Response Status:', res.status);
-    console.log('Response Data:', res.data);
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/login`, form);
 
-    if (res.status === 200 || res.status === 201) {
-      if (res.data.message === 'Login successful') {
-           toast({
-        title: 'Success',
-        description: 'Logged successfully.',
-        
+    if (res.data.message === "Login successful") {
+      
+      // Encrypt and store token
+      const encrypted = encryptToken(res.data.token);
+      localStorage.setItem("token", encrypted);
+
+      dispatch(setAdmin({
+        name: res.data.admin.name,
+        email: res.data.admin.email
+      }));
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully.",
       });
-  
-          console.log('Attempting navigation to /dashboard');
-          console.log('Cookies after login:', document.cookie);
-        localStorage.setItem('token', res.data.token); // ✅ save JWT
-  dispatch(setAdmin({ name: res.data.admin.name, email: res.data.admin.email }));
-  router.push('/dashboard');
-        dispatch(
-          setAdmin({
-            name: res.data.admin?.name || res.data.name,
-            email: res.data.admin?.email || res.data.email,
-          })
-        );
-        console.log('Dispatched Admin:', {
-          name: res.data.admin?.name || res.data.name,
-          email: res.data.admin?.email || res.data.email,
-        });
-        setIsLoading(false);
-      } else {
-        throw new Error(res.data.message || 'Unexpected response');
-      }
-    } else {
-      throw new Error(`Unexpected status: ${res.status}`);
+
+      router.push("/dashboard");
     }
+
   } catch (err: any) {
-    console.error('Error:', err.response?.data?.message || err.message || 'Login failed');
-    setError(err?.response?.data?.message || 'Login failed');
-    setIsLoading(false);
+    setError(err.response?.data?.message || "Login failed");
   } finally {
     setIsLoading(false);
   }
