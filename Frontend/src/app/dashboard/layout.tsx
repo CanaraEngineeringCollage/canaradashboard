@@ -19,43 +19,37 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   const [isAuthorized, setIsAuthorized] = useState(false);
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-  //   if (!token) {
-  //     router.replace("/login");
-  //   } else {
-  //     setIsAuthorized(true); // Allow rendering
-  //   }
-  // }, [router]);
+    if (!token) {
+      router.replace("/login");
+    } else {
+      setIsAuthorized(true); // Allow rendering
+    }
+  }, [router]);
 
-  // if (!isAuthorized) {
-  //   return null; // Prevents flashing UI
-  // }
+  if (!isAuthorized) {
+    return null; // Prevents flashing UI
+  }
 
-const logoutHandler = async () => {
-  try {
-    await axios.post("/api/auth/logout", {}, { withCredentials: true });
-
+  const logoutHandler = async () => {
+    const token = localStorage.getItem("token");
+    localStorage.removeItem("token"); // ✅ clear JWT
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admin/logout`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ send JWT in headers
+      },
+    });
     toast({
       title: "Success",
       description: "Logged out successfully.",
     });
-
     router.push("/login");
-
-  } catch (error) {
-    console.error(error);
-    toast({
-      title: "Error",
-      description: "Logout failed.",
-    });
-  }
-};
-
+  };
 
   return (
-    // <ProtectedRoute>
+    <ProtectedRoute>
       <SidebarProvider defaultOpen>
         <Sidebar collapsible="icon" variant="sidebar" side="left" className="border-r">
           <SidebarHeader className="h-16 flex items-center justify-between p-4">
@@ -113,6 +107,6 @@ const logoutHandler = async () => {
           <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </SidebarInset>
       </SidebarProvider>
-    // </ProtectedRoute>
+    </ProtectedRoute>
   );
 }
