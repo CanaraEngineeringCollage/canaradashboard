@@ -16,22 +16,19 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.use(cookieParser());
-app.enableCors({
-  origin: [
-    'http://localhost:9002',
-    'http://localhost:3001',
-    'http://localhost:3000',
-    'https://canaradashboard.vercel.app',
-    'https://canaraengineering.vercel.app',
-    'https://cec.edu.in',
-    'https://www.cec.edu.in',
-    'https://apiserver.cec.edu.in',   // <--- ADD THIS
-    'http://apiserver.cec.edu.in'    // <--- ADD THIS
-  ],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-});
-
+  app.enableCors({
+    origin: [
+      'http://localhost:9002',
+      'http://localhost:3001',
+      'http://localhost:3000',
+      'https://canaradashboard.vercel.app',
+      'https://canaraengineering.vercel.app',
+      'https://cec.edu.in',
+      'https://www.cec.edu.in'
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   await app.listen(3000);
   console.log(`🚀 Server is running on http://localhost:3000`);
