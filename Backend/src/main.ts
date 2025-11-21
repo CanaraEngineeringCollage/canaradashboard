@@ -23,6 +23,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://canaradashboard.vercel.app',
       'https://canaraengineering.vercel.app',
+      'https://cec.edu.in'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
