@@ -121,7 +121,7 @@ export default function UpdatePptPage() {
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Upload the PDF of your PPT to any flipbook maker like <Link   href="https://heyzine.com/" target="_blank"> Heyzine </Link>and paste the public link here.
+                Upload the PDF of your PPT to any flipbook maker like <Link   href="https://heyzine.com/"  className="text-blue-500 font-semibold underline" target="_blank"> Heyzine </Link>and paste the public link here.
               </p>
             </div>
             <Button type="submit" disabled={isLoading || isSaving}>
