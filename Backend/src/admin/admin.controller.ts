@@ -33,8 +33,4 @@ export class AdminController {
     return this.adminService.logout(res);
   }
 
-  @Get('seed')
-  seed() {
-    return this.adminService.seedAdmin();
-  }
 }
