@@ -8,16 +8,18 @@ import {
   UseInterceptors,
   Res,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  // Upload file
+  @UseGuards(JwtAuthGuard)
 @Post('upload')
 @UseInterceptors(FileInterceptor('file'))
 async uploadFile(
@@ -59,7 +61,7 @@ async getAll(
 }
 
 
-
+@UseGuards(JwtAuthGuard)
   // Delete file
   @Delete(':id')
   async deleteFile(@Param('id') id: number) {

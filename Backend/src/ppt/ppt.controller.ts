@@ -9,7 +9,7 @@ import { PptService } from './ppt.service';
 import { UpdatePptDto } from './dto/update-ppt.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
+
 @Controller('ppt')
 export class PptController {
   constructor(private readonly pptService: PptService) {}
@@ -19,7 +19,7 @@ export class PptController {
     const link = await this.pptService.getLink();
     return link ?? { link: null };
   }
-
+  @UseGuards(JwtAuthGuard)
   @Post()
   updateLink(@Body() dto: UpdatePptDto) {
     return this.pptService.updateLink(dto.link);
