@@ -8,19 +8,26 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class BuzzController {
   constructor(private readonly buzzService: BuzzService) {}
 
-  @Get()
-  async getAllBuzz(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return this.buzzService.getAllBuzz(page, limit);
-  }
+@Get()
+async getAllBuzz(
+  @Query('page') page: number = 1,
+  @Query('limit') limit: number = 10,
+  @Query('category') category?: string,
+  @Query('search') search?: string,
+) {
+  return this.buzzService.getAllBuzz(page, limit, category, search);
+}
+
 @UseGuards(JwtAuthGuard)
   @Post()
   async createBuzz(@Body() createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     return this.buzzService.createBuzz(createBuzzDto);
   }
 
+@Get('categories')
+async getCategories() {
+  return this.buzzService.getCategories();
+}
 
 
 @Get('count')

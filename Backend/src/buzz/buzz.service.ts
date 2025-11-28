@@ -11,28 +11,49 @@ export class BuzzService {
     private readonly buzzRepository: Repository<Buzz>,
   ) {}
 
-  async getAllBuzz(page: number = 1, limit: number = 10) {
-    const [data, total] = await this.buzzRepository.findAndCount({
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+ async getAllBuzz(page = 1, limit = 10, category?: string, search?: string) {
+  const query = this.buzzRepository
+    .createQueryBuilder("buzz")
+    .orderBy("buzz.createdAt", "DESC")
+    .skip((page - 1) * limit)
+    .take(limit);
 
-    return {
-      data,
-      meta: {
-        total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+  if (category) {
+    query.andWhere("buzz.category = :category", { category });
   }
+
+  if (search) {
+    query.andWhere(
+      "(buzz.content LIKE :search OR buzz.eventName LIKE :search)",
+      { search: `%${search}%` }
+    );
+  }
+
+  const [data, total] = await query.getManyAndCount();
+
+  return {
+    data,
+    meta: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
 
 async countAll() {
   return this.buzzRepository.count();
+}
+async getCategories() {
+  const categories = await this.buzzRepository
+    .createQueryBuilder("buzz")
+    .select("DISTINCT buzz.category", "category")
+    .where("buzz.category IS NOT NULL")
+    .getRawMany();
+
+  return categories.map(c => c.category);
 }
 
 

@@ -5,52 +5,103 @@ export interface Buzz {
   id: string;
   content: string;
   design: string;
-  category: string; // Added category here
+  category: string;
+  eventDate?: string;
+  eventName?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export const getAllBuzz = (page: number = 1, limit: number = 10) => {
-  return apiFetch(`/buzz?page=${page}&limit=${limit}`, {
+// ✅ Updated: supports category + search filters
+export const getAllBuzz = (
+  page: number = 1,
+  limit: number = 10,
+  category: string = "",
+  search: string = ""
+) => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  if (category) params.append("category", category);
+  if (search) params.append("search", search);
+
+  return apiFetch(`/buzz?${params.toString()}`, {
+    method: "GET",
+  });
+};
+
+// ✅ New: fetch unique categories from backend
+export const getCategories = () => {
+  return apiFetch("/buzz/categories", {
     method: "GET",
   });
 };
 
 export const deleteBuzz = (id: string) => {
-   const encrypted = localStorage.getItem("token");
-     const token = encrypted ? decryptToken(encrypted) : null;
+  const encrypted = localStorage.getItem("token");
+  const token = encrypted ? decryptToken(encrypted) : null;
+
   return apiFetch(`/buzz/${id}`, {
     method: "DELETE",
-     headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   });
 };
 
-export const createBuzz = (content: string, design: object, category: string,eventDate:string, eventName:string) => {
+export const createBuzz = (
+  content: string,
+  design: object,
+  category: string,
+  eventDate: string,
+  eventName: string
+) => {
   const encrypted = localStorage.getItem("token");
   const token = encrypted ? decryptToken(encrypted) : null;
+
   return apiFetch("/buzz", {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-       Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ content, design, category,eventDate ,eventName}), // send category
+    body: JSON.stringify({
+      content,
+      design,
+      category,
+      eventDate,
+      eventName,
+    }),
   });
 };
 
-export const editBuzz = (id: string, content: string, design: object, category: string,eventDate:string, eventName:string) => {
-   const encrypted = localStorage.getItem("token");
+export const editBuzz = (
+  id: string,
+  content: string,
+  design: object,
+  category: string,
+  eventDate: string,
+  eventName: string
+) => {
+  const encrypted = localStorage.getItem("token");
   const token = encrypted ? decryptToken(encrypted) : null;
+
   return apiFetch(`/buzz/${id}`, {
     method: "PATCH",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-       Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ content, design, category,eventDate,eventName }), // send category
+    body: JSON.stringify({
+      content,
+      design,
+      category,
+      eventDate,
+      eventName,
+    }),
   });
 };

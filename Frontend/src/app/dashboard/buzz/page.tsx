@@ -8,7 +8,13 @@ import { PlusCircle, Megaphone } from "lucide-react";
 import { BuzzEditor } from "./components/buzz-editor";
 import TablePagination from "@/components/ui/TablePagination";
 import { useToast } from "@/hooks/use-toast";
-import { createBuzz, deleteBuzz, editBuzz, getAllBuzz } from "@/lib/buzz";
+import {
+  createBuzz,
+  deleteBuzz,
+  editBuzz,
+  getAllBuzz,
+  getCategories,
+} from "@/lib/buzz";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
 
@@ -62,11 +68,14 @@ function DeleteConfirmationModal({
   if (!isOpen || !id) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          Confirm Delete
+        </h2>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to delete <strong>{itemName}</strong>? This action cannot be undone.
+          Are you sure you want to delete <strong>{itemName}</strong>? This
+          action cannot be undone.
         </p>
         <div className="flex justify-end gap-3">
           <button
@@ -92,40 +101,74 @@ export default function BuzzPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
+
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingBuzz, setEditingBuzz] = useState<Buzz | null>(null);
   const [deleteBuzzId, setDeleteBuzzId] = useState<string | null>(null);
-  const { toast } = useToast();
 
-  const router = useRouter();
+  const [category, setCategory] = useState<string>(""); // filter category
+  const [search, setSearch] = useState<string>(""); // search text
+  const [categories, setCategories] = useState<string[]>([]); // dropdown options
+  console.log(buzzes);
   
-   useEffect(() => {
-   const encrypted = localStorage.getItem("token");
- 
-   if (!encrypted) {
-     router.push("/login");
-     return;
-   }
- 
-   try {
-     const decrypted = decryptToken(encrypted);
-     if (!decrypted || decrypted.length < 10) {
-       localStorage.removeItem("token");
-       router.push("/login");
-     }
-   } catch (err) {
-     localStorage.removeItem("token");
-     router.push("/login");
-   }
- }, []);
 
+  const { toast } = useToast();
+  const router = useRouter();
+
+  // ✅ Auth check (your existing logic)
   useEffect(() => {
-    fetchBuzzes(currentPage, limit);
-  }, [currentPage, limit]);
+    const encrypted = localStorage.getItem("token");
 
-  const fetchBuzzes = async (page: number, limit: number) => {
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
+
     try {
-      const response = await getAllBuzz(page, limit);
+      const decrypted = decryptToken(encrypted);
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }, [router]);
+
+  // ✅ Fetch categories (for dropdown)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load categories.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchCategories();
+  }, [toast]);
+
+  // ✅ Fetch buzz list (with filters)
+  useEffect(() => {
+    fetchBuzzes(currentPage, limit, category, search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, limit, category, search]);
+
+  const fetchBuzzes = async (
+    page: number,
+    limit: number,
+    categoryFilter: string,
+    searchTerm: string
+  ) => {
+    try {
+      const response = await getAllBuzz(page, limit, categoryFilter, searchTerm);
       setBuzzes(response.data);
       setTotalPages(response.meta.totalPages);
     } catch (error) {
@@ -141,7 +184,7 @@ export default function BuzzPage() {
   const DeleteBuzz = async (id: string) => {
     try {
       await deleteBuzz(id);
-      await fetchBuzzes(currentPage, limit);
+      await fetchBuzzes(currentPage, limit, category, search);
       toast({
         title: "Success",
         description: "Buzz deleted successfully.",
@@ -180,17 +223,59 @@ export default function BuzzPage() {
         }
       />
 
-      <div className="mt-6 space-y-6">
+      {/* ✅ Filters row */}
+   <div className="mt-6 mb-4 flex flex-wrap items-center gap-4 w-full">
+
+        {/* Category Dropdown */}
+          <div className="flex w-[40%]">
+          <input
+            type="text"
+            placeholder="Search buzz (content / event name)..."
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          
+          <select
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">All</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Search Bar */}
+      
+      </div>
+
+      <div className="space-y-6">
         {buzzes.map((buzz) => {
           const { title, excerpt, image } = extractContent(buzz.content);
 
           return (
-            <div key={buzz.id} className="rounded-lg border bg-card p-6 shadow-sm">
+            <div
+              key={buzz.id}
+              className="rounded-lg border bg-card p-6 shadow-sm"
+            >
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
                     <th className="border border-gray-300 p-2">Image</th>
-                    <th className="border border-gray-300 p-2">Title</th>
+                    <th className="border border-gray-300 p-2">Name</th>
                     <th className="border border-gray-300 p-2">Description</th>
                     <th className="border border-gray-300 p-2">Category</th>
                     <th className="border border-gray-300 p-2">Event Date</th>
@@ -208,13 +293,17 @@ export default function BuzzPage() {
                       )}
                     </td>
                     <td className="border border-gray-300 p-2 align-top">
-                      <h2 className="text-lg font-semibold">{title}</h2>
+                      <h2 className="text-lg font-semibold">{buzz.eventName}</h2>
                     </td>
                     <td className="border border-gray-300 p-2 align-top">
-                      <p className="text-sm text-muted-foreground">{excerpt}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {excerpt}
+                      </p>
                     </td>
                     <td className="border border-gray-300 p-2 align-top">
-                      <p className="text-sm text-muted-foreground">{buzz.category}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {buzz.category || "-"}
+                      </p>
                     </td>
                     <td className="border border-gray-300 p-2 align-top">
                       <p className="text-sm text-muted-foreground">
@@ -228,7 +317,10 @@ export default function BuzzPage() {
               </table>
 
               <div className="mt-4 flex justify-between items-center text-sm text-muted-foreground">
-                <div>Last updated: {new Date(buzz.updatedAt).toLocaleDateString()}</div>
+                <div>
+                  Last updated:{" "}
+                  {new Date(buzz.updatedAt).toLocaleDateString()}
+                </div>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -252,7 +344,8 @@ export default function BuzzPage() {
 
         {buzzes.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
-            No buzz items yet. Click "Add Buzz" to create one.
+            No buzz items found. Try changing filters or click &quot;Add Buzz&quot; to
+            create one.
           </div>
         )}
       </div>
@@ -266,7 +359,7 @@ export default function BuzzPage() {
           onPageChange={setCurrentPage}
           onRowsPerPageChange={(rows) => {
             setLimit(rows);
-            setCurrentPage(1); // Reset to first page when changing limit
+            setCurrentPage(1);
           }}
         />
       </div>
@@ -290,25 +383,39 @@ export default function BuzzPage() {
         initialCategory={editingBuzz?.category}
         initialEventDate={editingBuzz?.eventDate}
         initalEventName={editingBuzz?.eventName}
-        onSave={async (html, design, category, eventDate,eventName) => {
+        onSave={async (html, design, categoryValue, eventDate, eventName) => {
           try {
             if (editingBuzz) {
-              await editBuzz(editingBuzz.id, html, design, category, eventDate,eventName);
+              await editBuzz(
+                editingBuzz.id,
+                html,
+                design,
+                categoryValue,
+                eventDate,
+                eventName
+              );
               setEditingBuzz(null);
               setIsEditorOpen(false);
-
-          
             } else {
-              await createBuzz(html, design, category, eventDate,eventName);
-                  setEditingBuzz(null);
+              await createBuzz(
+                html,
+                design,
+                categoryValue,
+                eventDate,
+                eventName
+              );
+              setEditingBuzz(null);
               setIsEditorOpen(false);
-
-       
             }
-            await fetchBuzzes(currentPage, limit);
+
+            // ✅ Refresh with current filters
+            await fetchBuzzes(currentPage, limit, category, search);
+
             toast({
               title: "Success",
-              description: `${editingBuzz ? "Updated" : "Created"} buzz successfully.`,
+              description: `${
+                editingBuzz ? "Updated" : "Created"
+              } buzz successfully.`,
             });
           } catch (error) {
             console.error(
@@ -317,10 +424,11 @@ export default function BuzzPage() {
             );
             toast({
               title: "Error",
-              description: `${editingBuzz ? "Update" : "Create"} buzz failed. Please try again.`,
+              description: `${
+                editingBuzz ? "Update" : "Create"
+              } buzz failed. Please try again.`,
               variant: "destructive",
             });
-            
           }
         }}
       />
