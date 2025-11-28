@@ -10,8 +10,8 @@ export interface Buzz {
   updatedAt: string;
 }
 
-export const getAllBuzz = () => {
-  return apiFetch("/buzz", {
+export const getAllBuzz = (page: number = 1, limit: number = 10) => {
+  return apiFetch(`/buzz?page=${page}&limit=${limit}`, {
     method: "GET",
   });
 };

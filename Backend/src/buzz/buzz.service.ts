@@ -11,12 +11,24 @@ export class BuzzService {
     private readonly buzzRepository: Repository<Buzz>,
   ) {}
 
-  async getAllBuzz(): Promise<Buzz[]> {
-    return this.buzzRepository.find({
+  async getAllBuzz(page: number = 1, limit: number = 10) {
+    const [data, total] = await this.buzzRepository.findAndCount({
       order: {
         createdAt: 'DESC',
       },
+      skip: (page - 1) * limit,
+      take: limit,
     });
+
+    return {
+      data,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
 async countAll() {

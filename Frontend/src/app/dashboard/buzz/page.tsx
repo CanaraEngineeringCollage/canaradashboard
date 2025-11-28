@@ -6,6 +6,7 @@ import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Megaphone } from "lucide-react";
 import { BuzzEditor } from "./components/buzz-editor";
+import TablePagination from "@/components/ui/TablePagination";
 import { useToast } from "@/hooks/use-toast";
 import { createBuzz, deleteBuzz, editBuzz, getAllBuzz } from "@/lib/buzz";
 import { useRouter } from "next/navigation";
@@ -88,6 +89,9 @@ function DeleteConfirmationModal({
 
 export default function BuzzPage() {
   const [buzzes, setBuzzes] = useState<Buzz[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingBuzz, setEditingBuzz] = useState<Buzz | null>(null);
   const [deleteBuzzId, setDeleteBuzzId] = useState<string | null>(null);
@@ -116,13 +120,14 @@ export default function BuzzPage() {
  }, []);
 
   useEffect(() => {
-    fetchBuzzes();
-  }, []);
+    fetchBuzzes(currentPage, limit);
+  }, [currentPage, limit]);
 
-  const fetchBuzzes = async () => {
+  const fetchBuzzes = async (page: number, limit: number) => {
     try {
-      const response = await getAllBuzz();
-      setBuzzes(response);
+      const response = await getAllBuzz(page, limit);
+      setBuzzes(response.data);
+      setTotalPages(response.meta.totalPages);
     } catch (error) {
       console.error("Error fetching buzzes:", error);
       toast({
@@ -136,7 +141,7 @@ export default function BuzzPage() {
   const DeleteBuzz = async (id: string) => {
     try {
       await deleteBuzz(id);
-      await fetchBuzzes();
+      await fetchBuzzes(currentPage, limit);
       toast({
         title: "Success",
         description: "Buzz deleted successfully.",
@@ -252,6 +257,20 @@ export default function BuzzPage() {
         )}
       </div>
 
+      {/* Pagination Controls */}
+      <div className="mt-6">
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPage={limit}
+          onPageChange={setCurrentPage}
+          onRowsPerPageChange={(rows) => {
+            setLimit(rows);
+            setCurrentPage(1); // Reset to first page when changing limit
+          }}
+        />
+      </div>
+
       <DeleteConfirmationModal
         isOpen={!!deleteBuzzId}
         id={deleteBuzzId}
@@ -286,7 +305,7 @@ export default function BuzzPage() {
 
        
             }
-            await fetchBuzzes();
+            await fetchBuzzes(currentPage, limit);
             toast({
               title: "Success",
               description: `${editingBuzz ? "Updated" : "Created"} buzz successfully.`,

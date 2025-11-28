@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Patch, Delete, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Patch, Delete, Param, UseGuards, Query } from '@nestjs/common';
 import { BuzzService } from './buzz.service';
 import { Buzz } from './entities/buzz.entity';
 import { CreateBuzzDto } from './dto/create-buzz.dto';
@@ -9,8 +9,11 @@ export class BuzzController {
   constructor(private readonly buzzService: BuzzService) {}
 
   @Get()
-  async getAllBuzz(): Promise<Buzz[]> {
-    return this.buzzService.getAllBuzz();
+  async getAllBuzz(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.buzzService.getAllBuzz(page, limit);
   }
 @UseGuards(JwtAuthGuard)
   @Post()
