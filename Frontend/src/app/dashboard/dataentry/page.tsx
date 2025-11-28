@@ -1,7 +1,9 @@
 "use client";
 
 import TablePagination from "@/components/ui/TablePagination";
+import { decryptToken } from "@/lib/encrypt";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface FileItem {
   id: number;
@@ -43,6 +45,30 @@ export default function UploadPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const router = useRouter();
+
+
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
+  
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
+  
+    try {
+      const decrypted = decryptToken(encrypted);
+  
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+  
+    } catch (err) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }, []);
 
   // ✅ Fetch files WITH backend filters + pagination
   const fetchFiles = async () => {
@@ -69,6 +95,8 @@ export default function UploadPage() {
   }, [searchTerm, typeFilter, departmentFilter, currentPage, rowsPerPage]);
 
   const handleUpload = async (e: React.FormEvent) => {
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
     e.preventDefault();
     if (!file) return alert("Please select a file");
 
@@ -85,6 +113,9 @@ export default function UploadPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/upload?${query.toString()}`, {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Failed to upload file");
@@ -105,8 +136,15 @@ export default function UploadPage() {
   };
 
   const confirmDelete = async (id: number) => {
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/${id}`, { method: "DELETE" });
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       fetchFiles();
     } catch (err) {
       console.error("Delete error:", err);
