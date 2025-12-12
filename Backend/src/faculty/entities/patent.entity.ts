@@ -9,7 +9,7 @@ export class Achievement {
   @Column()
   heading: string;
 
-  @Column('simple-array') // Stores array of strings
+  @Column({ type: 'json' }) // Stores array of strings
   descriptions: string[];
 
   @ManyToOne(() => Faculty, (faculty) => faculty.achievements, {

@@ -9,7 +9,7 @@ export class Certification {
   @Column()
   heading: string;
 
-  @Column('simple-array')
+  @Column({ type: 'json' })
   descriptions: string[];
 
   @ManyToOne(() => Faculty, (faculty) => faculty.certifications, {

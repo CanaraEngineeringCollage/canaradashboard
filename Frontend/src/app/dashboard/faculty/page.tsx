@@ -312,7 +312,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
        if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
       if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
       if (!faculty.department) newErrors.department = "Department is required";
-      if (faculty.department === "Science & Humanities" && !faculty.subDepartment) {
+      if (faculty.department === "Science & Humanities" && faculty.type !== "Technical Staff" && !faculty.subDepartment) {
         newErrors.subDepartment = "Sub-department is required for Science & Humanities";
       }
       if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
@@ -1054,7 +1054,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
               {faculty.department === "Science & Humanities" && (
                 <div>
-                  <label className="block text-sm font-medium mb-1">Sub-Department *</label>
+                  <label className="block text-sm font-medium mb-1">Sub-Department {faculty.type !== "Technical Staff" ? "*" : "(Optional)"}</label>
                   <select
                     name="subDepartment"
                     value={faculty.subDepartment || ""}
