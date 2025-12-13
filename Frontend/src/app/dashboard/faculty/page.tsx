@@ -1054,7 +1054,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
               {faculty.department === "Science & Humanities" && (
                 <div>
-                  <label className="block text-sm font-medium mb-1">Sub-Department {faculty.type !== "Technical Staff" ? "*" : "(Optional)"}</label>
+                  <label className="block text-sm font-medium mb-1">Sub-Department (Optional)</label>
                   <select
                     name="subDepartment"
                     value={faculty.subDepartment || ""}
