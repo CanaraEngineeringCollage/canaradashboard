@@ -312,9 +312,9 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
        if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
       if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
       if (!faculty.department) newErrors.department = "Department is required";
-      if (faculty.department === "Science & Humanities" && faculty.type !== "Technical Staff" && !faculty.subDepartment) {
-        newErrors.subDepartment = "Sub-department is required for Science & Humanities";
-      }
+      // if (faculty.department === "Science & Humanities" && faculty.type !== "Technical Staff" && !faculty.subDepartment) {
+      //   newErrors.subDepartment = "Sub-department is required for Science & Humanities";
+      // }
       if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
       if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
       if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
