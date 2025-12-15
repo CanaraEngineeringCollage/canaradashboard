@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper } from "lucide-react";
+import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper, Video, Briefcase } from "lucide-react";
 import { getAllFaculty, getFacultyCount } from "@/lib/faculty";
 import { getGrievances } from "@/lib/grievance";
 import { getScStGrievances } from "@/lib/scstGrievances";
@@ -20,6 +20,8 @@ export default function DashboardPage() {
   const [alumniCount, setAlumniCount] = useState<number | null>(null);
   const [eventsCount, setEventsCount] = useState<number | null>(null);
   const [buzzCount, setBuzzCount] = useState<number | null>(null);
+  const [placementCount, setPlacementCount] = useState<number | null>(null);
+  const [podcastCount, setPodcastCount] = useState<number | null>(null);
 
 
 const router = useRouter();
@@ -124,6 +126,34 @@ const fetchCounsellingCount = async () => {
   }
 };
 
+const fetchPlacementCount = async () => {
+const token = getToken();
+ if (!token) return router.push("/login");
+try {
+ const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/placement/count`, {
+   headers: { Authorization: `Bearer ${token}` },
+ });
+ const data = await res.json();
+ setPlacementCount(data.count);
+} catch (error) {
+ console.error(error);
+}
+};
+
+const fetchPodcastCount = async () => {
+const token = getToken();
+ if (!token) return router.push("/login");
+try {
+ const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni/podcast/count`, {
+   headers: { Authorization: `Bearer ${token}` },
+ });
+ const data = await res.json();
+ setPodcastCount(data.count);
+} catch (error) {
+ console.error(error);
+}
+};
+
 
   useEffect(() => {
     fetchAllData();
@@ -132,6 +162,8 @@ const fetchCounsellingCount = async () => {
     fetchAlumniCount();
     fetchEventsCounts();
     fetchBuzzCounts();
+    fetchPlacementCount();
+    fetchPodcastCount();
   }, []);
 
   // 🔹 Reusable card with skeleton
@@ -207,12 +239,18 @@ const fetchCounsellingCount = async () => {
           count={alumniCount}
           description="Total queries received from alumni"
         />
-        {/* <StatCard
-          title="Grievance Received"
-          icon={ShieldCheck}
-          count={grievanceCount}
-          description="Total grievances submitted by website visitors"
-        /> */}
+        <StatCard
+          title="Placement Received"
+          icon={Briefcase}
+          count={placementCount}
+          description="Total placements received"
+        />
+        <StatCard
+          title="Alumni Podcast"
+          icon={Video}
+          count={podcastCount}
+          description="Total alumni podcasts"
+        />
       </div>
     </>
   );

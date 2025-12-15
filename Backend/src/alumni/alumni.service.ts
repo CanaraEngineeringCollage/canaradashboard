@@ -28,6 +28,10 @@ export class AlumniService {
   return this.alumniRepo.count();
 }
 
+async countPodcasts() {
+  return this.podcastRepo.count();
+}
+
   createPodcast(data: CreateAlumniPodcastDto) {
     const podcast = this.podcastRepo.create(data);
     return this.podcastRepo.save(podcast);

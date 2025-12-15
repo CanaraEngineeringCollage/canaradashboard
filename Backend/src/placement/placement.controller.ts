@@ -19,4 +19,10 @@ export class PlacementController {
   findAll() {
     return this.placementService.findAll();
   }
+
+  @Get('count')
+  async getCount() {
+    const count = await this.placementService.count();
+    return { count };
+  }
 }

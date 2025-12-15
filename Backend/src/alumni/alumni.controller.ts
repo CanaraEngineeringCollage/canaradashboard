@@ -35,6 +35,13 @@ async getCount() {
     return this.alumniService.findAllPodcasts();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('podcast/count')
+  async getPodcastCount() {
+    const count = await this.alumniService.countPodcasts();
+    return { count };
+  }
+
   @Patch('podcast/:id')
   updatePodcast(@Param('id') id: string, @Body() data: { url: string }) {
     return this.alumniService.updatePodcast(+id, data.url);

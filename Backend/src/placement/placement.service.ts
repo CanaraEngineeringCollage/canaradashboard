@@ -23,4 +23,8 @@ export class PlacementService {
       },
     });
   }
+
+  count() {
+    return this.placementRepository.count();
+  }
 }
