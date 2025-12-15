@@ -63,14 +63,14 @@ export function BuzzEditor({
       });
       return;
     }
-    if (!eventDate.trim()) {
-      toast({
-        title: "Error",
-        description: " Please select a Date",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (!eventDate.trim()) {
+    //   toast({
+    //     title: "Error",
+    //     description: " Please select a Date",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     if (emailEditorRef.current?.editor && isEditorLoaded) {
       emailEditorRef.current.editor.exportHtml((data: { design: object; html: string }) => {
