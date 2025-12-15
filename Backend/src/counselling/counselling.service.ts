@@ -17,8 +17,14 @@ export class CounsellingService {
     return this.repo.save(counselling);
   }
 
-  async findAll() {
-    return this.repo.find({ order: { createdAt: 'DESC' } });
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.repo.findAndCount({
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
+    return { data, total };
   }
   async countAll () {
   return this.repo.count();

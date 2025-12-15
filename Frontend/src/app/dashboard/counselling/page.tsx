@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PageTitle } from "@/components/page-title";
+import TablePagination from "@/components/ui/TablePagination";
 import { Brain, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
@@ -24,6 +25,9 @@ interface CounsellingTableProps {
 const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
   const [counsellingData, setCounsellingData] = useState<CounsellingType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
 
   const router = useRouter();
@@ -59,7 +63,7 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
       if (fetchData) {
         data = await fetchData();
       } else {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling?page=${currentPage}&limit=${itemsPerPage}`, {
           method: "GET",
           headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
@@ -68,7 +72,10 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
         if (!res.ok) {
           throw new Error("Failed to fetch counselling data");
         }
-        data = await res.json();
+        const result = await res.json();
+        const { data: resultData, total } = result;
+        data = resultData;
+        setTotalPages(Math.ceil(total / itemsPerPage));
       }
 
       
@@ -86,8 +93,8 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
     setLoading(false);
   };
 
-  loadData();
-}, [fetchData]);
+    loadData();
+  }, [fetchData, currentPage, itemsPerPage]);
 
 
 
@@ -100,6 +107,7 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
       {loading ? (
         <p>Loading...</p>
       ) : (
+        <>
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-200 rounded-lg">
             <thead className="bg-gray-100">
@@ -131,6 +139,19 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
             </tbody>
           </table>
         </div>
+        <div className="mt-4">
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onRowsPerPageChange={(rows) => {
+              setItemsPerPage(rows);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+        </>
       )}
     </div>
   );

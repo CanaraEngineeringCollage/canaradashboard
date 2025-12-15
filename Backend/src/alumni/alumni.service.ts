@@ -21,8 +21,14 @@ export class AlumniService {
     return this.alumniRepo.save(alumni);
   }
 
-  findAll() {
-    return this.alumniRepo.find({ order: { createdAt: 'DESC' } });
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.alumniRepo.findAndCount({
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
+    return { data, total };
   }
   async countAll() {
   return this.alumniRepo.count();

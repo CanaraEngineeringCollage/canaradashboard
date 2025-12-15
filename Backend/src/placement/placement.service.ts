@@ -16,12 +16,14 @@ export class PlacementService {
     return this.placementRepository.save(placement);
   }
 
-  findAll() {
-    return this.placementRepository.find({
-      order: {
-        createdAt: 'DESC',
-      },
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.placementRepository.findAndCount({
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+    return { data, total };
   }
 
   count() {

@@ -4,6 +4,7 @@ import { decryptToken } from "@/lib/encrypt";
 import { GraduationCap, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import TablePagination from "@/components/ui/TablePagination";
 // your API fetch function
 
 export interface Alumni {
@@ -21,6 +22,9 @@ export interface Alumni {
 const AlumniPage = () => {
   const [alumniList, setAlumniList] = useState<Alumni[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
 
   const router = useRouter();
@@ -51,17 +55,21 @@ const AlumniPage = () => {
      const token = encrypted ? decryptToken(encrypted) : null;
       setLoading(true);
       try {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni`, { method: "GET", headers: {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni?page=${currentPage}&limit=${itemsPerPage}`, { method: "GET", headers: {
       Authorization: `Bearer ${token}`, // ✅ send token
     }, });
-      if (!res.ok) throw new Error("Failed to fetch timetables");
-      const data = await res.json();
+      if (!res.ok) throw new Error("Failed to fetch alumni data");
+      const result = await res.json();
+      
+      const { data, total } = result;
+      
         // sort by createdAt descending
         const sorted = data.sort(
           (a: Alumni, b: Alumni) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setAlumniList(sorted);
+        setTotalPages(Math.ceil(total / itemsPerPage));
       } catch (error) {
         console.error(error);
       }
@@ -69,7 +77,7 @@ const AlumniPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentPage, itemsPerPage]);
 
   return (
     <div className="p-6">
@@ -78,6 +86,7 @@ const AlumniPage = () => {
       {loading ? (
         <p>Loading...</p>
       ) : (
+        <>
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-200 rounded-lg">
             <thead className="bg-gray-100">
@@ -118,6 +127,19 @@ const AlumniPage = () => {
           )}
           </table>
         </div>
+        <div className="mt-4">
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onRowsPerPageChange={(rows) => {
+              setItemsPerPage(rows);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+        </>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 // src/alumni/alumni.controller.ts
-import { Controller, Post, Body, Get, UseGuards, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AlumniService } from './alumni.service';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
 import { CreateAlumniPodcastDto } from './dto/create-alumni-podcast.dto';
@@ -15,8 +15,11 @@ export class AlumniController {
   }
 @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.alumniService.findAll();
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.alumniService.findAll(+page, +limit);
   }
   @UseGuards(JwtAuthGuard)
 @Get('count')

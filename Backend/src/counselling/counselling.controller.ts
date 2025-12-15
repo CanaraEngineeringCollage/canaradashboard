@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 import { CounsellingService } from './counselling.service';
 import { CreateCounsellingDto } from './dto/counselling.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -12,10 +12,9 @@ export class CounsellingController {
   async create(@Body() body: CreateCounsellingDto) {
     return this.counsellingService.create(body);
   }
-@UseGuards(JwtAuthGuard)
   @Get()
-  async findAll() {
-    return this.counsellingService.findAll();
+  async findAll(@Query('page') page: string = '1', @Query('limit') limit: string = '10') {
+    return this.counsellingService.findAll(+page, +limit);
   }
 @UseGuards(JwtAuthGuard)
 @Get('count')

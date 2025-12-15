@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PageTitle } from "@/components/page-title";
+import TablePagination from "@/components/ui/TablePagination";
 import { Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
@@ -23,6 +24,9 @@ interface PlacementTableProps {
 const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
   const [submissions, setSubmissions] = useState<PlacementSubmission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const router = useRouter();
 
   useEffect(() => {
@@ -56,14 +60,17 @@ const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
         if (fetchData) {
           data = await fetchData();
         } else {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/placement`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/placement?page=${currentPage}&limit=${itemsPerPage}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
           if (res.ok) {
-            data = await res.json();
+            const result = await res.json();
+            const { data: resultData, total } = result;
+            data = resultData;
+            setTotalPages(Math.ceil(total / itemsPerPage));
           } else {
             console.error("Failed to fetch submissions");
           }
@@ -82,7 +89,7 @@ const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
     };
 
     loadData();
-  }, [fetchData]);
+  }, [fetchData, currentPage, itemsPerPage]);
 
   return (
     <div className="p-6">
@@ -91,6 +98,7 @@ const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
       {loading ? (
         <p>Loading...</p>
       ) : (
+        <>
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-200 rounded-lg">
             <thead className="bg-gray-100">
@@ -126,6 +134,19 @@ const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
             </tbody>
           </table>
         </div>
+        <div className="mt-4">
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onRowsPerPageChange={(rows) => {
+              setItemsPerPage(rows);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+        </>
       )}
     </div>
   );

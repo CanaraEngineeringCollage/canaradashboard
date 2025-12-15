@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { PlacementService } from './placement.service';
 import { CreatePlacementDto } from './dto/create-placement.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -13,11 +13,12 @@ export class PlacementController {
     return this.placementService.create(createPlacementDto);
   }
 
- @UseGuards(JwtAuthGuard)
   @Get()
- 
-  findAll() {
-    return this.placementService.findAll();
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.placementService.findAll(+page, +limit);
   }
 
   @Get('count')
