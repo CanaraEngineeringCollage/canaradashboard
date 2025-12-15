@@ -27,7 +27,9 @@ export class FacultyController {
   // ✅ Only logged-in admin can create
   @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(FileInterceptor('avatar', {
+    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+  }))
   async create(
     @Body('data') data: string,
     @UploadedFile() avatar?: Express.Multer.File,
@@ -108,7 +110,9 @@ export class FacultyController {
   // ✅ Only logged-in admin can update
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(FileInterceptor('avatar', {
+    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+  }))
   async update(
     @Param('id') id: string,
     @Body('data') data: string,

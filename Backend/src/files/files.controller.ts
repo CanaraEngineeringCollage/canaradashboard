@@ -22,7 +22,9 @@ export class FilesController {
 
   @UseGuards(JwtAuthGuard)
 @Post('upload')
-@UseInterceptors(FileInterceptor('file'))
+@UseInterceptors(FileInterceptor('file', {
+    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+  }))
 async uploadFile(
   @UploadedFile() file: Express.Multer.File,
   @Query('type') type: 'pdf' | 'image' | 'video',

@@ -20,7 +20,9 @@ export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {
+    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+  }))
   async upload(
     @Body() body: CreateTimetableDto,
     @UploadedFile() file: Express.Multer.File,
