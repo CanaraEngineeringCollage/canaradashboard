@@ -99,6 +99,7 @@ const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, 
             <option value="Mechanical Engineering">Mechanical Engineering</option>
             <option value="Science & Humanities">Science & Humanities</option>
             <option value="Student Welfare Department">Student Welfare Department</option>
+            <option value="Alumni">Alumni</option>
           </select>
 
           <input

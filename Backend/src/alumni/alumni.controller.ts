@@ -24,7 +24,7 @@ async getCount() {
   const count = await this.alumniService.countAll();
   return { count };
 }
-
+@UseGuards(JwtAuthGuard)
   @Post('podcast')
   createPodcast(@Body() data: CreateAlumniPodcastDto) {
     return this.alumniService.createPodcast(data);

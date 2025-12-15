@@ -14,6 +14,7 @@ import {
   Brain,
   GraduationCap,
   Video,
+  Briefcase,
 } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
@@ -32,9 +33,11 @@ const navItems: NavItem[] = [
   //  { href: "/dashboard/exam-timetable", label: "Exam Timetable", icon: BookOpenCheck },
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
-  { href: "/dashboard/alumni", label: "alumni", icon: GraduationCap },
-    { href: "/dashboard/alumni-podcasts", label: "Alumni Podcast", icon: Video },
-  { href: "/dashboard/counselling", label: "Counselling", icon: Brain },
+   { href: "/dashboard/alumni-podcasts", label: "Alumni Podcast", icon: Video },
+  { href: "/dashboard/alumni", label: "Alumni Submissions", icon: GraduationCap },
+   
+    { href: "/dashboard/placement", label: "Placement Submissions", icon: Briefcase },
+  { href: "/dashboard/counselling", label: "Counselling Submissions", icon: Brain },
   { href: "/dashboard/ppt", label: "Update PPT", icon: FileText },
   // { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
   // { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
