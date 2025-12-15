@@ -14,6 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import * as path from 'path';
 
 @Controller('files')
 export class FilesController {
@@ -24,7 +25,7 @@ export class FilesController {
 @UseInterceptors(FileInterceptor('file'))
 async uploadFile(
   @UploadedFile() file: Express.Multer.File,
-  @Query('type') type: 'pdf' | 'image',
+  @Query('type') type: 'pdf' | 'image' | 'video',
   @Query('name') name?: string,
   @Query('department') department: string = 'Common',
 ) {
@@ -35,8 +36,15 @@ async uploadFile(
 @Get(':name')
 async getFileByName(@Param('name') name: string, @Res() res: Response) {
   const file = await this.filesService.getFileByName(name);
-  res.setHeader('Content-Type', file.mimetype);
-  res.send(file.file || file.avatar);
+  
+  if (file.type === 'video' && file.video) {
+    const filePath = path.join(process.cwd(), 'uploads', file.video);
+    res.setHeader('Content-Type', file.mimetype);
+    res.sendFile(filePath);
+  } else {
+    res.setHeader('Content-Type', file.mimetype);
+    res.send(file.file || file.avatar);
+  }
 }
 
 
@@ -44,15 +52,22 @@ async getFileByName(@Param('name') name: string, @Res() res: Response) {
   @Get(':id')
   async getFile(@Param('id') id: number, @Res() res: Response) {
     const file = await this.filesService.getFile(id);
-    res.setHeader('Content-Type', file.mimetype);
-    res.send(file.file || file.avatar);
+    
+    if (file.type === 'video' && file.video) {
+      const filePath = path.join(process.cwd(), 'uploads', file.video);
+      res.setHeader('Content-Type', file.mimetype);
+      res.sendFile(filePath);
+    } else {
+      res.setHeader('Content-Type', file.mimetype);
+      res.send(file.file || file.avatar);
+    }
   }
 
   // Get all files
 @Get()
 async getAll(
   @Query('search') search?: string,
-  @Query('type') type?: 'pdf' | 'image',
+  @Query('type') type?: 'pdf' | 'image' | 'video',
   @Query('department') department?: string,
   @Query('page') page: number = 1,
   @Query('limit') limit: number = 10,

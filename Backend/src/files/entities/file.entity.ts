@@ -16,11 +16,15 @@ export class FileEntity {
   @Column({ type: 'longblob', nullable: true })
   avatar: Buffer | null;
 
+  // Store Video file path (filename)
+  @Column({ nullable: true })
+  video: string;
+
   @Column({ nullable: true })
   mimetype: string;
 
   @Column({ nullable: true })
-  type: 'pdf' | 'image';
+  type: 'pdf' | 'image' | 'video';
   
   @Column({ default: 'Common' })
   department: string;

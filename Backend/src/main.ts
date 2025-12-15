@@ -13,8 +13,8 @@ async function bootstrap() {
   
 
   // Middleware setup
-  app.use(bodyParser.json({ limit: '50mb' }));
-  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+  app.use(bodyParser.json({ limit: '150mb' }));
+  app.use(bodyParser.urlencoded({ limit: '150mb', extended: true }));
   app.use(cookieParser());
   app.enableCors({
     origin: [

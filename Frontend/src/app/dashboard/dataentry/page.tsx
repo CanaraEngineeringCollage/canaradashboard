@@ -9,7 +9,7 @@ interface FileItem {
   id: number;
   name: string;
   mimetype: string;
-  type: "pdf" | "image";
+  type: "pdf" | "image" | "video";
   department: string;
 }
 
@@ -29,12 +29,12 @@ const departments = [
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [fileType, setFileType] = useState<"pdf" | "image">("image");
+  const [fileType, setFileType] = useState<"pdf" | "image" | "video">("image");
   const [customName, setCustomName] = useState<string>("");
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [typeFilter, setTypeFilter] = useState<"all" | "pdf" | "image">("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | "pdf" | "image" | "video">("all");
   const [department, setDepartment] = useState("Common");
   const [departmentFilter, setDepartmentFilter] = useState("All");
 
@@ -172,11 +172,12 @@ export default function UploadPage() {
 
           <select
             value={fileType}
-            onChange={(e) => setFileType(e.target.value as "pdf" | "image")}
+            onChange={(e) => setFileType(e.target.value as "pdf" | "image" | "video")}
             className="border rounded-lg px-3 py-2"
           >
             <option value="image">Image</option>
             <option value="pdf">PDF</option>
+            <option value="video">Video</option>
           </select>
 
           <div
@@ -197,7 +198,7 @@ export default function UploadPage() {
               Select File
               <input
                 type="file"
-                accept={fileType === "pdf" ? "application/pdf" : "image/*"}
+                accept={fileType === "pdf" ? "application/pdf" : fileType === "video" ? "video/*" : "image/*"}
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="hidden"
               />
@@ -207,6 +208,8 @@ export default function UploadPage() {
               <div className="mt-4 flex flex-col items-center">
                 {file.type.startsWith("image/") ? (
                   <img src={URL.createObjectURL(file)} alt="preview" className="w-40 h-40 object-cover rounded-md border" />
+                ) : file.type.startsWith("video/") ? (
+                   <video src={URL.createObjectURL(file)} controls className="w-40 h-40 object-cover rounded-md border" />
                 ) : (
                   <embed src={URL.createObjectURL(file)} type="application/pdf" className="w-40 h-40 border rounded-md" />
                 )}
@@ -241,12 +244,13 @@ export default function UploadPage() {
 
         <select
           value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as "all" | "pdf" | "image")}
+          onChange={(e) => setTypeFilter(e.target.value as "all" | "pdf" | "image" | "video")}
           className="border rounded-lg px-3 py-2"
         >
           <option value="all">All</option>
           <option value="image">Images</option>
           <option value="pdf">PDFs</option>
+          <option value="video">Videos</option>
         </select>
 
         <select
@@ -270,6 +274,8 @@ export default function UploadPage() {
             <div key={f.id} className="p-4 bg-white rounded-xl shadow border flex flex-col items-center">
               {f.type === "image" ? (
                 <img src={`${process.env.NEXT_PUBLIC_API_URL}/files/${f.name}`} className="w-40 h-40 object-cover rounded-md border" />
+              ) : f.type === "video" ? (
+                <video src={`${process.env.NEXT_PUBLIC_API_URL}/files/${f.name}`} controls className="w-40 h-40 object-cover rounded-md border" />
               ) : (
                 <a href={`${process.env.NEXT_PUBLIC_API_URL}/files/${f.name}`} target="_blank" className="text-blue-600 underline mt-4 truncate">
                   {f.name}
