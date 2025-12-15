@@ -26,28 +26,39 @@ export class FilesService {
   ) {
     let videoFilename: string | undefined;
 
-    if (type === 'video') {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const extension = path.extname(file.originalname);
-      videoFilename = `${uniqueSuffix}${extension}`;
-      const uploadPath = path.join(process.cwd(), 'uploads', videoFilename);
-      fs.writeFileSync(uploadPath, file.buffer);
-    }
-
-    const newFile = this.fileRepo.create({
-      name: customName || file.originalname, 
-      mimetype: file.mimetype,
-      type,
-       department,
-      file: type === 'pdf' ? file.buffer : undefined,
-      avatar: type === 'image' ? file.buffer : undefined,
-      video: type === 'video' ? videoFilename : undefined,
-    });
-
     try {
+      if (type === 'video') {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const extension = path.extname(file.originalname);
+        videoFilename = `${uniqueSuffix}${extension}`;
+        const uploadPath = path.join(process.cwd(), 'uploads', videoFilename);
+        fs.writeFileSync(uploadPath, file.buffer);
+      }
+
+      const newFile = this.fileRepo.create({
+        name: customName || file.originalname, 
+        mimetype: file.mimetype,
+        type,
+        department,
+        file: type === 'pdf' ? file.buffer : undefined,
+        avatar: type === 'image' ? file.buffer : undefined,
+        video: type === 'video' ? videoFilename : undefined,
+      });
+
       return await this.fileRepo.save(newFile);
     } catch (error) {
-      console.error("Error saving file to database:", error);
+      console.error("Error processing/saving file:", error);
+      // Clean up uploaded video if DB save fails
+      if (videoFilename) {
+        const uploadPath = path.join(process.cwd(), 'uploads', videoFilename);
+        if (fs.existsSync(uploadPath)) {
+            try {
+                fs.unlinkSync(uploadPath);
+            } catch (unlinkError) {
+                console.error("Error cleaning up file:", unlinkError);
+            }
+        }
+      }
       throw error;
     }
   }

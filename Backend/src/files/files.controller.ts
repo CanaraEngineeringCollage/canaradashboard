@@ -9,6 +9,7 @@ import {
   Res,
   Query,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
@@ -31,6 +32,9 @@ async uploadFile(
   @Query('name') name?: string,
   @Query('department') department: string = 'Common',
 ) {
+  if (!file) {
+    throw new BadRequestException('File is required');
+  }
   return this.filesService.uploadFile(file, type, name,department);
 }
 

@@ -38,7 +38,7 @@ export function BuzzEditor({
   const [eventName, setEventName] = useState(initalEventName || "");
 
   const { toast } = useToast();
-  const categories = ["Sports", "Fest", "Academics", "Cultural Events", "Technical Events", "Exams", "CSR", "Alumni"];
+  const categories = ["Sports", "Fest", "Academics", "Cultural Events", "Technical Events", "Exams", "CSR", "Alumni","Career Guidance"];
 
   useEffect(() => {
     if (initialCategory) setCategory(initialCategory);

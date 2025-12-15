@@ -1,7 +1,8 @@
 // src/alumni/alumni.controller.ts
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Patch, Param, Delete } from '@nestjs/common';
 import { AlumniService } from './alumni.service';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
+import { CreateAlumniPodcastDto } from './dto/create-alumni-podcast.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('alumni')
@@ -23,5 +24,25 @@ async getCount() {
   const count = await this.alumniService.countAll();
   return { count };
 }
+
+  @Post('podcast')
+  createPodcast(@Body() data: CreateAlumniPodcastDto) {
+    return this.alumniService.createPodcast(data);
+  }
+
+  @Get('podcast')
+  findAllPodcasts() {
+    return this.alumniService.findAllPodcasts();
+  }
+
+  @Patch('podcast/:id')
+  updatePodcast(@Param('id') id: string, @Body() data: { url: string }) {
+    return this.alumniService.updatePodcast(+id, data.url);
+  }
+
+  @Delete('podcast/:id')
+  removePodcast(@Param('id') id: string) {
+    return this.alumniService.removePodcast(+id);
+  }
 
 }

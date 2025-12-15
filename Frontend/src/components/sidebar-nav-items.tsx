@@ -13,6 +13,7 @@ import {
   BookOpenCheck,
   Brain,
   GraduationCap,
+  Video,
 } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
@@ -32,12 +33,14 @@ const navItems: NavItem[] = [
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
   { href: "/dashboard/alumni", label: "alumni", icon: GraduationCap },
+    { href: "/dashboard/alumni-podcasts", label: "Alumni Podcast", icon: Video },
   { href: "/dashboard/counselling", label: "Counselling", icon: Brain },
   { href: "/dashboard/ppt", label: "Update PPT", icon: FileText },
   // { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
   // { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
   // { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },
   { href: "/dashboard/profile", label: "Profile", icon: UserCog },
+
 ];
 
 export function SidebarNavItems() {
@@ -50,10 +53,10 @@ export function SidebarNavItems() {
           <Link href={item.href} passHref legacyBehavior>
             <SidebarMenuButton
               asChild
-              isActive={pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))}
+              isActive={pathname === item.href || (item.href !== "/dashboard" && pathname===item.href)}
               className={cn(
                 "justify-start",
-                pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+                pathname === item.href || (item.href !== "/dashboard" && "/dashboard" && pathname===item.href)
                   ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
                   : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}

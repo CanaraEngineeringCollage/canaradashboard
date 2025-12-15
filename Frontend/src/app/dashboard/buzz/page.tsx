@@ -137,23 +137,23 @@ export default function BuzzPage() {
   }, [router]);
 
   // ✅ Fetch categories (for dropdown)
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load categories.",
-          variant: "destructive",
-        });
-      }
-    };
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load categories.",
+        variant: "destructive",
+      });
+    }
+  };
 
+  useEffect(() => {
     fetchCategories();
-  }, [toast]);
+  }, []);
 
   // ✅ Fetch buzz list (with filters)
   useEffect(() => {
@@ -185,6 +185,7 @@ export default function BuzzPage() {
     try {
       await deleteBuzz(id);
       await fetchBuzzes(currentPage, limit, category, search);
+      await fetchCategories(); // Refresh categories
       toast({
         title: "Success",
         description: "Buzz deleted successfully.",
@@ -203,6 +204,7 @@ export default function BuzzPage() {
   const handleAddBuzz = () => {
     setEditingBuzz(null);
     setIsEditorOpen(true);
+    
   };
 
   const handleEditBuzz = (buzz: Buzz) => {
@@ -410,7 +412,8 @@ export default function BuzzPage() {
 
             // ✅ Refresh with current filters
             await fetchBuzzes(currentPage, limit, category, search);
-
+            await fetchCategories(); // Refresh categories
+            
             toast({
               title: "Success",
               description: `${
@@ -426,7 +429,7 @@ export default function BuzzPage() {
               title: "Error",
               description: `${
                 editingBuzz ? "Update" : "Create"
-              } buzz failed. Please try again.`,
+                } buzz failed. Please try again.`,
               variant: "destructive",
             });
           }
