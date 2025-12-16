@@ -6,7 +6,7 @@ export class JournalPublication {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'text' })
   publicationsData: string;
 
 

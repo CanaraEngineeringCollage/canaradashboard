@@ -6,12 +6,15 @@ export class ConferencePublication {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'text' })
   conferencePublications: string;
 
-
-  @ManyToOne(() => Faculty, (faculty) => faculty.internationalConferencePublications,{
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Faculty,
+    (faculty) => faculty.internationalConferencePublications,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   faculty: Faculty;
 }

@@ -3,7 +3,7 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { LandPlot, PlusCircle } from "lucide-react";
+import { LandPlot, PlusCircle, Upload } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
@@ -94,7 +94,7 @@ const departments = [
   "Dean Office",
   "Physical Education",
   "Hostel",
-  "Library"
+  "Library",
 ];
 
 const subDepartments = ["Chemistry", "Physics", "Mathematics", "Humanities & Management", "Computintg Science", "Engineering Science", "Civil"];
@@ -307,65 +307,79 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
   const validateStep = (currentStep: number) => {
     const newErrors: { [key: string]: string } = {};
     if (currentStep === 1) {
-       const isAdminOrGeneral = faculty.department === "Admin" || faculty.department === "General" || faculty.department === "Student Welfare Department" || faculty.department === "Dean Office" || faculty.department === "Hostel" || faculty.department === "Library"|| faculty.department === "Physical Education";
-       if (!isAdminOrGeneral) {
-       if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
-      if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
-      if (!faculty.department) newErrors.department = "Department is required";
-      // if (faculty.department === "Science & Humanities" && faculty.type !== "Technical Staff" && !faculty.subDepartment) {
-      //   newErrors.subDepartment = "Sub-department is required for Science & Humanities";
-      // }
-      if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
-      if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
-      if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
-      if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
-      if (!faculty.type) newErrors.type = "Type is required";
+      const isAdminOrGeneral =
+        faculty.department === "Admin" ||
+        faculty.department === "General" ||
+        faculty.department === "Student Welfare Department" ||
+        faculty.department === "Dean Office" ||
+        faculty.department === "Hostel" ||
+        faculty.department === "Library" ||
+        faculty.department === "Physical Education";
+      if (!isAdminOrGeneral) {
+        if (!faculty.name || faculty.name.trim() === "") newErrors.name = "Name is required";
+        if (!faculty.designation || faculty.designation.trim() === "") newErrors.designation = "Designation is required";
+        if (!faculty.department) newErrors.department = "Department is required";
+        // if (faculty.department === "Science & Humanities" && faculty.type !== "Technical Staff" && !faculty.subDepartment) {
+        //   newErrors.subDepartment = "Sub-department is required for Science & Humanities";
+        // }
+        if (!faculty.joiningDate) newErrors.joiningDate = "Joining date is required";
+        if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
+        if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
+        if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
+        if (!faculty.type) newErrors.type = "Type is required";
+      }
     }
-  }
     if (currentStep === 2) {
-       const isAdminOrGeneral = faculty.department === "Admin" || faculty.department === "General" || faculty.department === "Student Welfare Department" || faculty.department === "Dean Office" || faculty.department === "Hostel" || faculty.department === "Library"|| faculty.department === "Physical Education";
+      const isAdminOrGeneral =
+        faculty.department === "Admin" ||
+        faculty.department === "General" ||
+        faculty.department === "Student Welfare Department" ||
+        faculty.department === "Dean Office" ||
+        faculty.department === "Hostel" ||
+        faculty.department === "Library" ||
+        faculty.department === "Physical Education";
 
-    // Only validate if NOT Admin/General
-  if (!isAdminOrGeneral) {
-      const isAddingOrUpdating =
-        newQualification.degree ||
-        newQualification.nameOfDigree ||
-        newQualification.passingYear ||
-        newQualification.college ||
-        newQualification.specialization ||
-        editQualificationId;
+      // Only validate if NOT Admin/General
+      if (!isAdminOrGeneral) {
+        const isAddingOrUpdating =
+          newQualification.degree ||
+          newQualification.nameOfDigree ||
+          newQualification.passingYear ||
+          newQualification.college ||
+          newQualification.specialization ||
+          editQualificationId;
 
-      if (isAddingOrUpdating) {
-        if (!newQualification.degree || newQualification.degree.trim() === "") {
-          newErrors.degree = "Degree is required";
+        if (isAddingOrUpdating) {
+          if (!newQualification.degree || newQualification.degree.trim() === "") {
+            newErrors.degree = "Degree is required";
+          }
+          if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
+            newErrors.nameOfDigree = "Name of degree is required";
+          }
+          if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
+            newErrors.passingYear = "Passing Year is required";
+          }
+          if (!newQualification.college || newQualification.college.trim() === "") {
+            newErrors.college = "College is required";
+          }
+          if (!newQualification.specialization || newQualification.specialization.trim() === "") {
+            newErrors.specialization = "Specialization is required";
+          }
         }
-        if (!newQualification.nameOfDigree || newQualification.nameOfDigree.trim() === "") {
-          newErrors.nameOfDigree = "Name of degree is required";
-        }
-        if (!newQualification.passingYear || newQualification.passingYear.trim() === "") {
-          newErrors.passingYear = "Passing Year is required";
-        }
-        if (!newQualification.college || newQualification.college.trim() === "") {
-          newErrors.college = "College is required";
-        }
-        if (!newQualification.specialization || newQualification.specialization.trim() === "") {
-          newErrors.specialization = "Specialization is required";
-        }
-      }
 
-      if (mode === "edit" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
-        newErrors.qualifications = "At least one qualification is required";
-      }
+        if (mode === "edit" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
+          newErrors.qualifications = "At least one qualification is required";
+        }
 
-      if (mode === "add" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
-        newErrors.qualifications = "At least one qualification is required";
+        if (mode === "add" && faculty.qualifications.length === 0 && !isAddingOrUpdating) {
+          newErrors.qualifications = "At least one qualification is required";
+        }
       }
     }
-  }
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleNext = () => {
     if (
@@ -1692,32 +1706,34 @@ const Page: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalFaculties, setTotalFaculties] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
 
- useEffect(() => {
-  const encrypted = localStorage.getItem("token");
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
 
-  if (!encrypted) {
-    router.push("/login");
-    return;
-  }
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
 
-  try {
-    const decrypted = decryptToken(encrypted);
-    if (!decrypted || decrypted.length < 10) {
+    try {
+      const decrypted = decryptToken(encrypted);
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
       localStorage.removeItem("token");
       router.push("/login");
     }
-  } catch (err) {
-    localStorage.removeItem("token");
-    router.push("/login");
-  }
-}, []);
-
+  }, []);
 
   const fetchFaculties = () => {
     setIsLoading(true);
@@ -1776,8 +1792,8 @@ const Page: React.FC = () => {
   };
 
   const handleSubmit = (faculty: Faculty, avatarFile: File | null) => {
-      const encrypted = localStorage.getItem("token");
-  const token = encrypted ? decryptToken(encrypted) : null;
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
     const facultyData = { ...faculty, avatar: undefined };
     const formData = new FormData();
     formData.append("data", JSON.stringify(facultyData));
@@ -1855,8 +1871,8 @@ const Page: React.FC = () => {
   };
 
   const handleDeleteFaculty = (id: string) => {
-      const encrypted = localStorage.getItem("token");
-  const token = encrypted ? decryptToken(encrypted) : null;
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
     fetch(`${API_BASE_URL}/faculty/${id}`, {
       method: "DELETE",
       headers: {
@@ -1885,6 +1901,72 @@ const Page: React.FC = () => {
       });
   };
 
+  const handleImportData = async () => {
+    if (!importFile) {
+      toast({
+        title: "Error",
+        description: "Please select a file to import.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file type
+    if (!importFile.name.match(/\.(xlsx|xls)$/i)) {
+      toast({
+        title: "Error",
+        description: "Only Excel files (.xlsx, .xls) are allowed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
+
+    const formData = new FormData();
+    formData.append("file", importFile);
+
+    setIsImporting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/faculty/import-data`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to import data");
+      }
+
+      const result = await response.json();
+
+      setIsImportModalOpen(false);
+      setImportFile(null);
+      fetchFaculties();
+
+      toast({
+        title: "Import Completed",
+        description: `Processed: ${result.totalProcessed}, Success: ${result.success}, Failed: ${result.failed}. ${
+          result.errors.length > 0 ? `Errors: ${result.errors.slice(0, 3).join(", ")}${result.errors.length > 3 ? "..." : ""}` : ""
+        }`,
+        variant: result.failed > 0 ? "destructive" : "default",
+      });
+    } catch (error: any) {
+      console.error("Error importing data:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to import faculty data.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   // Filter faculties by search (client-side for name search)
   // ✅ Use data directly from backend
   const displayedFaculties = faculties;
@@ -1895,10 +1977,16 @@ const Page: React.FC = () => {
         title="Faculty Management"
         icon={LandPlot}
         action={
-          <Button onClick={handleAddFaculty}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Faculty
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsImportModalOpen(true)} variant="outline">
+              <Upload className="mr-2 h-4 w-4" />
+              Import Data
+            </Button>
+            <Button onClick={handleAddFaculty}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Faculty
+            </Button>
+          </div>
         }
       />
       <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -2012,6 +2100,42 @@ const Page: React.FC = () => {
           setFacultyToDelete(null);
         }}
       />
+      {/* Import Data Modal */}
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4">Import Faculty Data</h2>
+            <p className="text-gray-600 mb-4">Upload an Excel file (.xlsx or .xls) containing faculty data to import.</p>
+            <div className="mb-4">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setImportFile(file);
+                }}
+                className="w-full border rounded p-2"
+              />
+              {importFile && <p className="mt-2 text-sm text-gray-600">Selected: {importFile.name}</p>}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsImportModalOpen(false);
+                  setImportFile(null);
+                }}
+                disabled={isImporting}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleImportData} disabled={!importFile || isImporting}>
+                {isImporting ? "Importing..." : "Import"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

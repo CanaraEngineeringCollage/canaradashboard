@@ -27,9 +27,11 @@ export class FacultyController {
   // ✅ Only logged-in admin can create
   @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('avatar', {
-    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
-  }))
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+    }),
+  )
   async create(
     @Body('data') data: string,
     @UploadedFile() avatar?: Express.Multer.File,
@@ -110,9 +112,11 @@ export class FacultyController {
   // ✅ Only logged-in admin can update
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('avatar', {
-    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
-  }))
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+    }),
+  )
   async update(
     @Param('id') id: string,
     @Body('data') data: string,
@@ -135,6 +139,22 @@ export class FacultyController {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('import-data')
+  @UseInterceptors(FileInterceptor('file'))
+  async importData(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    // Validate file type
+    if (!file.originalname.match(/\.(xlsx|xls)$/)) {
+      throw new BadRequestException('Only Excel files are allowed!');
+    }
+
+    return this.facultyService.importFacultyData(file);
   }
 
   // ✅ Only logged-in admin can delete
