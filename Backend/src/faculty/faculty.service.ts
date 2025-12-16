@@ -169,8 +169,8 @@ export class FacultyService {
   }
 
   /**
-   * Normalize name by removing common prefixes and titles.
-   * Examples: "Dr Jamshad" -> "Jamshad", "Prof. John Doe" -> "John Doe"
+   * Normalize name by removing common prefixes/titles, dots, and extra spaces.
+   * Examples: "Dr.  Jamshad" -> "Jamshad", "Prof. John  Doe" -> "John Doe"
    */
   private normalizeName(name: string): string {
     if (!name) return '';
@@ -199,13 +199,16 @@ export class FacultyService {
       'ms.',
     ];
 
+    // Trim and remove leading prefixes
     let normalized = name.trim();
-
-    // Remove prefixes from the beginning
     for (const prefix of prefixes) {
       const regex = new RegExp(`^${prefix}\\.?\\s+`, 'i');
       normalized = normalized.replace(regex, '');
     }
+
+    // Remove dots/commas and collapse multiple spaces
+    normalized = normalized.replace(/[.,]/g, ' ');
+    normalized = normalized.replace(/\s+/g, ' ');
 
     return normalized.trim();
   }
