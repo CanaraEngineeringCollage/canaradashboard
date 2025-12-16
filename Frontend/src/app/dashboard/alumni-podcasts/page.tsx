@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { decryptToken } from "@/lib/encrypt";
-import axios from "axios";
+import { api } from "@/lib/axiosClient";
 import { Video, Loader2, Trash2, Pencil, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ const AlumniPodcastsPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  
+
   const router = useRouter();
   const { toast } = useToast();
 
@@ -57,7 +57,7 @@ const AlumniPodcastsPage = () => {
         return null;
       }
     };
-    
+
     checkAuth();
     fetchData();
   }, [router]);
@@ -67,8 +67,8 @@ const AlumniPodcastsPage = () => {
     try {
       const encrypted = localStorage.getItem("token");
       const token = encrypted ? decryptToken(encrypted) : null;
-      
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/alumni/podcast`, {
+
+      const res = await api.get("/alumni/podcast", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPodcasts(res.data);
@@ -94,8 +94,8 @@ const AlumniPodcastsPage = () => {
       const token = encrypted ? decryptToken(encrypted) : null;
 
       if (editingId) {
-        await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/alumni/podcast/${editingId}`,
+        await api.patch(
+          `/alumni/podcast/${editingId}`,
           { url },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -103,8 +103,8 @@ const AlumniPodcastsPage = () => {
         );
         toast({ title: "Success", description: "Podcast updated successfully" });
       } else {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/alumni/podcast`,
+        await api.post(
+          "/alumni/podcast",
           { url },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -112,7 +112,7 @@ const AlumniPodcastsPage = () => {
         );
         toast({ title: "Success", description: "Podcast uploaded successfully" });
       }
-      
+
       handleCancelEdit();
       fetchData();
     } catch (error) {
@@ -130,7 +130,7 @@ const AlumniPodcastsPage = () => {
   const handleEdit = (podcast: AlumniPodcast) => {
     setUrl(podcast.url);
     setEditingId(podcast.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancelEdit = () => {
@@ -140,18 +140,15 @@ const AlumniPodcastsPage = () => {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    
+
     try {
       const encrypted = localStorage.getItem("token");
       const token = encrypted ? decryptToken(encrypted) : null;
-      
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/alumni/podcast/${deleteId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      
+
+      await api.delete(`/alumni/podcast/${deleteId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       toast({ title: "Success", description: "Podcast deleted successfully" });
       fetchData();
     } catch (error) {
@@ -172,16 +169,14 @@ const AlumniPodcastsPage = () => {
 
       <div className="bg-white p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">
-            {editingId ? "Edit Podcast" : "Upload New Podcast"}
-          </h2>
+          <h2 className="text-lg font-semibold">{editingId ? "Edit Podcast" : "Upload New Podcast"}</h2>
           {editingId && (
             <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
               <X className="h-4 w-4 mr-2" /> Cancel Edit
             </Button>
           )}
         </div>
-        
+
         <form onSubmit={handleSubmit} className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
             <label htmlFor="url" className="text-sm font-medium">
@@ -201,8 +196,10 @@ const AlumniPodcastsPage = () => {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {editingId ? "Updating..." : "Uploading..."}
               </>
+            ) : editingId ? (
+              "Update"
             ) : (
-              editingId ? "Update" : "Upload"
+              "Upload"
             )}
           </Button>
         </form>
@@ -221,15 +218,9 @@ const AlumniPodcastsPage = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    URL
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Uploaded At
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploaded At</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -240,24 +231,12 @@ const AlumniPodcastsPage = () => {
                         {podcast.url}
                       </a>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(podcast.createdAt).toLocaleDateString()}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(podcast.createdAt).toLocaleDateString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(podcast)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(podcast)} className="text-blue-600 hover:text-blue-900">
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeleteId(podcast.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(podcast.id)} className="text-red-600 hover:text-red-900">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </td>
@@ -273,9 +252,7 @@ const AlumniPodcastsPage = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the podcast.
-            </AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete the podcast.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

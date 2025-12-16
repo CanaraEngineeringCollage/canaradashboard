@@ -4,6 +4,7 @@ import { decryptToken } from "@/lib/encrypt";
 import { GraduationCap, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/client";
 import TablePagination from "@/components/ui/TablePagination";
 // your API fetch function
 
@@ -51,16 +52,20 @@ const AlumniPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-         const encrypted = localStorage.getItem("token");
-     const token = encrypted ? decryptToken(encrypted) : null;
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
       setLoading(true);
       try {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni?page=${currentPage}&limit=${itemsPerPage}`, { method: "GET", headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
-    }, });
-      if (!res.ok) throw new Error("Failed to fetch alumni data");
-      const result = await res.json();
-      
+        const result = await apiFetch(
+          `/alumni?page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`, // ✅ send token
+            },
+          }
+        );
+
       const { data, total } = result;
       
         // sort by createdAt descending

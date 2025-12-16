@@ -6,6 +6,7 @@ import TablePagination from "@/components/ui/TablePagination";
 import { Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
+import { apiFetch } from "@/lib/client";
 
 export type PlacementSubmission = {
   id: number;
@@ -50,9 +51,6 @@ const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
   }, []);
 
   useEffect(() => {
-    const encrypted = localStorage.getItem("token");
-    const token = encrypted ? decryptToken(encrypted) : null;
-
     const loadData = async () => {
       setLoading(true);
       try {
@@ -60,20 +58,20 @@ const PlacementSubmissions: React.FC<PlacementTableProps> = ({ fetchData }) => {
         if (fetchData) {
           data = await fetchData();
         } else {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/placement?page=${currentPage}&limit=${itemsPerPage}`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (res.ok) {
-            const result = await res.json();
-            const { data: resultData, total } = result;
-            data = resultData;
-            setTotalPages(Math.ceil(total / itemsPerPage));
-          } else {
-            console.error("Failed to fetch submissions");
-          }
+          const encrypted = localStorage.getItem("token");
+          const token = encrypted ? decryptToken(encrypted) : null;
+          const result = await apiFetch(
+            `/placement?page=${currentPage}&limit=${itemsPerPage}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const { data: resultData, total } = result;
+          data = resultData;
+          setTotalPages(Math.ceil(total / itemsPerPage));
         }
 
         // Sort latest first

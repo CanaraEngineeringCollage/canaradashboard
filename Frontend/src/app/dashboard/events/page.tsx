@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
+import { apiFetch } from "@/lib/client";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   id: string | null;
@@ -66,13 +67,11 @@ useEffect(() => {
 
   const fetchEvents = async () => {
     setIsLoading(true);
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/events?page=${currentPage}&limit=${rowsPerPage}${selectedCategory !== 'All' ? `&category=${encodeURIComponent(selectedCategory)}` : ''}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
+    const url = `/events?page=${currentPage}&limit=${rowsPerPage}${
+      selectedCategory !== "All" ? `&category=${encodeURIComponent(selectedCategory)}` : ""
+    }${search ? `&search=${encodeURIComponent(search)}` : ""}`;
     try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch events: ${res.statusText}`);
-      }
-      const { data, total } = await res.json();
+      const { data, total } = await apiFetch(url);
       setEvents(data || []);
       setTotalEvents(total || 0);
     } catch (err) {
@@ -89,11 +88,7 @@ useEffect(() => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/categories`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch categories: ${res.statusText}`);
-      }
-      const data = await res.json();
+      const data = await apiFetch("/events/categories");
       console.log('Fetched categories:', data); // Debug log
       if (Array.isArray(data)) {
         const validCategories = ['All', ...data.filter((cat: string) => cat && typeof cat === 'string' && cat.trim() !== '')];

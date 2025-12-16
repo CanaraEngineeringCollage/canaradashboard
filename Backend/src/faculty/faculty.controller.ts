@@ -141,21 +141,21 @@ export class FacultyController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('import-data')
-  @UseInterceptors(FileInterceptor('file'))
-  async importData(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
-    }
+  // @UseGuards(JwtAuthGuard)
+  // @Post('import-data')
+  // @UseInterceptors(FileInterceptor('file'))
+  // async importData(@UploadedFile() file: Express.Multer.File) {
+  //   if (!file) {
+  //     throw new BadRequestException('No file uploaded');
+  //   }
 
-    // Validate file type
-    if (!file.originalname.match(/\.(xlsx|xls)$/)) {
-      throw new BadRequestException('Only Excel files are allowed!');
-    }
+  //   // Validate file type
+  //   if (!file.originalname.match(/\.(xlsx|xls)$/)) {
+  //     throw new BadRequestException('Only Excel files are allowed!');
+  //   }
 
-    return this.facultyService.importFacultyData(file);
-  }
+  //   return this.facultyService.importFacultyData(file);
+  // }
 
   // ✅ Only logged-in admin can delete
   @UseGuards(JwtAuthGuard)

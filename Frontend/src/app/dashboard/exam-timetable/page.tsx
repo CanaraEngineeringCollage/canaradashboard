@@ -2,6 +2,7 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { apiFetch } from "@/lib/client";
 import { BookOpenCheck, PlusCircle } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -223,17 +224,13 @@ export default function DemoAdminUploadModal() {
     formData.append("file", payload.file);
      const token = localStorage.getItem("token");
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, {
+    await apiFetch("/timetables", {
       method: "POST",
       body: formData,
       headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
-    },
+        Authorization: `Bearer ${token}`, // ✅ send token
+      },
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to upload timetable");
-    }
 
     toast({
       title: "Success",
@@ -245,9 +242,7 @@ export default function DemoAdminUploadModal() {
 
   async function getTimetables() {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables`, { method: "GET" });
-      if (!res.ok) throw new Error("Failed to fetch timetables");
-      const data = await res.json();
+      const data = await apiFetch("/timetables", { method: "GET" });
       setTimetables(data);
     } catch (error) {
       console.error(error);
@@ -257,10 +252,12 @@ export default function DemoAdminUploadModal() {
   async function handleDelete(id: number) {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/timetables/${id}`, { method: "DELETE", headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
-    }, });
-      if (!res.ok) throw new Error("Failed to delete timetable");
+      await apiFetch(`/timetables/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ send token
+        },
+      });
       toast({
         title: "Success",
         description: "Timetable deleted successfully.",

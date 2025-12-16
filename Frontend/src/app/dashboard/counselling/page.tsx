@@ -6,6 +6,7 @@ import TablePagination from "@/components/ui/TablePagination";
 import { Brain, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
+import { apiFetch } from "@/lib/client";
 
 // Define the type for counselling entries
 export type CounsellingType = {
@@ -54,8 +55,6 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
 
 
   useEffect(() => {
-      const encrypted = localStorage.getItem("token");
-    const token = encrypted ? decryptToken(encrypted) : null;
   const loadData = async () => {
     setLoading(true);
     try {
@@ -63,16 +62,17 @@ const CounsellingTable: React.FC<CounsellingTableProps> = ({ fetchData }) => {
       if (fetchData) {
         data = await fetchData();
       } else {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling?page=${currentPage}&limit=${itemsPerPage}`, {
-          method: "GET",
-          headers: {
-      Authorization: `Bearer ${token}`, // ✅ send token
-    },
-        });
-        if (!res.ok) {
-          throw new Error("Failed to fetch counselling data");
-        }
-        const result = await res.json();
+        const encrypted = localStorage.getItem("token");
+        const token = encrypted ? decryptToken(encrypted) : null;
+        const result = await apiFetch(
+          `/counselling?page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`, // ✅ send token
+            },
+          }
+        );
         const { data: resultData, total } = result;
         data = resultData;
         setTotalPages(Math.ceil(total / itemsPerPage));

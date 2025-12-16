@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
 import { getToken } from "@/lib/token";
+import { apiFetch } from "@/lib/client";
 
 export default function DashboardPage() {
   const [facultyCount, setFacultyCount] = useState<number | null>(null);
@@ -73,10 +74,9 @@ useEffect(() => {
        const token = getToken();
     if (!token) return router.push("/login");
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/buzz/count`, {
+    const data = await apiFetch("/buzz/count", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const data = await res.json();
     setBuzzCount(data.count);
   } catch (error) {
     console.error(error);
@@ -87,10 +87,9 @@ useEffect(() => {
      const token = getToken();
     if (!token) return router.push("/login");
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/count`, {
+    const data = await apiFetch("/events/count", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const data = await res.json();
     setEventsCount(data.count);
   } catch (error) {
     console.error(error);
@@ -101,10 +100,9 @@ const fetchCounsellingCount = async () => {
    const token = getToken();
     if (!token) return router.push("/login");
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/counselling/count`, {
+    const data = await apiFetch("/counselling/count", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const data = await res.json();
     setCounsellingCount(data.count);
   } catch (error) {
     console.error(error);
@@ -116,10 +114,9 @@ const fetchCounsellingCount = async () => {
    const token = getToken();
     if (!token) return router.push("/login");
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni/count`, {
+    const data = await apiFetch("/alumni/count", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const data = await res.json();
     setAlumniCount(data.count);
   } catch (error) {
     console.error(error);
@@ -130,10 +127,9 @@ const fetchPlacementCount = async () => {
 const token = getToken();
  if (!token) return router.push("/login");
 try {
- const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/placement/count`, {
+ const data = await apiFetch("/placement/count", {
    headers: { Authorization: `Bearer ${token}` },
  });
- const data = await res.json();
  setPlacementCount(data.count);
 } catch (error) {
  console.error(error);
@@ -144,10 +140,9 @@ const fetchPodcastCount = async () => {
 const token = getToken();
  if (!token) return router.push("/login");
 try {
- const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/alumni/podcast/count`, {
+ const data = await apiFetch("/alumni/podcast/count", {
    headers: { Authorization: `Bearer ${token}` },
  });
- const data = await res.json();
  setPodcastCount(data.count);
 } catch (error) {
  console.error(error);

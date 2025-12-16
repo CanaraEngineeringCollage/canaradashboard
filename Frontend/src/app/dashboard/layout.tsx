@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SidebarNavItems } from "@/components/sidebar-nav-items";
 import { LogOut, Bell } from "lucide-react";
-import axios from "axios";
+import { api } from "@/lib/axiosClient";
 import { toast, useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -21,61 +21,59 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-  const encrypted = localStorage.getItem("token");
+    const encrypted = localStorage.getItem("token");
 
-  if (!encrypted) {
-    router.replace("/login");
-    return;
-  }
-
-  try {
-    const decrypted = decryptToken(encrypted);
-
-    if (!decrypted || decrypted.length < 10) {
-      // Invalid or fake token
-      localStorage.removeItem("token");
+    if (!encrypted) {
       router.replace("/login");
       return;
     }
 
-    setIsAuthorized(true); // Valid token — allow UI
+    try {
+      const decrypted = decryptToken(encrypted);
 
-  } catch {
-    localStorage.removeItem("token");
-    router.replace("/login");
-  }
-}, []);
+      if (!decrypted || decrypted.length < 10) {
+        // Invalid or fake token
+        localStorage.removeItem("token");
+        router.replace("/login");
+        return;
+      }
 
+      setIsAuthorized(true); // Valid token — allow UI
+    } catch {
+      localStorage.removeItem("token");
+      router.replace("/login");
+    }
+  }, []);
 
   if (!isAuthorized) {
     return null; // Prevents flashing UI
   }
 
-const logoutHandler = async () => {
-  const encrypted = localStorage.getItem("token");
-  const token = encrypted ? decryptToken(encrypted) : null;
+  const logoutHandler = async () => {
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
 
-  localStorage.removeItem("token");
+    localStorage.removeItem("token");
 
-  if (token) {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/logout`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-  }
+    if (token) {
+      await api.post(
+        "/admin/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    }
 
-  toast({
-    title: "Success",
-    description: "Logged out successfully.",
-  });
+    toast({
+      title: "Success",
+      description: "Logged out successfully.",
+    });
 
-  router.push("/login");
-};
+    router.push("/login");
+  };
 
   return (
     <ProtectedRoute>

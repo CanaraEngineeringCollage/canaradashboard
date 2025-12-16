@@ -1,6 +1,7 @@
 "use client";
 
 import TablePagination from "@/components/ui/TablePagination";
+import { apiFetch } from "@/lib/client";
 import { decryptToken } from "@/lib/encrypt";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -23,8 +24,7 @@ const departments = [
   "Artificial Intelligence & Machine Learning",
   "Mechanical Engineering",
   "Science & Humanities",
-  "Mandatory Disclosure"
-
+  "Mandatory Disclosure",
 ];
 
 export default function UploadPage() {
@@ -47,23 +47,21 @@ export default function UploadPage() {
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
 
-
   useEffect(() => {
     const encrypted = localStorage.getItem("token");
-  
+
     if (!encrypted) {
       router.push("/login");
       return;
     }
-  
+
     try {
       const decrypted = decryptToken(encrypted);
-  
+
       if (!decrypted || decrypted.length < 10) {
         localStorage.removeItem("token");
         router.push("/login");
       }
-  
     } catch (err) {
       localStorage.removeItem("token");
       router.push("/login");
@@ -80,8 +78,7 @@ export default function UploadPage() {
       if (typeFilter !== "all") query.append("type", typeFilter);
       if (departmentFilter !== "All") query.append("department", departmentFilter);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files?${query.toString()}`);
-      const data = await res.json();
+      const data = await apiFetch(`/files?${query.toString()}`);
 
       setFiles(Array.isArray(data.data) ? data.data : []);
       setTotalPages(data.totalPages || 1);
@@ -139,7 +136,7 @@ export default function UploadPage() {
     const encrypted = localStorage.getItem("token");
     const token = encrypted ? decryptToken(encrypted) : null;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/${id}`, {
+      await apiFetch(`/files/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -160,21 +157,15 @@ export default function UploadPage() {
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow">
         <h1 className="text-2xl font-bold mb-4 text-gray-700">📁 Upload Files</h1>
         <form onSubmit={handleUpload} className="flex flex-col gap-4">
-          <select
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            className="border rounded-lg px-3 py-2"
-          >
+          <select value={department} onChange={(e) => setDepartment(e.target.value)} className="border rounded-lg px-3 py-2">
             {departments.map((d) => (
-              <option key={d} value={d}>{d}</option>
+              <option key={d} value={d}>
+                {d}
+              </option>
             ))}
           </select>
 
-          <select
-            value={fileType}
-            onChange={(e) => setFileType(e.target.value as "pdf" | "image" | "video")}
-            className="border rounded-lg px-3 py-2"
-          >
+          <select value={fileType} onChange={(e) => setFileType(e.target.value as "pdf" | "image" | "video")} className="border rounded-lg px-3 py-2">
             <option value="image">Image</option>
             <option value="pdf">PDF</option>
             <option value="video">Video</option>
@@ -209,7 +200,7 @@ export default function UploadPage() {
                 {file.type.startsWith("image/") ? (
                   <img src={URL.createObjectURL(file)} alt="preview" className="w-40 h-40 object-cover rounded-md border" />
                 ) : file.type.startsWith("video/") ? (
-                   <video src={URL.createObjectURL(file)} controls className="w-40 h-40 object-cover rounded-md border" />
+                  <video src={URL.createObjectURL(file)} controls className="w-40 h-40 object-cover rounded-md border" />
                 ) : (
                   <embed src={URL.createObjectURL(file)} type="application/pdf" className="w-40 h-40 border rounded-md" />
                 )}
@@ -253,14 +244,12 @@ export default function UploadPage() {
           <option value="video">Videos</option>
         </select>
 
-        <select
-          value={departmentFilter}
-          onChange={(e) => setDepartmentFilter(e.target.value)}
-          className="border rounded-lg px-3 py-2"
-        >
+        <select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} className="border rounded-lg px-3 py-2">
           <option value="All">All Departments</option>
           {departments.map((d) => (
-            <option key={d} value={d}>{d}</option>
+            <option key={d} value={d}>
+              {d}
+            </option>
           ))}
         </select>
       </div>
@@ -333,10 +322,16 @@ function DeleteConfirmationModal({ isOpen, id, onClose, onConfirm, itemName = "t
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h2>
-        <p className="text-gray-600 mb-6">Are you sure you want to delete <strong>{itemName}</strong>? This action cannot be undone.</p>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete <strong>{itemName}</strong>? This action cannot be undone.
+        </p>
         <div className="flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300">Cancel</button>
-          <button onClick={() => onConfirm(id)} className="px-4 py-2 rounded-md text-sm bg-red-600 text-white hover:bg-red-700">Delete</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300">
+            Cancel
+          </button>
+          <button onClick={() => onConfirm(id)} className="px-4 py-2 rounded-md text-sm bg-red-600 text-white hover:bg-red-700">
+            Delete
+          </button>
         </div>
       </div>
     </div>

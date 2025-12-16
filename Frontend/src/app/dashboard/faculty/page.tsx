@@ -1901,71 +1901,71 @@ const Page: React.FC = () => {
       });
   };
 
-  const handleImportData = async () => {
-    if (!importFile) {
-      toast({
-        title: "Error",
-        description: "Please select a file to import.",
-        variant: "destructive",
-      });
-      return;
-    }
+  // const handleImportData = async () => {
+  //   if (!importFile) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Please select a file to import.",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
 
-    // Validate file type
-    if (!importFile.name.match(/\.(xlsx|xls)$/i)) {
-      toast({
-        title: "Error",
-        description: "Only Excel files (.xlsx, .xls) are allowed.",
-        variant: "destructive",
-      });
-      return;
-    }
+  //   // Validate file type
+  //   if (!importFile.name.match(/\.(xlsx|xls)$/i)) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Only Excel files (.xlsx, .xls) are allowed.",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
 
-    const encrypted = localStorage.getItem("token");
-    const token = encrypted ? decryptToken(encrypted) : null;
+  //   const encrypted = localStorage.getItem("token");
+  //   const token = encrypted ? decryptToken(encrypted) : null;
 
-    const formData = new FormData();
-    formData.append("file", importFile);
+  //   const formData = new FormData();
+  //   formData.append("file", importFile);
 
-    setIsImporting(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/faculty/import-data`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  //   setIsImporting(true);
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/faculty/import-data`, {
+  //       method: "POST",
+  //       body: formData,
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to import data");
-      }
+  //     if (!response.ok) {
+  //       const error = await response.json();
+  //       throw new Error(error.message || "Failed to import data");
+  //     }
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      setIsImportModalOpen(false);
-      setImportFile(null);
-      fetchFaculties();
+  //     setIsImportModalOpen(false);
+  //     setImportFile(null);
+  //     fetchFaculties();
 
-      toast({
-        title: "Import Completed",
-        description: `Processed: ${result.totalProcessed}, Success: ${result.success}, Failed: ${result.failed}. ${
-          result.errors.length > 0 ? `Errors: ${result.errors.slice(0, 3).join(", ")}${result.errors.length > 3 ? "..." : ""}` : ""
-        }`,
-        variant: result.failed > 0 ? "destructive" : "default",
-      });
-    } catch (error: any) {
-      console.error("Error importing data:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to import faculty data.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsImporting(false);
-    }
-  };
+  //     toast({
+  //       title: "Import Completed",
+  //       description: `Processed: ${result.totalProcessed}, Success: ${result.success}, Failed: ${result.failed}. ${
+  //         result.errors.length > 0 ? `Errors: ${result.errors.slice(0, 3).join(", ")}${result.errors.length > 3 ? "..." : ""}` : ""
+  //       }`,
+  //       variant: result.failed > 0 ? "destructive" : "default",
+  //     });
+  //   } catch (error: any) {
+  //     console.error("Error importing data:", error);
+  //     toast({
+  //       title: "Error",
+  //       description: error.message || "Failed to import faculty data.",
+  //       variant: "destructive",
+  //     });
+  //   } finally {
+  //     setIsImporting(false);
+  //   }
+  // };
 
   // Filter faculties by search (client-side for name search)
   // ✅ Use data directly from backend
@@ -1978,10 +1978,10 @@ const Page: React.FC = () => {
         icon={LandPlot}
         action={
           <div className="flex gap-2">
-            <Button onClick={() => setIsImportModalOpen(true)} variant="outline">
+            {/* <Button onClick={() => setIsImportModalOpen(true)} variant="outline">
               <Upload className="mr-2 h-4 w-4" />
               Import Data
-            </Button>
+            </Button> */}
             <Button onClick={handleAddFaculty}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Faculty
@@ -2101,7 +2101,7 @@ const Page: React.FC = () => {
         }}
       />
       {/* Import Data Modal */}
-      {isImportModalOpen && (
+      {/* {isImportModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold mb-4">Import Faculty Data</h2>
@@ -2135,7 +2135,7 @@ const Page: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "@/lib/axiosClient";
 import { PageTitle } from "@/components/page-title";
 import { FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,7 @@ export default function UpdatePptPage() {
           return;
         }
 
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/ppt`, {
+        const res = await api.get("/ppt", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -72,8 +72,8 @@ export default function UpdatePptPage() {
 
     try {
       setIsSaving(true);
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/ppt`,
+      const res = await api.post(
+        "/ppt",
         { link },
         {
           headers: {
@@ -121,7 +121,12 @@ export default function UpdatePptPage() {
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Upload the PDF of your PPT to any flipbook maker like <Link   href="https://heyzine.com/"  className="text-blue-500 font-semibold underline" target="_blank"> Heyzine </Link>and paste the public link here.
+                Upload the PDF of your PPT to any flipbook maker like{" "}
+                <Link href="https://heyzine.com/" className="text-blue-500 font-semibold underline" target="_blank">
+                  {" "}
+                  Heyzine{" "}
+                </Link>
+                and paste the public link here.
               </p>
             </div>
             <Button type="submit" disabled={isLoading || isSaving}>
@@ -131,10 +136,9 @@ export default function UpdatePptPage() {
         </CardContent>
       </Card>
       <div className=" text-[#1D1D1F] pb-20">
-      <h1 className="text-center text-3xl text-[#1D1D1F] pt-20 pb-16 md:text-[40px] lg2:text-5xl xl:text-6xl font-bold">Glimpses of CEC</h1>
-      <iframe src={link}  className="w-[100%] h-[60vh] md:h-[100vh]"></iframe>
-    </div>
+        <h1 className="text-center text-3xl text-[#1D1D1F] pt-20 pb-16 md:text-[40px] lg2:text-5xl xl:text-6xl font-bold">Glimpses of CEC</h1>
+        <iframe src={link} className="w-[100%] h-[60vh] md:h-[100vh]"></iframe>
+      </div>
     </>
   );
 }
-

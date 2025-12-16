@@ -12,7 +12,7 @@ import { UserCog } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
+import { api } from "@/lib/axiosClient";
 import { setAdmin } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -23,33 +23,29 @@ export default function ProfilePage() {
   const dispatch = useDispatch();
   const admin = useSelector((state: any) => state.admin);
 
-const router = useRouter();
+  const router = useRouter();
 
-useEffect(() => {
-  const encrypted = localStorage.getItem("token");
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
 
-  if (!encrypted) {
-    router.push("/login");
-    return;
-  }
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
 
-  try {
-    const decrypted = decryptToken(encrypted);
+    try {
+      const decrypted = decryptToken(encrypted);
 
-    if (!decrypted || decrypted.length < 10) {
-      // Token corrupted or fake → logout
+      if (!decrypted || decrypted.length < 10) {
+        // Token corrupted or fake → logout
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
       localStorage.removeItem("token");
       router.push("/login");
     }
-
-  } catch (err) {
-
-    localStorage.removeItem("token");
-    router.push("/login");
-  }
-}, []);
-
-
+  }, []);
 
   const profileForm = useForm<AdminProfileFormData>({
     resolver: zodResolver(AdminProfileSchema),
@@ -68,25 +64,16 @@ useEffect(() => {
     },
   });
 
+  const updateAdminProfile = async (data: any) => {
+    const encrypted = localStorage.getItem("token");
+    const token = encrypted ? decryptToken(encrypted) : null;
 
-  
-
-const updateAdminProfile = async (data: any) => {
-  const encrypted = localStorage.getItem("token");
-  const token = encrypted ? decryptToken(encrypted) : null;
-
-  return await axios.patch(
-    `${process.env.NEXT_PUBLIC_API_URL}/admin/update`,
-    data,
-    {
+    return await api.patch("/admin/update", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
-  );
-};
-
-
+    });
+  };
 
   const onProfileSubmit = async (data: AdminProfileFormData) => {
     try {
@@ -113,7 +100,7 @@ const updateAdminProfile = async (data: any) => {
 
   const onPasswordSubmit = async (data: ChangePasswordFormData) => {
     try {
-      await updateAdminProfile({ currentPassword:data.currentPassword,password: data.newPassword });
+      await updateAdminProfile({ currentPassword: data.currentPassword, password: data.newPassword });
       toast({
         title: "Password Changed",
         description: "Your password has been successfully changed.",
