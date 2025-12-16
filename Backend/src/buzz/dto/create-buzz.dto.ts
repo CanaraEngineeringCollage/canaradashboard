@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsObject, IsIn, IsDateString } from 'class-validator';
+import { IsString, IsNotEmpty, IsObject, IsIn, IsDateString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateBuzzDto {
@@ -31,8 +31,7 @@ export class CreateBuzzDto {
 
 
 
-
+  @IsOptional()
   @IsDateString()
-  @IsNotEmpty()
-  eventDate: string;
+  eventDate?: string;
 }

@@ -30,6 +30,6 @@ export class Buzz {
   @UpdateDateColumn()
   updatedAt: Date;
 
-   @Column({ type: 'date' })
-  eventDate: Date;
+  @Column({ type: 'date', nullable: true })
+  eventDate: Date | null;
 }
