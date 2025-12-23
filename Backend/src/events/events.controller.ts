@@ -28,6 +28,14 @@ export class EventController {
     @UploadedFiles() files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
     @Body() dto: CreateEventDto,
   ) {
+    console.log('--- Create Event Request Received ---');
+    console.log('DTO:', JSON.stringify(dto, null, 2));
+    console.log('Files Keys:', files ? Object.keys(files) : 'No files object');
+    if (files) {
+      if (files.image) console.log('Image File:', files.image[0].originalname, files.image[0].size);
+      if (files.video) console.log('Video File:', files.video[0].originalname, files.video[0].size);
+    }
+
     const imageFile = files.image ? files.image[0] : undefined;
     const videoFile = files.video ? files.video[0] : undefined;
 
@@ -38,15 +46,15 @@ export class EventController {
         throw new BadRequestException('Alumni events can have either an image or a video, not both.');
       }
       if (!imageFile && !videoFile) {
-        throw new BadRequestException('For Alumni events, either an Image or a Video is required.');
+        throw new BadRequestException('For Alumni events, either an Image or a Video is required. Received neither.');
       }
     } else {
       // Others: Must have Image, Cannot have Video
       if (videoFile) {
-        throw new BadRequestException('Video upload is only allowed for Alumni events.');
+        throw new BadRequestException(`Video upload is only allowed for Alumni events. Category received: ${dto.category}`);
       }
       if (!imageFile) {
-        throw new BadRequestException('Image file is required.');
+        throw new BadRequestException(`Image file is required for category: ${dto.category}. Files received: ${files ? Object.keys(files).join(',') : 'none'}`);
       }
     }
 
