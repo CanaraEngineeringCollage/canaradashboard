@@ -152,3 +152,5 @@ export class EventService {
       .getRawMany().then((results) => results.map((r) => r.event_category).filter(Boolean));
   }
 }
+
+
