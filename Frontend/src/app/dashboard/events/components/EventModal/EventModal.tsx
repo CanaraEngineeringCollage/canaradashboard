@@ -118,6 +118,7 @@ const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, 
             <option value="Alumni">Alumni</option>
           </select>
 
+
           <input
             type="date"
             name="date"
