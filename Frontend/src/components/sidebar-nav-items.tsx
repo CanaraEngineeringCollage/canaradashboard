@@ -38,7 +38,7 @@ const navItems: NavItem[] = [
    
     { href: "/dashboard/placement", label: "Placement Submissions", icon: Briefcase },
   { href: "/dashboard/counselling", label: "Counselling Submissions", icon: Brain },
-  { href: "/dashboard/ppt", label: "Update PPT", icon: FileText },
+  { href: "/dashboard/glimpses-of-cec", label: "Glimpses of CEC", icon: FileText },
   // { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
   // { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
   // { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },

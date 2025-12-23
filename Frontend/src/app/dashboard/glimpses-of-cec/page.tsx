@@ -103,7 +103,7 @@ export default function UpdatePptPage() {
 
   return (
     <>
-      <PageTitle title="Update PPT" icon={FileText} />
+      <PageTitle title="Glimpses of CEC" icon={FileText} />
       <Card className="max-w-3xl">
         <CardHeader>
           <CardTitle>Add your presentation link</CardTitle>
