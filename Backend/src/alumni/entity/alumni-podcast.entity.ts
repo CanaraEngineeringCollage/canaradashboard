@@ -6,6 +6,9 @@ export class AlumniPodcast {
   id: number;
 
   @Column()
+  title: string;
+
+  @Column()
   url: string;
 
   @CreateDateColumn()

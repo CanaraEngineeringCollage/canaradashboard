@@ -38,6 +38,7 @@ export type Event = {
   date: string;
   category: string;
   image: { type: string; data: number[] }; // Buffer-like structure for backend
+  videoUrl?: string; // S3 URL
 };
 
 export interface Certification {

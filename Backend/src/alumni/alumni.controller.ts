@@ -46,8 +46,8 @@ async getCount() {
   }
 
   @Patch('podcast/:id')
-  updatePodcast(@Param('id') id: string, @Body() data: { url: string }) {
-    return this.alumniService.updatePodcast(+id, data.url);
+  updatePodcast(@Param('id') id: string, @Body() data: { title: string; url: string }) {
+    return this.alumniService.updatePodcast(+id, data.title, data.url);
   }
 
   @Delete('podcast/:id')

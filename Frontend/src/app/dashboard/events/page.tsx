@@ -28,6 +28,7 @@ const EventsPage = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event>>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -63,6 +64,7 @@ useEffect(() => {
   }
 }, []);
 
+console.log(events,"evemt");
 
 
   const fetchEvents = async () => {
@@ -160,6 +162,9 @@ useEffect(() => {
     if (selectedFile) {
       formData.append('image', selectedFile);
     }
+    if (selectedVideoFile) {
+      formData.append('video', selectedVideoFile);
+    }
     try {
       if (isEdit && selectedEvent.id) {
         await editEvent(selectedEvent.id, formData);
@@ -173,6 +178,7 @@ useEffect(() => {
       setShowModal(false);
       setSelectedEvent({});
       setSelectedFile(null);
+      setSelectedVideoFile(null);
       setPreviewUrl(null);
       setIsEdit(false);
       fetchEvents();
@@ -193,15 +199,28 @@ useEffect(() => {
       const file = files[0];
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
+      // Clear video if image is selected
+      setSelectedVideoFile(null);
+    } else if (name === 'video' && files && files.length > 0) {
+      const file = files[0];
+      setSelectedVideoFile(file);
+      // Clear image if video is selected
+      setSelectedFile(null);
+      setPreviewUrl(null);
     } else {
       setSelectedEvent({
         ...selectedEvent,
         [name]: value,
       });
+      // If category changes to non-Alumni, clear video
+      if (name === 'category' && value !== 'Alumni') {
+        setSelectedVideoFile(null);
+      }
     }
   };
 
-  const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
+  const bufferToBase64 = (buffer: { type: string; data: number[] } | null | undefined) => {
+    if (!buffer || !buffer.data) return null;
     const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
     const base64 = btoa(binary);
     return `data:image/jpeg;base64,${base64}`;
@@ -225,6 +244,7 @@ useEffect(() => {
               setIsEdit(false);
               setSelectedEvent({});
               setSelectedFile(null);
+              setSelectedVideoFile(null);
               setPreviewUrl(null);
               setShowModal(true);
             }}
@@ -279,7 +299,13 @@ useEffect(() => {
                   })()}
                 </td>
                 <td className="px-4 py-2">
-                  <img src={bufferToBase64(event.image)} alt={event.title} className="w-32 h-20 object-cover rounded ml-4" />
+                  {event.image ? (
+                    <img src={bufferToBase64(event.image) || ''} alt={event.title} className="w-32 h-20 object-cover rounded ml-4" />
+                  ) : (
+                    <div className="w-32 h-20 bg-gray-100 rounded ml-4 flex items-center justify-center text-gray-400 text-xs">
+                      {event.videoUrl ? 'Video' : 'No Media'}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-2">{event.title}</td>
                 <td className="px-4 py-2">{event.description}</td>
@@ -301,6 +327,7 @@ useEffect(() => {
                         setIsEdit(true);
                         setSelectedEvent(event);
                         setSelectedFile(null);
+                        setSelectedVideoFile(null);
                         setPreviewUrl(bufferToBase64(event.image));
                         setShowModal(true);
                       }}
@@ -348,11 +375,13 @@ useEffect(() => {
         isEdit={isEdit}
         eventData={selectedEvent}
         imagePreview={previewUrl}
+        videoFileName={selectedVideoFile?.name}
         onClose={() => {
           setShowModal(false);
           setIsEdit(false);
           setSelectedEvent({});
           setSelectedFile(null);
+          setSelectedVideoFile(null);
           setPreviewUrl(null);
         }}
         onChange={handleInputChange}

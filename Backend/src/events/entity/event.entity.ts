@@ -17,8 +17,12 @@ export class Event {
   @Column()
   date: string;
 
-  @Column('longblob') 
+  @Column({ type: 'longblob', nullable: true }) 
   image: Buffer;
+
+  @Column({ nullable: true })
+  videoUrl: string;
+
    @Column()
   category: string;
 

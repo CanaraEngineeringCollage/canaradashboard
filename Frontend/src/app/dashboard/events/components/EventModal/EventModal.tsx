@@ -6,12 +6,26 @@ type Props = {
   isEdit: boolean;
   eventData: Partial<Event>;
   imagePreview?: string | null;
+  videoPreview?: string | null;
+  videoFileName?: string | null;
   onClose: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
 };
 
-const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, onClose, onChange, onSubmit }) => {
+const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, videoFileName, onClose, onChange, onSubmit }) => {
+  const [mediaType, setMediaType] = React.useState<'image' | 'video'>('image');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      if (eventData.videoUrl || videoFileName) {
+        setMediaType('video');
+      } else {
+        setMediaType('image');
+      }
+    }
+  }, [isOpen, eventData.videoUrl, videoFileName]);
+
   if (!isOpen) return null;
 
   // Drag-and-drop handler for dd/mm/yyyy or dd-mm-yyyy
@@ -63,6 +77,8 @@ const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, 
     }
   };
 
+  const isAlumni = eventData.category === 'Alumni';
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex overflow-y-auto items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg mt-20 mb-10 w-full max-w-md">
@@ -113,25 +129,65 @@ const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, 
             required
           />
 
-          {/* Image drag-and-drop/paste input */}
-          <div
-            onDrop={handleImageDrop}
-            onDragOver={(e) => e.preventDefault()}
-            onPaste={handleImagePaste}
-            className="w-full p-2 border rounded flex items-center justify-center cursor-pointer text-gray-500 relative"
-          >
-            <input
-              type="file"
-              name="image"
-              accept="image/*"
-              onChange={onChange}
-              className="w-full h-full opacity-0 absolute cursor-pointer"
-              required={!imagePreview && !isEdit}
-            />
-            <span className="text-gray-500 pointer-events-none select-none">Upload Image</span>
-          </div>
+          {/* Media Type Selection for Alumni */}
+          {isAlumni && (
+            <div className="mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Upload Type</label>
+              <select
+                value={mediaType}
+                onChange={(e) => setMediaType(e.target.value as 'image' | 'video')}
+                className="w-full p-2 border rounded"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
+            </div>
+          )}
 
-          {imagePreview && <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded border mt-2" />}
+          {/* Image Input */}
+          {(!isAlumni || mediaType === 'image') && (
+            <div
+              onDrop={handleImageDrop}
+              onDragOver={(e) => e.preventDefault()}
+              onPaste={handleImagePaste}
+              className="w-full p-2 border rounded flex items-center justify-center cursor-pointer text-gray-500 relative"
+            >
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={onChange}
+                className="w-full h-full opacity-0 absolute cursor-pointer"
+                required={!imagePreview && !isEdit && !isAlumni} // Required for non-Alumni (or if Alumni chose Image)
+              />
+              <span className="text-gray-500 pointer-events-none select-none">Upload Image</span>
+            </div>
+          )}
+
+          {/* Video Input */}
+          {isAlumni && mediaType === 'video' && (
+            <div className="w-full p-2 border rounded flex items-center justify-center cursor-pointer text-gray-500 relative">
+              <input
+                type="file"
+                name="video"
+                accept="video/*"
+                onChange={onChange}
+                className="w-full h-full opacity-0 absolute cursor-pointer"
+                required={!videoFileName && !isEdit && !eventData.videoUrl} // Required if Alumni chose Video
+              />
+              <span className="text-gray-500 pointer-events-none select-none">
+                {videoFileName ? `Selected: ${videoFileName}` : "Upload Video"}
+              </span>
+            </div>
+          )}
+
+          {imagePreview && (!isAlumni || mediaType === 'image') && (
+             <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded border mt-2" />
+          )}
+          
+          {eventData.videoUrl && isAlumni && mediaType === 'video' && (
+             <video src={eventData.videoUrl} controls className="w-full h-40 object-cover rounded border mt-2" />
+          )}
 
           <div className="flex justify-end gap-2 mt-4">
             <button type="button" onClick={onClose} className="bg-gray-400 text-white px-4 py-2 rounded">

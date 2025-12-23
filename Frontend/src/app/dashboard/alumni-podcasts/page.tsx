@@ -21,12 +21,14 @@ import {
 
 interface AlumniPodcast {
   id: number;
+  title: string;
   url: string;
   createdAt: string;
 }
 
 const AlumniPodcastsPage = () => {
   const [podcasts, setPodcasts] = useState<AlumniPodcast[]>([]);
+  const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -86,7 +88,7 @@ const AlumniPodcastsPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!url) return;
+    if (!url || !title) return;
 
     setSubmitting(true);
     try {
@@ -96,7 +98,7 @@ const AlumniPodcastsPage = () => {
       if (editingId) {
         await api.patch(
           `/alumni/podcast/${editingId}`,
-          { url },
+          { title, url },
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -105,7 +107,7 @@ const AlumniPodcastsPage = () => {
       } else {
         await api.post(
           "/alumni/podcast",
-          { url },
+          { title, url },
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -128,12 +130,14 @@ const AlumniPodcastsPage = () => {
   };
 
   const handleEdit = (podcast: AlumniPodcast) => {
+    setTitle(podcast.title);
     setUrl(podcast.url);
     setEditingId(podcast.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancelEdit = () => {
+    setTitle("");
     setUrl("");
     setEditingId(null);
   };
@@ -179,6 +183,18 @@ const AlumniPodcastsPage = () => {
 
         <form onSubmit={handleSubmit} className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
+            <label htmlFor="title" className="text-sm font-medium">
+              Title
+            </label>
+            <Input
+              id="title"
+              placeholder="Podcast Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={submitting}
+            />
+          </div>
+          <div className="flex-1 space-y-2">
             <label htmlFor="url" className="text-sm font-medium">
               YouTube URL
             </label>
@@ -190,7 +206,7 @@ const AlumniPodcastsPage = () => {
               disabled={submitting}
             />
           </div>
-          <Button type="submit" disabled={submitting || !url}>
+          <Button type="submit" disabled={submitting || !url || !title}>
             {submitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -218,6 +234,7 @@ const AlumniPodcastsPage = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploaded At</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -226,6 +243,7 @@ const AlumniPodcastsPage = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {podcasts.map((podcast) => (
                   <tr key={podcast.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{podcast.title}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:underline truncate max-w-md">
                       <a href={podcast.url} target="_blank" rel="noopener noreferrer">
                         {podcast.url}

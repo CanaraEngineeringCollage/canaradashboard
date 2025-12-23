@@ -47,11 +47,12 @@ async countPodcasts() {
     return this.podcastRepo.find({ order: { createdAt: 'DESC' } });
   }
 
-  async updatePodcast(id: number, url: string) {
+  async updatePodcast(id: number, title: string, url: string) {
     const podcast = await this.podcastRepo.findOne({ where: { id } });
     if (!podcast) {
       throw new Error('Podcast not found');
     }
+    podcast.title = title;
     podcast.url = url;
     return this.podcastRepo.save(podcast);
   }

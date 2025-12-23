@@ -14,6 +14,10 @@ export class CreateEventDto {
     'Computer Science & Design',
     'Computer Science & Business System',
     'Artificial Intelligence & Machine Learning',
+    'Mechanical Engineering',
+    'Science & Humanities',
+    'Student Welfare Department',
+    'Alumni',
     'College Event',
   ])
   category: string; 

@@ -5,9 +5,12 @@ import { EventController } from './events.controller';
 import { EventService } from './events.service';
 
 
+import { ConfigModule } from '@nestjs/config';
+import { S3Service } from './s3.service';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Event])],
+  imports: [TypeOrmModule.forFeature([Event]), ConfigModule],
   controllers: [EventController],
-  providers: [EventService],
+  providers: [EventService, S3Service],
 })
 export class EventModule {}
