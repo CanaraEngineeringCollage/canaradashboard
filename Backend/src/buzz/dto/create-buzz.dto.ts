@@ -22,6 +22,7 @@ export class CreateBuzzDto {
     'Exams',
     'CSR',
     'Alumni',
+    'Career Guidance'
   ])
   category: string;
   
