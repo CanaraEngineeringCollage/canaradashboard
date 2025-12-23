@@ -129,7 +129,6 @@ export function BuzzEditor({
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Date Of Event</label>
             <input
-              required
               type="date"
               value={eventDate}
               onChange={(e) => setEventDate(e.target.value)}

@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react'
 const page = () => {
   const [grievances, setGrievances] = useState<ScstGrievance[]>([]);
   const [loading, setLoading] = useState(true);
-  console.log(grievances,"scst");
+  
   
 
  useEffect(() => {

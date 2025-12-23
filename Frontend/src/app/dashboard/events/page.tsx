@@ -33,6 +33,7 @@ const EventsPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalEvents, setTotalEvents] = useState(0);
@@ -64,7 +65,6 @@ useEffect(() => {
   }
 }, []);
 
-console.log(events,"evemt");
 
 
   const fetchEvents = async () => {
@@ -91,7 +91,6 @@ console.log(events,"evemt");
   const fetchCategories = async () => {
     try {
       const data = await apiFetch("/events/categories");
-      console.log('Fetched categories:', data); // Debug log
       if (Array.isArray(data)) {
         const validCategories = ['All', ...data.filter((cat: string) => cat && typeof cat === 'string' && cat.trim() !== '')];
         setCategories(validCategories);
@@ -165,6 +164,8 @@ console.log(events,"evemt");
     if (selectedVideoFile) {
       formData.append('video', selectedVideoFile);
     }
+    
+    setIsSubmitting(true);
     try {
       if (isEdit && selectedEvent.id) {
         await editEvent(selectedEvent.id, formData);
@@ -190,6 +191,8 @@ console.log(events,"evemt");
         description: 'Failed to submit event.',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -295,7 +298,7 @@ console.log(events,"evemt");
                     const day = String(d.getDate()).padStart(2, '0');
                     const month = String(d.getMonth() + 1).padStart(2, '0');
                     const year = d.getFullYear();
-                    return `${day}/${month}/${year}`;
+                    return event.date ? `${day}/${month}/${year}` : 'N/A';
                   })()}
                 </td>
                 <td className="px-4 py-2">
@@ -386,6 +389,7 @@ console.log(events,"evemt");
         }}
         onChange={handleInputChange}
         onSubmit={handleSubmit}
+        isLoading={isSubmitting}
       />
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}

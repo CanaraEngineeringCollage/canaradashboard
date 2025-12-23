@@ -11,9 +11,10 @@ type Props = {
   onClose: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
+  isLoading?: boolean;
 };
 
-const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, videoFileName, onClose, onChange, onSubmit }) => {
+const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, videoFileName, onClose, onChange, onSubmit, isLoading }) => {
   const [mediaType, setMediaType] = React.useState<'image' | 'video'>('image');
 
   React.useEffect(() => {
@@ -127,7 +128,6 @@ const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, 
             onDrop={handleDateDrop}
             onDragOver={handleDateDragOver}
             className="w-full p-2 border rounded"
-            required
           />
 
           {/* Media Type Selection for Alumni */}
@@ -194,7 +194,10 @@ const EventModal: React.FC<Props> = ({ isOpen, isEdit, eventData, imagePreview, 
             <button type="button" onClick={onClose} className="bg-gray-400 text-white px-4 py-2 rounded">
               Cancel
             </button>
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+            <button type="submit" disabled={isLoading} className={`bg-blue-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+              {isLoading && (
+                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              )}
               {isEdit ? "Update" : "Create"}
             </button>
           </div>

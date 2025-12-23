@@ -26,11 +26,6 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
       },
     });
 
-    console.log("API Response:", {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

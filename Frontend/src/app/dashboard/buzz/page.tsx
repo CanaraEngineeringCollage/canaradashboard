@@ -109,7 +109,6 @@ export default function BuzzPage() {
   const [category, setCategory] = useState<string>(""); // filter category
   const [search, setSearch] = useState<string>(""); // search text
   const [categories, setCategories] = useState<string[]>([]); // dropdown options
-  console.log(buzzes);
   
 
   const { toast } = useToast();

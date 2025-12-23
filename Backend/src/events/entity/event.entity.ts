@@ -14,7 +14,7 @@ export class Event {
    @Column({ type: 'longtext' }) 
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   date: string;
 
   @Column({ type: 'longblob', nullable: true }) 

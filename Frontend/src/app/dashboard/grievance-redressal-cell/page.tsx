@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react'
 
 const page = () => {
     const [grievances, setGrievances] = useState([]);
-    console.log(grievances);
+    
     
   const [loading, setLoading] = useState(true);
 

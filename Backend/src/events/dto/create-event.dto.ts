@@ -1,10 +1,13 @@
-import { IsIn } from 'class-validator';
+import { IsIn, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateEventDto {
   title: string;
   // tagline: string;
   description: string;
-  date: string;
+  @IsOptional()
+  @Transform(({ value }) => value === "" ? null : value)
+  date?: string;
   image: string;
 
   @IsIn([
