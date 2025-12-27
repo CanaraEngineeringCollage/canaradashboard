@@ -33,7 +33,7 @@ export function BuzzEditor({
   const [isPreview, setIsPreview] = useState(false);
   const [html, setHtml] = useState("");
   const [isEditorLoaded, setIsEditorLoaded] = useState(false);
-  const [category, setCategory] = useState(initialCategory || "Student Achievements");
+  const [category, setCategory] = useState(initialCategory || "Sports");
   const [eventDate, setEventDate] = useState(initialEventDate || "");
   const [eventName, setEventName] = useState(initalEventName || "");
 
