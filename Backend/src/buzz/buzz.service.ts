@@ -11,7 +11,7 @@ export class BuzzService {
     private readonly buzzRepository: Repository<Buzz>,
   ) {}
 
- async getAllBuzz(page = 1, limit = 10, category?: string, search?: string) {
+ async getAllBuzz(page = 1, limit = 10, category?: string, search?: string, excludeCategory?: string) {
   const query = this.buzzRepository
     .createQueryBuilder("buzz")
     .orderBy("buzz.createdAt", "DESC")
@@ -20,6 +20,10 @@ export class BuzzService {
 
   if (category) {
     query.andWhere("buzz.category = :category", { category });
+  }
+
+  if (excludeCategory) {
+    query.andWhere("buzz.category != :excludeCategory", { excludeCategory });
   }
 
   if (search) {
@@ -40,6 +44,10 @@ export class BuzzService {
       totalPages: Math.ceil(total / limit),
     },
   };
+}
+
+async getStudentAchievements(page = 1, limit = 10) {
+  return this.getAllBuzz(page, limit, 'Student Achievements');
 }
 
 

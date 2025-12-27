@@ -33,12 +33,12 @@ export function BuzzEditor({
   const [isPreview, setIsPreview] = useState(false);
   const [html, setHtml] = useState("");
   const [isEditorLoaded, setIsEditorLoaded] = useState(false);
-  const [category, setCategory] = useState(initialCategory || "Sports");
+  const [category, setCategory] = useState(initialCategory || "Student Achievements");
   const [eventDate, setEventDate] = useState(initialEventDate || "");
   const [eventName, setEventName] = useState(initalEventName || "");
 
   const { toast } = useToast();
-  const categories = ["Sports", "Fest", "Academics", "Cultural Events", "Technical Events", "Exams", "CSR", "Alumni","Career Guidance"];
+  const categories = ["Student Achievements","Sports", "Fest", "Academics", "Cultural Events", "Technical Events", "Exams", "CSR", "Alumni","Career Guidance"];
 
   useEffect(() => {
     if (initialCategory) setCategory(initialCategory);

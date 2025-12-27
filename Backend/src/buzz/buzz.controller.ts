@@ -14,8 +14,17 @@ async getAllBuzz(
   @Query('limit') limit: number = 10,
   @Query('category') category?: string,
   @Query('search') search?: string,
+  @Query('excludeCategory') excludeCategory?: string,
 ) {
-  return this.buzzService.getAllBuzz(page, limit, category, search);
+  return this.buzzService.getAllBuzz(page, limit, category, search, excludeCategory);
+}
+
+@Get('student-achievements')
+async getStudentAchievements(
+  @Query('page') page: number = 1,
+  @Query('limit') limit: number = 10,
+) {
+  return this.buzzService.getStudentAchievements(page, limit);
 }
 
 @UseGuards(JwtAuthGuard)

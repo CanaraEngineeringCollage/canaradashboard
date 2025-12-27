@@ -211,6 +211,8 @@ export default function BuzzPage() {
     setIsEditorOpen(true);
   };
 
+
+  console.log(buzzes);
   return (
     <>
       <PageTitle
