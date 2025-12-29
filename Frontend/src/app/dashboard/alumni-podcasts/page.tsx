@@ -168,7 +168,7 @@ const AlumniPodcastsPage = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <PageTitle title="Alumni Podcasts" icon={Video} />
 
       <div className="bg-white p-6 rounded-lg shadow border">
@@ -181,7 +181,7 @@ const AlumniPodcastsPage = () => {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex gap-4 items-end">
+        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
           <div className="flex-1 space-y-2">
             <label htmlFor="title" className="text-sm font-medium">
               Title
@@ -206,7 +206,7 @@ const AlumniPodcastsPage = () => {
               disabled={submitting}
             />
           </div>
-          <Button type="submit" disabled={submitting || !url || !title}>
+          <Button type="submit" disabled={submitting || !url || !title} className="w-full md:w-auto">
             {submitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -230,31 +230,45 @@ const AlumniPodcastsPage = () => {
         ) : podcasts.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No podcasts found.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploaded At</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Title</th>
+                  <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">URL</th>
+                  <th className="hidden sm:table-cell px-4 md:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Uploaded At</th>
+                  <th className="px-4 md:px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {podcasts.map((podcast) => (
                   <tr key={podcast.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{podcast.title}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:underline truncate max-w-md">
+                    <td className="px-4 md:px-6 py-4 text-sm font-medium text-gray-900">
+                      <div className="flex flex-col">
+                        <span className=" max-w-[150px] sm:max-w-xs md:max-w-md">{podcast.title}</span>
+                        <a 
+                          href={podcast.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="md:hidden text-xs text-blue-600 hover:underline truncate max-w-[150px] sm:max-w-xs"
+                        >
+                          {podcast.url}
+                        </a>
+                      </div>
+                    </td>
+                    <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:underline truncate max-w-md">
                       <a href={podcast.url} target="_blank" rel="noopener noreferrer">
                         {podcast.url}
                       </a>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(podcast.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(podcast)} className="text-blue-600 hover:text-blue-900">
+                    <td className="hidden sm:table-cell px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(podcast.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-1 md:space-x-2">
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(podcast)} className="h-8 w-8 text-blue-600 hover:text-blue-900">
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(podcast.id)} className="text-red-600 hover:text-red-900">
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(podcast.id)} className="h-8 w-8 text-red-600 hover:text-red-900">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </td>
