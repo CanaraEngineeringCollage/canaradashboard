@@ -27,7 +27,8 @@ async function bootstrap() {
       'https://canaraengineering.vercel.app',
       'https://cec.edu.in',
       'https://www.cec.edu.in',
-      'https://cecdashboard.cec.edu.in'
+      'https://cecdashboard.cec.edu.in',
+      'https://apply.canaraengineering.in'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,

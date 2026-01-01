@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { PptModule } from './ppt/ppt.module';
 import { PlacementModule } from './placement/placement.module';
+import { AdmissionModule } from './admission/admission.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -43,8 +44,9 @@ import { AppService } from './app.service';
     FilesModule,
     PptModule,
     PlacementModule,
+    AdmissionModule,
   ],
-  controllers: [AppController],  
-  providers: [AppService],    
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

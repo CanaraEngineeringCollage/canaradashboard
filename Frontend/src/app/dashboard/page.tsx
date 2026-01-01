@@ -23,31 +23,31 @@ export default function DashboardPage() {
   const [buzzCount, setBuzzCount] = useState<number | null>(null);
   const [placementCount, setPlacementCount] = useState<number | null>(null);
   const [podcastCount, setPodcastCount] = useState<number | null>(null);
+  const [admissionCount, setAdmissionCount] = useState<number | null>(null);
 
+  const router = useRouter();
 
-const router = useRouter();
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
 
-useEffect(() => {
-  const encrypted = localStorage.getItem("token");
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
 
-  if (!encrypted) {
-    router.push("/login");
-    return;
-  }
+    try {
+      const decrypted = decryptToken(encrypted);
 
-  try {
-    const decrypted = decryptToken(encrypted);
-
-    // Token invalid or empty → logout
-    if (!decrypted || decrypted.length < 10) {
+      // Token invalid or empty → logout
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch {
       localStorage.removeItem("token");
       router.push("/login");
     }
-  } catch {
-    localStorage.removeItem("token");
-    router.push("/login");
-  }
-}, []);
+  }, []);
 
   const fetchAllData = async () => {
     try {
@@ -71,84 +71,95 @@ useEffect(() => {
   };
 
   const fetchBuzzCounts = async () => {
-       const token = getToken();
+    const token = getToken();
     if (!token) return router.push("/login");
-  try {
-    const data = await apiFetch("/buzz/count", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setBuzzCount(data.count);
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+      const data = await apiFetch("/buzz/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBuzzCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-    const fetchEventsCounts = async () => {
-     const token = getToken();
+  const fetchEventsCounts = async () => {
+    const token = getToken();
     if (!token) return router.push("/login");
-  try {
-    const data = await apiFetch("/events/count", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setEventsCount(data.count);
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+      const data = await apiFetch("/events/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEventsCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-const fetchCounsellingCount = async () => {
-   const token = getToken();
+  const fetchCounsellingCount = async () => {
+    const token = getToken();
     if (!token) return router.push("/login");
-  try {
-    const data = await apiFetch("/counselling/count", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setCounsellingCount(data.count);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
+    try {
+      const data = await apiFetch("/counselling/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCounsellingCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchAlumniCount = async () => {
-   const token = getToken();
+    const token = getToken();
     if (!token) return router.push("/login");
-  try {
-    const data = await apiFetch("/alumni/count", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setAlumniCount(data.count);
-  } catch (error) {
-    console.error(error);
-  }
-};
+    try {
+      const data = await apiFetch("/alumni/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAlumniCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-const fetchPlacementCount = async () => {
-const token = getToken();
- if (!token) return router.push("/login");
-try {
- const data = await apiFetch("/placement/count", {
-   headers: { Authorization: `Bearer ${token}` },
- });
- setPlacementCount(data.count);
-} catch (error) {
- console.error(error);
-}
-};
+  const fetchPlacementCount = async () => {
+    const token = getToken();
+    if (!token) return router.push("/login");
+    try {
+      const data = await apiFetch("/placement/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPlacementCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-const fetchPodcastCount = async () => {
-const token = getToken();
- if (!token) return router.push("/login");
-try {
- const data = await apiFetch("/alumni/podcast/count", {
-   headers: { Authorization: `Bearer ${token}` },
- });
- setPodcastCount(data.count);
-} catch (error) {
- console.error(error);
-}
-};
+  const fetchPodcastCount = async () => {
+    const token = getToken();
+    if (!token) return router.push("/login");
+    try {
+      const data = await apiFetch("/alumni/podcast/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPodcastCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  const fetchAdmissionCount = async () => {
+    const token = getToken();
+    if (!token) return router.push("/login");
+    try {
+      const data = await apiFetch("/admission-enquiries/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAdmissionCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     fetchAllData();
@@ -158,21 +169,13 @@ try {
     fetchEventsCounts();
     fetchBuzzCounts();
     fetchPlacementCount();
+    fetchPlacementCount();
     fetchPodcastCount();
+    fetchAdmissionCount();
   }, []);
 
   // 🔹 Reusable card with skeleton
-  const StatCard = ({
-    title,
-    icon: Icon,
-    count,
-    description,
-  }: {
-    title: string;
-    icon: any;
-    count: number | null;
-    description: string;
-  }) => (
+  const StatCard = ({ title, icon: Icon, count, description }: { title: string; icon: any; count: number | null; description: string }) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
@@ -198,54 +201,21 @@ try {
     <>
       <PageTitle title="Dashboard" icon={LayoutDashboard} />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Total Faculty"
-          icon={UsersRound}
-          count={facultyCount}
-          description="Number of faculty members currently active"
-        />
+        <StatCard title="Total Faculty" icon={UsersRound} count={facultyCount} description="Number of faculty members currently active" />
         {/* <StatCard
           title="SC/ST Grievance Received"
           icon={ShieldCheck}
           count={scstGrievanceCount}
           description="Grievances submitted by SC/ST category users"
         /> */}
-        <StatCard
-          title="Events"
-          icon={PartyPopper}
-          count={eventsCount}
-          description="Number of Events"
-        />
-          <StatCard
-          title="Buzz"
-          icon={Brain}
-          count={buzzCount}
-          description="Number of Buzz"
-        />
-            <StatCard
-          title="Counselling Received"
-          icon={Brain}
-          count={counsellingCount}
-          description="Requests for counselling sessions from visitors"
-        />
-        <StatCard
-          title="Alumni Received"
-          icon={GraduationCap}
-          count={alumniCount}
-          description="Total queries received from alumni"
-        />
-        <StatCard
-          title="Placement Received"
-          icon={Briefcase}
-          count={placementCount}
-          description="Total placements received"
-        />
-        <StatCard
-          title="Alumni Podcast"
-          icon={Video}
-          count={podcastCount}
-          description="Total alumni podcasts"
-        />
+        <StatCard title="Events" icon={PartyPopper} count={eventsCount} description="Number of Events" />
+        <StatCard title="Buzz" icon={Brain} count={buzzCount} description="Number of Buzz" />
+        <StatCard title="Admission Enquiries" icon={UsersRound} count={admissionCount} description="Total admission enquiries received" />
+
+        <StatCard title="Counselling Received" icon={Brain} count={counsellingCount} description="Requests for counselling sessions from visitors" />
+        <StatCard title="Alumni Received" icon={GraduationCap} count={alumniCount} description="Total queries received from alumni" />
+        <StatCard title="Placement Received" icon={Briefcase} count={placementCount} description="Total placements received" />
+        <StatCard title="Alumni Podcast" icon={Video} count={podcastCount} description="Total alumni podcasts" />
       </div>
     </>
   );

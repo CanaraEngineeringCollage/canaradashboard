@@ -15,6 +15,7 @@ import {
   GraduationCap,
   Video,
   Briefcase,
+  UserCheck,
 } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
@@ -33,17 +34,18 @@ const navItems: NavItem[] = [
   //  { href: "/dashboard/exam-timetable", label: "Exam Timetable", icon: BookOpenCheck },
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
-   { href: "/dashboard/alumni-podcasts", label: "Alumni Podcast", icon: Video },
+  { href: "/dashboard/admission-enquiries", label: "Admission Enquiries", icon: UserCheck },
+
+  { href: "/dashboard/alumni-podcasts", label: "Alumni Podcast", icon: Video },
   { href: "/dashboard/alumni", label: "Alumni Submissions", icon: GraduationCap },
-   
-    { href: "/dashboard/placement", label: "Placement Submissions", icon: Briefcase },
+
+  { href: "/dashboard/placement", label: "Placement Submissions", icon: Briefcase },
   { href: "/dashboard/counselling", label: "Counselling Submissions", icon: Brain },
   { href: "/dashboard/glimpses-of-cec", label: "Glimpses of CEC", icon: FileText },
   // { href: "/dashboard/grievance-redressal-cell", label: "Grievance Redressal Cell", icon: ShieldCheck },
   // { href: "/dashboard/sc-st-grievance", label: "SC/ST Grievance", icon: ShieldCheck },
   // { href: "/dashboard/inquiries", label: "Inquiries", icon: FileText },
   { href: "/dashboard/profile", label: "Profile", icon: UserCog },
-
 ];
 
 export function SidebarNavItems() {
@@ -56,10 +58,10 @@ export function SidebarNavItems() {
           <Link href={item.href} passHref legacyBehavior>
             <SidebarMenuButton
               asChild
-              isActive={pathname === item.href || (item.href !== "/dashboard" && pathname===item.href)}
+              isActive={pathname === item.href || (item.href !== "/dashboard" && pathname === item.href)}
               className={cn(
                 "justify-start",
-                pathname === item.href || (item.href !== "/dashboard" && "/dashboard" && pathname===item.href)
+                pathname === item.href || (item.href !== "/dashboard" && "/dashboard" && pathname === item.href)
                   ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
                   : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}
