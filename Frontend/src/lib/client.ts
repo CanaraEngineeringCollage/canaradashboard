@@ -1,3 +1,5 @@
+import { decryptToken } from "./encrypt";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
@@ -17,15 +19,29 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
       return false;
     };
 
-    const response = await fetch(url, {
+    const fetchOptions: RequestInit = {
       ...options,
-      credentials: options.credentials || "include", // Ensure credentials are included
+      credentials: options.credentials || "include",
       headers: {
         ...options.headers,
         ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       },
-    });
+    };
 
+    if (typeof window !== "undefined") {
+      const encryptedToken = localStorage.getItem("token");
+      if (encryptedToken) {
+        try {
+          const token = decryptToken(encryptedToken);
+          // @ts-ignore
+          fetchOptions.headers["Authorization"] = `Bearer ${token}`;
+        } catch (error) {
+          console.error("Failed to decrypt token:", error);
+        }
+      }
+    }
+
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

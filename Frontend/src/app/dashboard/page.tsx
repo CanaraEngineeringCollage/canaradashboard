@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper, Video, Briefcase } from "lucide-react";
+import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper, Video, Briefcase, Images } from "lucide-react";
 import { getAllFaculty, getFacultyCount } from "@/lib/faculty";
+import { getGalleryCount } from "@/lib/gallery";
 import { getGrievances } from "@/lib/grievance";
 import { getScStGrievances } from "@/lib/scstGrievances";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,6 +25,7 @@ export default function DashboardPage() {
   const [placementCount, setPlacementCount] = useState<number | null>(null);
   const [podcastCount, setPodcastCount] = useState<number | null>(null);
   const [admissionCount, setAdmissionCount] = useState<number | null>(null);
+  const [galleryCount, setGalleryCount] = useState<number | null>(null);
 
   const router = useRouter();
 
@@ -161,6 +163,15 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchGalleryCount = async () => {
+    try {
+      const data = await getGalleryCount();
+      setGalleryCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchAllData();
     fetchGrievanceCounts();
@@ -169,9 +180,9 @@ export default function DashboardPage() {
     fetchEventsCounts();
     fetchBuzzCounts();
     fetchPlacementCount();
-    fetchPlacementCount();
     fetchPodcastCount();
     fetchAdmissionCount();
+    fetchGalleryCount();
   }, []);
 
   // 🔹 Reusable card with skeleton
@@ -209,6 +220,7 @@ export default function DashboardPage() {
           description="Grievances submitted by SC/ST category users"
         /> */}
         <StatCard title="Events" icon={PartyPopper} count={eventsCount} description="Number of Events" />
+        <StatCard title="Gallery" icon={Images} count={galleryCount} description="Total images in gallery" />
         <StatCard title="Buzz" icon={Brain} count={buzzCount} description="Number of Buzz" />
         <StatCard title="Admission Enquiries" icon={UsersRound} count={admissionCount} description="Total admission enquiries received" />
 

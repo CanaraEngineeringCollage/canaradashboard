@@ -16,6 +16,7 @@ import {
   Video,
   Briefcase,
   UserCheck,
+  Images,
 } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
@@ -32,8 +33,10 @@ const navItems: NavItem[] = [
   { href: "/dashboard/faculty", label: "Faculty", icon: UsersRound },
   { href: "/dashboard/events", label: "Events", icon: UserCog },
   //  { href: "/dashboard/exam-timetable", label: "Exam Timetable", icon: BookOpenCheck },
+  { href: "/dashboard/gallery", label: "Gallery", icon: Images },
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
+
   { href: "/dashboard/admission-enquiries", label: "Admission Enquiries", icon: UserCheck },
 
   { href: "/dashboard/alumni-podcasts", label: "Alumni Podcast", icon: Video },

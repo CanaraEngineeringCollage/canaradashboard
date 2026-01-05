@@ -15,6 +15,7 @@ import { FilesModule } from './files/files.module';
 import { PptModule } from './ppt/ppt.module';
 import { PlacementModule } from './placement/placement.module';
 import { AdmissionModule } from './admission/admission.module';
+import { GalleryModule } from './gallery/gallery.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -45,6 +46,7 @@ import { AppService } from './app.service';
     PptModule,
     PlacementModule,
     AdmissionModule,
+    GalleryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
