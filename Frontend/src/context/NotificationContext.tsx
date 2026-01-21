@@ -34,14 +34,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // BUT, the requirement is "form submission happened the notficaiton thing want to works".
   // So let's store the latest ID or timestamp we've seen in localStorage.
 
-  const fetchEndpoint = async (endpoint: string, key: NotificationType) => {
+  const fetchEndpoint = async (endpoint: string, key: NotificationType, lastViewedTime: number) => {
     try {
       const encrypted = localStorage.getItem("token");
       const token = encrypted ? decryptToken(encrypted) : null;
       if (!token) return { count: 0, latest: 0 };
 
-      // Fetch page 1, limit 1 to get the latest
-      const result = await apiFetch(`${endpoint}?page=1&limit=1`, {
+      // Fetch page 1, limit 1000 to get the latest batch
+      const result = await apiFetch(`${endpoint}?page=1&limit=1000`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -51,10 +51,25 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const latestItem = data[0];
         const latestTime = new Date(latestItem.createdAt).getTime();
 
-        // This is a naive implementation: we are just getting the latest time.
-        // To show a "badge count", we need to compare this with what user has "seen".
-        // For now, we'll return the latest timestamp.
-        return { count: 1, latest: latestTime };
+        // Calculate count of new items
+        // If latestTime <= lastViewedTime, then 0 new
+        if (latestTime <= lastViewedTime) {
+          return { count: 0, latest: latestTime };
+        }
+
+        // Count how many are newer than lastViewedTime
+        let newCount = 0;
+        for (const item of data) {
+          if (new Date(item.createdAt).getTime() > lastViewedTime) {
+            newCount++;
+          } else {
+            break; // Since it's sorted desc, once we hit an old one, all remaining are old
+          }
+        }
+
+        // If we filled the batch (20) and all were new, we might have more.
+        // But for UI "standard", just showing "20+" or the actual number up to 20 is fine.
+        return { count: newCount, latest: latestTime };
       }
     } catch (e) {
       console.error(`Failed to fetch ${endpoint}`, e);
@@ -79,17 +94,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const lastViewedMap: Record<string, number> = lastViewedMapStr ? JSON.parse(lastViewedMapStr) : {};
 
     for (const ep of endpoints) {
-      // We really need to know HOW MANY are new.
-      // But the API only gives us paginated lists.
-      // Doing a count of everything > lastViewedTime would require fetching until we hit that time.
-      // For polling efficiency, let's just fetch the latest one.
-      // If latest > lastViewed, we show a notification (maybe just "1+" or a dot).
+      const lastViewed = lastViewedMap[ep.type] || 0;
+      const res = await fetchEndpoint(ep.url, ep.type, lastViewed);
 
-      const res = await fetchEndpoint(ep.url, ep.type);
-      if (res.latest > (lastViewedMap[ep.type] || 0)) {
-        // It's new!
-        results.push({ type: ep.type, count: 1, latestTimestamp: res.latest });
-        grandTotal++;
+      if (res.count > 0) {
+        results.push({ type: ep.type, count: res.count, latestTimestamp: res.latest });
+        grandTotal += res.count;
       }
     }
 
