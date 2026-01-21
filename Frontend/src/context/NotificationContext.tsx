@@ -16,7 +16,8 @@ interface NotificationContextType {
   notifications: NotificationItem[];
   totalNotifications: number;
   loading: boolean;
-  refreshNotifications: () => void;
+  refreshNotifications: () => Promise<void>;
+  markAsViewed: (type: NotificationType, timestamp: number) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -25,14 +26,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [totalNotifications, setTotalNotifications] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  // Helper to fetch counts
-  // Since the APIs are paginated, we just check the latest item's timestamp
-  // against a locally stored "lastChecked" timestamp to determine "new" items.
-  // However, for simplicity and "alert" behaviour, we might initially just check if there are *any* items
-  // created after the last time the user "cleared" or "viewed" notifications.
-  // BUT, the requirement is "form submission happened the notficaiton thing want to works".
-  // So let's store the latest ID or timestamp we've seen in localStorage.
+  const [lastViewedMap, setLastViewedMap] = useState<Record<string, number>>({});
 
   const fetchEndpoint = async (endpoint: string, key: NotificationType, lastViewedTime: number) => {
     try {
@@ -67,8 +61,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
         }
 
-        // If we filled the batch (20) and all were new, we might have more.
-        // But for UI "standard", just showing "20+" or the actual number up to 20 is fine.
         return { count: newCount, latest: latestTime };
       }
     } catch (e) {
@@ -77,7 +69,72 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return { count: 0, latest: 0 };
   };
 
+  const fetchStatus = async () => {
+    try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+      if (!token) return {};
+
+      const result = await apiFetch("/admin/notifications/status", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Map backend fields to our map
+      const statusMap: Record<string, number> = {};
+      if (result) {
+        statusMap["Admission"] = Number(result.admissionLastViewed || 0);
+        statusMap["Alumni"] = Number(result.alumniLastViewed || 0);
+        statusMap["Placement"] = Number(result.placementLastViewed || 0);
+        statusMap["Counselling"] = Number(result.counsellingLastViewed || 0);
+      }
+      return statusMap;
+    } catch (e) {
+      console.error("Failed to fetch notification status", e);
+      return {};
+    }
+  };
+
+  const markAsViewed = async (type: NotificationType, timestamp: number) => {
+    // Optimistic update
+    setLastViewedMap((prev) => ({ ...prev, [type]: timestamp }));
+
+    // Trigger refresh immediately to clear badge locally
+    // Logic: checkNotifications uses lastViewedMap state.
+    // Wait, checkNotifications is async and inside it reads state?
+    // State updates might be slow. We should pass the updated map to checkNotifications or let the next poll pick it up.
+    // Better: Update state, then call API.
+    // Since checkNotifications depends on `lastViewedMap`, we should probably wrap checkNotifications in useEffect dependent on lastViewedMap?
+    // No, that might cause loops.
+    // Let's just update the API and let the next poll (or manual refresh) handle it.
+    // For immediate UI feedback, we can manually filter the displayed notifications list.
+
+    setNotifications((prev) => prev.filter((n) => n.type !== type));
+    setTotalNotifications((prev) => {
+      const removed = notifications.find((n) => n.type === type);
+      return prev - (removed?.count || 0);
+    });
+
+    try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+      if (token) {
+        await apiFetch("/admin/notifications/status", {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ type, timestamp }),
+        });
+      }
+    } catch (e) {
+      console.error("Failed to update status", e);
+    }
+  };
+
   const checkNotifications = async () => {
+    // First fetch latest status from DB to ensure sync across devices
+    const currentStatusMap = await fetchStatus();
+    setLastViewedMap(currentStatusMap);
+
     // We will check all 4 endpoints
     const endpoints: { url: string; type: NotificationType }[] = [
       { url: "/admission-enquiries", type: "Admission" },
@@ -89,12 +146,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const results: NotificationItem[] = [];
     let grandTotal = 0;
 
-    // Get last viewed timestamp from local storage
-    const lastViewedMapStr = localStorage.getItem("notificationLastViewed");
-    const lastViewedMap: Record<string, number> = lastViewedMapStr ? JSON.parse(lastViewedMapStr) : {};
-
     for (const ep of endpoints) {
-      const lastViewed = lastViewedMap[ep.type] || 0;
+      const lastViewed = currentStatusMap[ep.type] || 0;
       const res = await fetchEndpoint(ep.url, ep.type, lastViewed);
 
       if (res.count > 0) {
@@ -121,6 +174,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         totalNotifications,
         loading,
         refreshNotifications: checkNotifications,
+        markAsViewed,
       }}
     >
       {children}

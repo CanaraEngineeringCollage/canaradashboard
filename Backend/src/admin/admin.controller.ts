@@ -1,5 +1,13 @@
 import {
-  Controller, Post, Body, Res, Get, UseGuards, Req, Patch
+  Controller,
+  Post,
+  Body,
+  Res,
+  Get,
+  UseGuards,
+  Req,
+  Patch,
+  Put,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Response, Request } from 'express';
@@ -33,4 +41,22 @@ export class AdminController {
     return this.adminService.logout(res);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('notifications/status')
+  getNotificationStatus(@Req() req: Request) {
+    return this.adminService.getNotificationStatus(req['user'].id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('notifications/status')
+  updateNotificationStatus(
+    @Req() req: Request,
+    @Body() body: { type: string; timestamp: number },
+  ) {
+    return this.adminService.updateNotificationStatus(
+      req['user'].id,
+      body.type,
+      body.timestamp,
+    );
+  }
 }

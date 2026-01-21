@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Admin } from './entities/admin.entity';
+import { NotificationStatus } from './entities/notification-status.entity';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Injectable()
@@ -17,6 +18,8 @@ export class AdminService {
   constructor(
     @InjectRepository(Admin)
     private adminRepo: Repository<Admin>,
+    @InjectRepository(NotificationStatus)
+    private statusRepo: Repository<NotificationStatus>,
     private jwtService: JwtService,
   ) {}
 
@@ -97,4 +100,38 @@ export class AdminService {
     return res.json({ message: 'Logged out' });
   }
 
+  async getNotificationStatus(adminId: number) {
+    let status = await this.statusRepo.findOne({ where: { adminId } });
+    if (!status) {
+      status = this.statusRepo.create({ adminId });
+      await this.statusRepo.save(status);
+    }
+    return status;
+  }
+
+  async updateNotificationStatus(
+    adminId: number,
+    type: string,
+    timestamp: number,
+  ) {
+    let status = await this.statusRepo.findOne({ where: { adminId } });
+    if (!status) {
+      status = this.statusRepo.create({ adminId });
+    }
+
+    const fieldMap: Record<string, string> = {
+      Admission: 'admissionLastViewed',
+      Alumni: 'alumniLastViewed',
+      Placement: 'placementLastViewed',
+      Counselling: 'counsellingLastViewed',
+    };
+
+    const field = fieldMap[type];
+    if (field) {
+      (status as any)[field] = timestamp.toString();
+      await this.statusRepo.save(status);
+    }
+
+    return status;
+  }
 }

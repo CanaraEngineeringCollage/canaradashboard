@@ -15,10 +15,10 @@ import { useNotifications } from "@/context/NotificationContext";
 import { useRouter } from "next/navigation";
 
 export function NotificationBell() {
-  const { notifications, totalNotifications, refreshNotifications } = useNotifications();
+  const { notifications, totalNotifications, refreshNotifications, markAsViewed } = useNotifications();
   const router = useRouter();
 
-  const handleClick = (type: string) => {
+  const handleClick = (type: any) => {
     // Navigate to the respective page
     switch (type) {
       case "Admission":
@@ -35,15 +35,10 @@ export function NotificationBell() {
         break;
     }
 
-    const lastViewedMapStr = localStorage.getItem("notificationLastViewed");
-    const lastViewedMap = lastViewedMapStr ? JSON.parse(lastViewedMapStr) : {};
-
     // Find the notification of this type
     const notif = notifications.find((n) => n.type === type);
     if (notif) {
-      lastViewedMap[type] = notif.latestTimestamp;
-      localStorage.setItem("notificationLastViewed", JSON.stringify(lastViewedMap));
-      refreshNotifications(); // Re-run check to clear the badge
+      markAsViewed(type, notif.latestTimestamp);
     }
   };
 

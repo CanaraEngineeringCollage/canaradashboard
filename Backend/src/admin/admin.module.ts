@@ -5,12 +5,13 @@ import { AdminController } from './admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { Admin } from './entities/admin.entity';
+import { NotificationStatus } from './entities/notification-status.entity';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Admin]),
+    TypeOrmModule.forFeature([Admin, NotificationStatus]),
     JwtModule.register({ secret: process.env.JWT_SECRET }),
   ],
   controllers: [AdminController],
