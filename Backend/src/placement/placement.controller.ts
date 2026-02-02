@@ -38,6 +38,13 @@ export class PlacementController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('top-recruiters/count')
+  async getTopRecruitersCount() {
+    const count = await this.placementService.topRecruitersCount();
+    return { count };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('top-recruiters')
   getTopRecruiters(
     @Query('year') year?: string,
@@ -48,7 +55,7 @@ export class PlacementController {
     return this.placementService.getTopRecruiters(year, +page, +limit, search);
   }
 
-
+  @UseGuards(JwtAuthGuard)
   @Post('top-recruiters')
   createTopRecruiter(@Body() createTopRecruiterDto: CreateTopRecruiterDto) {
     return this.placementService.createTopRecruiter(createTopRecruiterDto);

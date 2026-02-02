@@ -41,6 +41,10 @@ export class PlacementService implements OnModuleInit {
     return this.placementRepository.count();
   }
 
+  topRecruitersCount() {
+    return this.topRecruiterRepository.count();
+  }
+
   async getTopRecruiters(
     year?: string,
     page: number = 1,
