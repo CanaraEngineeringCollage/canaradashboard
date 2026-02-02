@@ -26,6 +26,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
         ...options.headers,
         ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       },
+      cache: "no-store",
     };
 
     if (typeof window !== "undefined") {
