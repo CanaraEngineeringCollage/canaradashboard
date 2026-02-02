@@ -151,18 +151,14 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
 
         const departmentFaculties: Faculty[] = await response.json();
 
-        const usedPriorities = departmentFaculties
-          .filter((f) => f.id !== faculty.id && f.priority !== null)
-          .map((f) => f.priority)
-          .filter((p): p is number => p !== null);
+        // No longer filter out used priorities as per "Insert and Shift" requirement
+        // users should be able to select any priority to insert themselves there
 
-        const maxPriority = departmentFaculties.length + 5;
+        const maxPriority = departmentFaculties.length + 1; // Allow +1 for the new/updated entry
         const availablePrioritiesList: (number | null)[] = [null];
 
         for (let i = 1; i <= maxPriority; i++) {
-          if (!usedPriorities.includes(i)) {
-            availablePrioritiesList.push(i);
-          }
+          availablePrioritiesList.push(i);
         }
 
         setAvailablePriorities(availablePrioritiesList);
@@ -486,7 +482,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setFaculty({
           ...faculty,
           internationalJournalPublications: (faculty.internationalJournalPublications || []).map((j) =>
-            j.id === editJournalPublicationId ? { ...newJournalPublication, id: j.id } : j
+            j.id === editJournalPublicationId ? { ...newJournalPublication, id: j.id } : j,
           ),
         });
         setEditJournalPublicationId(null);
@@ -510,7 +506,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
           setFaculty((prev) => ({
             ...prev,
             internationalConferencePublications: (prev.internationalConferencePublications || []).map((c) =>
-              c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c
+              c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c,
             ),
           }));
           setEditConferencePublicationId(null);
@@ -906,7 +902,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setFaculty({
           ...faculty,
           internationalJournalPublications: (faculty.internationalJournalPublications || []).map((j) =>
-            j.id === editJournalPublicationId ? { ...newJournalPublication, id: j.id } : j
+            j.id === editJournalPublicationId ? { ...newJournalPublication, id: j.id } : j,
           ),
         });
         setEditJournalPublicationId(null);
@@ -962,7 +958,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         setFaculty({
           ...faculty,
           internationalConferencePublications: (faculty.internationalConferencePublications || []).map((c) =>
-            c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c
+            c.id === editConferencePublicationId ? { ...newConferencePublication, id: c.id } : c,
           ),
         });
         setEditConferencePublicationId(null);
@@ -1361,7 +1357,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                               <p key={index} className="text-sm text-gray-700 pl-2 ">
                                 • {desc}
                               </p>
-                            )
+                            ),
                         )}
                       </div>
                     </div>
@@ -1463,7 +1459,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                               <p key={index} className="text-sm text-gray-700 pl-2  ">
                                 • {desc}
                               </p>
-                            )
+                            ),
                         )}
                       </div>
                     </div>
@@ -1565,7 +1561,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                               <p key={index} className="text-sm text-gray-700 pl-2  ">
                                 • {desc}
                               </p>
-                            )
+                            ),
                         )}
                       </div>
                     </div>

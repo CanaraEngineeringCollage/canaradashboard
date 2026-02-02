@@ -30,10 +30,31 @@ export class FacultyService {
     private readonly achievementRepo: Repository<Achievement>,
   ) {}
 
+  /**
+   * Shift priorities down to make space for a new priority.
+   * Increments the priority of all faculties in the department with priority >= startPriority.
+   */
+  private async shiftPriorities(department: string, startPriority: number) {
+    await this.facultyRepository
+      .createQueryBuilder()
+      .update(Faculty)
+      .set({ priority: () => 'priority + 1' })
+      .where('department = :department', { department })
+      .andWhere('priority >= :startPriority', { startPriority })
+      .execute();
+  }
+
   async create(
     createFacultyDto: CreateFacultyDto,
     avatar?: Express.Multer.File,
   ) {
+    if (createFacultyDto.priority) {
+      await this.shiftPriorities(
+        createFacultyDto.department,
+        createFacultyDto.priority,
+      );
+    }
+
     const faculty = this.facultyRepository.create(createFacultyDto);
     if (avatar) {
       faculty.avatar = avatar.buffer;
@@ -322,6 +343,17 @@ export class FacultyService {
     if (!faculty) {
       throw new NotFoundException(`Faculty with ID ${id} not found`);
     }
+
+    // Shift priorities if priority is being updated and is different
+    if (
+      updateFacultyDto.priority !== undefined &&
+      updateFacultyDto.priority !== null &&
+      updateFacultyDto.priority !== faculty.priority
+    ) {
+      const department = updateFacultyDto.department || faculty.department;
+      await this.shiftPriorities(department, updateFacultyDto.priority);
+    }
+
     Object.assign(faculty, updateFacultyDto);
     if (avatar) {
       faculty.avatar = avatar.buffer;
