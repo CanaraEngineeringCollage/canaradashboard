@@ -37,20 +37,20 @@ export class PlacementController {
     return { count };
   }
 
-  @UseGuards(JwtAuthGuard)
+
   @Get('top-recruiters/count')
   async getTopRecruitersCount() {
     const count = await this.placementService.topRecruitersCount();
     return { count };
   }
 
-  @UseGuards(JwtAuthGuard)
+
   @Get('top-recruiters/years')
   async getDistinctYears() {
     return this.placementService.getDistinctYears();
   }
 
-  @UseGuards(JwtAuthGuard)
+  
   @Get('top-recruiters')
   getTopRecruiters(
     @Query('year') year?: string,
