@@ -36,6 +36,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/gallery", label: "Gallery", icon: Images },
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
+  { href: "/dashboard/placement/top-recruiters", label: "Top Recruiters", icon: Briefcase },
 
   { href: "/dashboard/admission-enquiries", label: "Admission Enquiries", icon: UserCheck },
 
