@@ -26,6 +26,7 @@ export default function TopRecruitersPage() {
   const router = useRouter();
   const [data, setData] = useState<TopRecruiter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [availableYears, setAvailableYears] = useState<string[]>([]);
   const [year, setYear] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -60,6 +61,27 @@ export default function TopRecruitersPage() {
     fetchData();
   }, [year, currentPage, debouncedSearch, itemsPerPage]);
 
+  useEffect(() => {
+    fetchYears();
+  }, []);
+
+  const fetchYears = async () => {
+    try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+      const response = await apiFetch("/placement/top-recruiters/years", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (Array.isArray(response)) {
+        setAvailableYears(response);
+      }
+    } catch (error) {
+      console.error("Error fetching years:", error);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -93,6 +115,7 @@ export default function TopRecruitersPage() {
 
   const refreshData = () => {
     fetchData();
+    fetchYears();
   };
 
   const handleEdit = (recruiter: TopRecruiter) => {
@@ -156,8 +179,8 @@ export default function TopRecruitersPage() {
       <div className="flex items-center gap-4 mb-4">
         <select value={year} onChange={(e) => setYear(e.target.value)} className="border outline-none rounded p-2 w-full md:w-1/4">
           <option value="all">All Years</option>
-          {Array.from({ length: new Date().getFullYear() - 2022 + 1 }, (_, i) => 2022 + i).map((y) => (
-            <option key={y} value={y.toString()}>
+          {availableYears.map((y) => (
+            <option key={y} value={y}>
               {y}
             </option>
           ))}

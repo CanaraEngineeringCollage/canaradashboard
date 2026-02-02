@@ -45,6 +45,12 @@ export class PlacementController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('top-recruiters/years')
+  async getDistinctYears() {
+    return this.placementService.getDistinctYears();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('top-recruiters')
   getTopRecruiters(
     @Query('year') year?: string,

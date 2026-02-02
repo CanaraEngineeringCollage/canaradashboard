@@ -96,4 +96,13 @@ export class PlacementService implements OnModuleInit {
   async removeTopRecruiter(id: number) {
     return this.topRecruiterRepository.delete(id);
   }
+
+  async getDistinctYears() {
+    const years = await this.topRecruiterRepository
+      .createQueryBuilder('tr')
+      .select('DISTINCT tr.year', 'year')
+      .orderBy('year', 'DESC')
+      .getRawMany();
+    return years.map((y) => y.year);
+  }
 }
