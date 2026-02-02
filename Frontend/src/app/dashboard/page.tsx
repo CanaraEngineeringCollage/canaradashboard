@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [podcastCount, setPodcastCount] = useState<number | null>(null);
   const [admissionCount, setAdmissionCount] = useState<number | null>(null);
   const [galleryCount, setGalleryCount] = useState<number | null>(null);
+  const [topRecruitersCount, setTopRecruitersCount] = useState<number | null>(null);
 
   const router = useRouter();
 
@@ -137,6 +138,19 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchTopRecruitersCount = async () => {
+    const token = getToken();
+    if (!token) return router.push("/login");
+    try {
+      const data = await apiFetch("/placement/top-recruiters/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTopRecruitersCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchPodcastCount = async () => {
     const token = getToken();
     if (!token) return router.push("/login");
@@ -183,6 +197,7 @@ export default function DashboardPage() {
     fetchPodcastCount();
     fetchAdmissionCount();
     fetchGalleryCount();
+    fetchTopRecruitersCount();
   }, []);
 
   // 🔹 Reusable card with skeleton
@@ -222,6 +237,8 @@ export default function DashboardPage() {
         <StatCard title="Events" icon={PartyPopper} count={eventsCount} description="Number of Events" />
         <StatCard title="Gallery" icon={Images} count={galleryCount} description="Total images in gallery" />
         <StatCard title="Buzz" icon={Brain} count={buzzCount} description="Number of Buzz" />
+        <StatCard title="Top Recruiters" icon={Briefcase} count={topRecruitersCount} description="Total top recruiters" />
+
         <StatCard title="Admission Enquiries" icon={UsersRound} count={admissionCount} description="Total admission enquiries received" />
 
         <StatCard title="Counselling Received" icon={Brain} count={counsellingCount} description="Requests for counselling sessions from visitors" />
