@@ -35,6 +35,9 @@ interface Faculty {
   certifications?: Certification[];
   internationalJournalPublications?: JournalPublication[];
   internationalConferencePublications?: ConferencePublication[];
+  isKeyFunctionary?: boolean;
+  keyFunctionaryName?: string;
+  keyFunctionaryPriority?: number | null;
 }
 
 interface Qualification {
@@ -128,10 +131,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     certifications: [],
     internationalJournalPublications: [],
     internationalConferencePublications: [],
+    isKeyFunctionary: false,
+    keyFunctionaryName: "",
+    keyFunctionaryPriority: null,
   };
   const [faculty, setFaculty] = useState<Faculty>(initialFaculty);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const [availableKeyFunctionaryPriorities, setAvailableKeyFunctionaryPriorities] = useState<number[]>([]);
 
   useEffect(() => {
     const loadAvailablePriorities = async () => {
@@ -150,11 +158,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         }
 
         const departmentFaculties: Faculty[] = await response.json();
-
-        // No longer filter out used priorities as per "Insert and Shift" requirement
-        // users should be able to select any priority to insert themselves there
-
-        const maxPriority = departmentFaculties.length + 1; // Allow +1 for the new/updated entry
+        const maxPriority = departmentFaculties.length + 1;
         const availablePrioritiesList: (number | null)[] = [null];
 
         for (let i = 1; i <= maxPriority; i++) {
@@ -170,8 +174,29 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       }
     };
 
+    const loadKeyFunctionaryPriorities = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/faculty?keyFunctionary=true&all=true`);
+        if (response.ok) {
+          const keyFunctionaries: Faculty[] = await response.json();
+          const maxKFPriority = keyFunctionaries.length + 1;
+          const list: number[] = [];
+          for (let i = 1; i <= maxKFPriority; i++) {
+            list.push(i);
+          }
+          setAvailableKeyFunctionaryPriorities(list);
+        }
+      } catch (e) {
+        console.error(e);
+        setAvailableKeyFunctionaryPriorities(Array.from({ length: 20 }, (_, i) => i + 1));
+      }
+    };
+
     loadAvailablePriorities();
-  }, [faculty.department, faculty.id, API_BASE_URL]);
+    if (faculty.isKeyFunctionary) {
+      loadKeyFunctionaryPriorities();
+    }
+  }, [faculty.department, faculty.id, API_BASE_URL, faculty.isKeyFunctionary]);
 
   useEffect(() => {
     if (mode === "add" && faculty.department) {
@@ -570,6 +595,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       }
     } else if (name === "priority") {
       setFaculty({ ...faculty, priority: parseInt(value, 10) || null });
+    } else if (name === "isKeyFunctionary") {
+      setFaculty({ ...faculty, isKeyFunctionary: (e.target as HTMLInputElement).checked });
+    } else if (name === "keyFunctionaryPriority") {
+      setFaculty({ ...faculty, keyFunctionaryPriority: parseInt(value, 10) || null });
     } else {
       setFaculty({ ...faculty, [name]: value });
       if (name === "department" && value !== "Science & Humanities") {
@@ -1173,6 +1202,60 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 {errors.avatar && <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>}
                 {faculty.avatar && (
                   <img src={bufferToBase64(faculty.avatar)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
+                )}
+              </div>
+              <div className="col-span-full border-t pt-4 mt-2">
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    name="isKeyFunctionary"
+                    id="isKeyFunctionary"
+                    checked={faculty.isKeyFunctionary || false}
+                    onChange={handleInputChange}
+                    className="mr-2 h-4 w-4"
+                  />
+                  <label htmlFor="isKeyFunctionary" className="font-medium">
+                    Is Key Functionary?
+                  </label>
+                </div>
+
+                {faculty.isKeyFunctionary && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Key Functionary Name *</label>
+                      <input
+                        type="text"
+                        name="keyFunctionaryName"
+                        value={faculty.keyFunctionaryName || ""}
+                        onChange={handleInputChange}
+                        placeholder="e.g. Dean, HOD"
+                        className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Key Functionary Priority *</label>
+                      <select
+                        name="keyFunctionaryPriority"
+                        value={faculty.keyFunctionaryPriority || ""}
+                        onChange={handleInputChange}
+                        className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Priority</option>
+                        {availableKeyFunctionaryPriorities.length > 0
+                          ? availableKeyFunctionaryPriorities.map((p) => (
+                              <option key={p} value={p}>
+                                {p}
+                              </option>
+                            ))
+                          : Array.from({ length: 20 }, (_, i) => i + 1).map((p) => (
+                              <option key={p} value={p}>
+                                {p}
+                              </option>
+                            ))}
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Lower number = Higher Priority (appears first)</p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -2028,7 +2111,7 @@ const Page: React.FC = () => {
               <td className="border px-4 py-2">{faculty.name}</td>
               <td className="border px-4 py-2">{faculty.designation}</td>
               <td className="border px-4 py-2">{faculty.department}</td>
-              <td className="border px-4 py-2">{faculty.joiningDate}</td>
+              <td className="border px-4 py-2">{new Date(faculty.joiningDate).toLocaleDateString("en-GB")}</td>
               <td className="border px-4 py-2">{faculty.employmentType}</td>
               <td className="border px-4 py-2 flex">
                 <button onClick={() => handleEditFaculty(faculty)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">

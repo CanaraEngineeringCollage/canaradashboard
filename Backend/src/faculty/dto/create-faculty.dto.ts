@@ -7,7 +7,8 @@ import {
   ValidateNested,
   IsOptional,
   IsNotEmpty,
-  IsInt
+  IsInt,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -81,7 +82,7 @@ export class CreateFacultyDto {
   @IsString()
   department: string;
 
-   @IsString()
+  @IsString()
   @IsOptional()
   subDepartment?: string;
 
@@ -90,7 +91,7 @@ export class CreateFacultyDto {
   email?: string;
 
   @IsDateString()
-   @IsOptional()
+  @IsOptional()
   joiningDate: string;
 
   @IsString()
@@ -104,7 +105,21 @@ export class CreateFacultyDto {
 
   @IsInt()
   @IsOptional()
+  @IsInt()
+  @IsOptional()
   priority?: number | null;
+
+  @IsBoolean()
+  @IsOptional()
+  isKeyFunctionary?: boolean;
+
+  @IsString()
+  @IsOptional()
+  keyFunctionaryName?: string;
+
+  @IsInt()
+  @IsOptional()
+  keyFunctionaryPriority?: number;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -155,7 +170,7 @@ export class UpdateFacultyDto {
   @IsOptional()
   department?: string;
 
-   @IsString()
+  @IsString()
   @IsOptional()
   subDepartment?: string;
 

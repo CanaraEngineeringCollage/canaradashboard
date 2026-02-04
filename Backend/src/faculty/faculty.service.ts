@@ -1,7 +1,7 @@
 // src/faculty/faculty.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Raw } from 'typeorm';
+import { Repository, Raw, MoreThanOrEqual } from 'typeorm';
 import { Faculty } from './entities/faculty.entity';
 import { JournalPublication } from './entities/journal-publication.entity';
 import { ConferencePublication } from './entities/conference-publication.entity';
@@ -44,6 +44,16 @@ export class FacultyService {
       .execute();
   }
 
+  private async shiftKeyFunctionaryPriorities(startPriority: number) {
+    await this.facultyRepository
+      .createQueryBuilder()
+      .update(Faculty)
+      .set({ keyFunctionaryPriority: () => 'keyFunctionaryPriority + 1' })
+      .where('isKeyFunctionary = :isKeyFunctionary', { isKeyFunctionary: true })
+      .andWhere('keyFunctionaryPriority >= :startPriority', { startPriority })
+      .execute();
+  }
+
   async create(
     createFacultyDto: CreateFacultyDto,
     avatar?: Express.Multer.File,
@@ -52,6 +62,15 @@ export class FacultyService {
       await this.shiftPriorities(
         createFacultyDto.department,
         createFacultyDto.priority,
+      );
+    }
+
+    if (
+      createFacultyDto.isKeyFunctionary &&
+      createFacultyDto.keyFunctionaryPriority
+    ) {
+      await this.shiftKeyFunctionaryPriorities(
+        createFacultyDto.keyFunctionaryPriority,
       );
     }
 
@@ -240,12 +259,16 @@ export class FacultyService {
     limit,
     all,
     search,
+    keyFunctionary,
+    hod,
   }: {
     department?: string;
     page?: number;
     limit?: number;
     all?: boolean;
     search?: string;
+    keyFunctionary?: boolean;
+    hod?: boolean;
   }) {
     const query = this.facultyRepository
       .createQueryBuilder('faculty')
@@ -260,8 +283,27 @@ export class FacultyService {
       .leftJoinAndSelect(
         'faculty.internationalConferencePublications',
         'internationalConferencePublications',
-      )
-      .orderBy('faculty.createdAt', 'DESC');
+      );
+
+    if (keyFunctionary) {
+      query.andWhere('faculty.isKeyFunctionary = :isKeyFunctionary', {
+        isKeyFunctionary: true,
+      });
+      query.orderBy('faculty.keyFunctionaryPriority', 'ASC');
+    } else {
+      query.orderBy('faculty.createdAt', 'DESC');
+    }
+
+    if (hod) {
+      // Case-insensitive check for 'hod' in designation
+      query.andWhere('LOWER(faculty.designation) LIKE :hodPattern', {
+        hodPattern: '%hod%',
+      });
+      // Sort by department alphabetically only if not sorting by Key Functionary priority
+      if (!keyFunctionary) {
+        query.orderBy('faculty.department', 'ASC');
+      }
+    }
 
     if (department) {
       query.where('faculty.department = :department', { department });
@@ -352,6 +394,22 @@ export class FacultyService {
     ) {
       const department = updateFacultyDto.department || faculty.department;
       await this.shiftPriorities(department, updateFacultyDto.priority);
+    }
+
+    // Shift Key Functionary priorities if priority is updated
+    // Check if the user is or becomes a Key Functionary
+    const isKeyFunctionary =
+      updateFacultyDto.isKeyFunctionary ?? faculty.isKeyFunctionary;
+
+    if (
+      isKeyFunctionary &&
+      updateFacultyDto.keyFunctionaryPriority !== undefined &&
+      updateFacultyDto.keyFunctionaryPriority !== null &&
+      updateFacultyDto.keyFunctionaryPriority !== faculty.keyFunctionaryPriority
+    ) {
+      await this.shiftKeyFunctionaryPriorities(
+        updateFacultyDto.keyFunctionaryPriority,
+      );
     }
 
     Object.assign(faculty, updateFacultyDto);

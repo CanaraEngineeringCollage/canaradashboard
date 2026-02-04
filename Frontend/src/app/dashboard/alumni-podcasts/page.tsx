@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { decryptToken } from "@/lib/encrypt";
 import { api } from "@/lib/axiosClient";
-import { Video, Loader2, Trash2, Pencil, X } from "lucide-react";
+import { Video, Loader2, Trash2, Pencil, X, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
@@ -23,6 +23,7 @@ interface AlumniPodcast {
   id: number;
   title: string;
   url: string;
+  thumbnail: any; // Type for buffer or base64
   createdAt: string;
 }
 
@@ -30,10 +31,13 @@ const AlumniPodcastsPage = () => {
   const [podcasts, setPodcasts] = useState<AlumniPodcast[]>([]);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -86,6 +90,18 @@ const AlumniPodcastsPage = () => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url || !title) return;
@@ -95,23 +111,23 @@ const AlumniPodcastsPage = () => {
       const encrypted = localStorage.getItem("token");
       const token = encrypted ? decryptToken(encrypted) : null;
 
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("url", url);
+      if (selectedImage) {
+        formData.append("thumbnail", selectedImage);
+      }
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      };
+
       if (editingId) {
-        await api.patch(
-          `/alumni/podcast/${editingId}`,
-          { title, url },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        await api.patch(`/alumni/podcast/${editingId}`, formData, { headers });
         toast({ title: "Success", description: "Podcast updated successfully" });
       } else {
-        await api.post(
-          "/alumni/podcast",
-          { title, url },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        await api.post("/alumni/podcast", formData, { headers });
         toast({ title: "Success", description: "Podcast uploaded successfully" });
       }
 
@@ -133,12 +149,16 @@ const AlumniPodcastsPage = () => {
     setTitle(podcast.title);
     setUrl(podcast.url);
     setEditingId(podcast.id);
+    setSelectedImage(null);
+    setImagePreview(getThumbnailSrc(podcast.thumbnail));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancelEdit = () => {
     setTitle("");
     setUrl("");
+    setSelectedImage(null);
+    setImagePreview(null);
     setEditingId(null);
   };
 
@@ -167,6 +187,17 @@ const AlumniPodcastsPage = () => {
     }
   };
 
+  const getThumbnailSrc = (thumbnail: any) => {
+    if (!thumbnail) return null;
+    if (typeof thumbnail === "string") return thumbnail; // If already base64 or url
+    if (thumbnail.type === "Buffer" && Array.isArray(thumbnail.data)) {
+      // Convert buffer array to base64
+      const base64String = Buffer.from(thumbnail.data).toString("base64");
+      return `data:image/jpeg;base64,${base64String}`;
+    }
+    return null;
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       <PageTitle title="Alumni Podcasts" icon={Video} />
@@ -181,32 +212,85 @@ const AlumniPodcastsPage = () => {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
-          <div className="flex-1 space-y-2">
-            <label htmlFor="title" className="text-sm font-medium">
-              Title
-            </label>
-            <Input
-              id="title"
-              placeholder="Podcast Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={submitting}
-            />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 space-y-2">
+              <label htmlFor="title" className="text-sm font-medium">
+                Title
+              </label>
+              <Input id="title" placeholder="Podcast Title" value={title} onChange={(e) => setTitle(e.target.value)} disabled={submitting} />
+            </div>
+            <div className="flex-1 space-y-2">
+              <label htmlFor="url" className="text-sm font-medium">
+                YouTube URL
+              </label>
+              <Input
+                id="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                disabled={submitting}
+              />
+            </div>
           </div>
-          <div className="flex-1 space-y-2">
-            <label htmlFor="url" className="text-sm font-medium">
-              YouTube URL
+
+          <div className="space-y-2">
+            <label htmlFor="thumbnail" className="text-sm font-medium">
+              Thumbnail Image
             </label>
-            <Input
-              id="url"
-              placeholder="https://www.youtube.com/watch?v=..."
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              disabled={submitting}
-            />
+
+            <div
+              className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file) {
+                  const event = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                  handleImageChange(event);
+                }
+              }}
+              onClick={() => document.getElementById("thumbnail")?.click()}
+            >
+              <Upload className={`h-10 w-10 mb-2 ${isDragging ? "text-blue-500" : "text-gray-400"}`} />
+              <p className="text-sm text-gray-600 font-medium">{isDragging ? "Drop the image here" : "Drag & drop image or click to browse"}</p>
+              <p className="text-xs text-gray-400 mt-1">Supports: JPG, PNG, GIF</p>
+              <Input id="thumbnail" type="file" accept="image/*" onChange={handleImageChange} disabled={submitting} className="hidden" />
+            </div>
+
+            {imagePreview && (
+              <div className="mt-4">
+                <p className="text-sm font-medium mb-2">Preview:</p>
+                <div className="relative h-40 w-fit shrink-0 rounded-md overflow-hidden border shadow-sm">
+                  <img src={imagePreview} alt="Preview" className="h-full w-auto object-contain" />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    onClick={() => {
+                      setSelectedImage(null);
+                      setImagePreview(null);
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
-          <Button type="submit" disabled={submitting || !url || !title} className="w-full md:w-auto">
+
+          <Button type="submit" disabled={submitting || !url || !title || (!editingId && !selectedImage)} className="w-full md:w-auto self-start">
             {submitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -230,52 +314,50 @@ const AlumniPodcastsPage = () => {
         ) : podcasts.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No podcasts found.</p>
         ) : (
-          <div className="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Title</th>
-                  <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">URL</th>
-                  <th className="hidden sm:table-cell px-4 md:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Uploaded At</th>
-                  <th className="px-4 md:px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {podcasts.map((podcast) => (
-                  <tr key={podcast.id}>
-                    <td className="px-4 md:px-6 py-4 text-sm font-medium text-gray-900">
-                      <div className="flex flex-col">
-                        <span className=" max-w-[150px] sm:max-w-xs md:max-w-md">{podcast.title}</span>
-                        <a 
-                          href={podcast.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="md:hidden text-xs text-blue-600 hover:underline truncate max-w-[150px] sm:max-w-xs"
-                        >
-                          {podcast.url}
-                        </a>
-                      </div>
-                    </td>
-                    <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:underline truncate max-w-md">
-                      <a href={podcast.url} target="_blank" rel="noopener noreferrer">
-                        {podcast.url}
-                      </a>
-                    </td>
-                    <td className="hidden sm:table-cell px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(podcast.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 md:px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-1 md:space-x-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(podcast)} className="h-8 w-8 text-blue-600 hover:text-blue-900">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(podcast.id)} className="h-8 w-8 text-red-600 hover:text-red-900">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {podcasts.map((podcast) => (
+              <div key={podcast.id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div className="aspect-video bg-gray-100 relative">
+                  {podcast.thumbnail ? (
+                    <img src={getThumbnailSrc(podcast.thumbnail) || ""} alt={podcast.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Video className="h-12 w-12" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg line-clamp-1" title={podcast.title}>
+                    {podcast.title}
+                  </h3>
+                  <a
+                    href={podcast.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline mt-1 block truncate"
+                  >
+                    Watch on YouTube
+                  </a>
+             <p className="text-xs text-gray-500 mt-2">
+  {new Date(podcast.createdAt).toLocaleDateString("en-GB")}
+</p>
+
+                  <div className="mt-4 flex justify-end space-x-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(podcast)}>
+                      <Pencil className="h-4 w-4 mr-2" /> Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteId(podcast.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" /> Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

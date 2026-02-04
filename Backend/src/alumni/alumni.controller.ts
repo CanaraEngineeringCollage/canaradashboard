@@ -1,5 +1,18 @@
 // src/alumni/alumni.controller.ts
-import { Controller, Post, Body, Get, UseGuards, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AlumniService } from './alumni.service';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
 import { CreateAlumniPodcastDto } from './dto/create-alumni-podcast.dto';
@@ -13,7 +26,7 @@ export class AlumniController {
   create(@Body() data: CreateAlumniDto) {
     return this.alumniService.create(data);
   }
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
     @Query('page') page: string = '1',
@@ -22,15 +35,19 @@ export class AlumniController {
     return this.alumniService.findAll(+page, +limit);
   }
   @UseGuards(JwtAuthGuard)
-@Get('count')
-async getCount() {
-  const count = await this.alumniService.countAll();
-  return { count };
-}
-@UseGuards(JwtAuthGuard)
+  @Get('count')
+  async getCount() {
+    const count = await this.alumniService.countAll();
+    return { count };
+  }
+  @UseGuards(JwtAuthGuard)
   @Post('podcast')
-  createPodcast(@Body() data: CreateAlumniPodcastDto) {
-    return this.alumniService.createPodcast(data);
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  createPodcast(
+    @Body() data: CreateAlumniPodcastDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.alumniService.createPodcast(data, file);
   }
 
   @Get('podcast')
@@ -46,13 +63,17 @@ async getCount() {
   }
 
   @Patch('podcast/:id')
-  updatePodcast(@Param('id') id: string, @Body() data: { title: string; url: string }) {
-    return this.alumniService.updatePodcast(+id, data.title, data.url);
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  updatePodcast(
+    @Param('id') id: string,
+    @Body() data: { title: string; url: string },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.alumniService.updatePodcast(+id, data.title, data.url, file);
   }
 
   @Delete('podcast/:id')
   removePodcast(@Param('id') id: string) {
     return this.alumniService.removePodcast(+id);
   }
-
 }

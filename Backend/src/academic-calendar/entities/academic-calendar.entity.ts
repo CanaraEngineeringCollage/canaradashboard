@@ -1,23 +1,23 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
+  Column,
   CreateDateColumn,
 } from 'typeorm';
 
-@Entity('alumni_podcast')
-export class AlumniPodcast {
+@Entity('academic_calendar')
+export class AcademicCalendar {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  title: string;
+  year: string;
 
   @Column()
-  url: string;
+  department: string;
 
   @Column({ type: 'longblob' })
-  thumbnail: Buffer;
+  pdf: Buffer;
 
   @CreateDateColumn()
   createdAt: Date;
