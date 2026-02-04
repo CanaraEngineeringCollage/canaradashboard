@@ -31,15 +31,19 @@ export class AlumniService {
     return { data, total };
   }
   async countAll() {
-  return this.alumniRepo.count();
-}
+    return this.alumniRepo.count();
+  }
 
-async countPodcasts() {
-  return this.podcastRepo.count();
-}
+  async countPodcasts() {
+    return this.podcastRepo.count();
+  }
 
-  createPodcast(data: CreateAlumniPodcastDto) {
+  createPodcast(data: CreateAlumniPodcastDto, file?: Express.Multer.File) {
+    if (!file) {
+      throw new Error('Thumbnail image is required');
+    }
     const podcast = this.podcastRepo.create(data);
+    podcast.thumbnail = file.buffer;
     return this.podcastRepo.save(podcast);
   }
 
@@ -47,18 +51,25 @@ async countPodcasts() {
     return this.podcastRepo.find({ order: { createdAt: 'DESC' } });
   }
 
-  async updatePodcast(id: number, title: string, url: string) {
+  async updatePodcast(
+    id: number,
+    title: string,
+    url: string,
+    file?: Express.Multer.File,
+  ) {
     const podcast = await this.podcastRepo.findOne({ where: { id } });
     if (!podcast) {
       throw new Error('Podcast not found');
     }
     podcast.title = title;
     podcast.url = url;
+    if (file) {
+      podcast.thumbnail = file.buffer;
+    }
     return this.podcastRepo.save(podcast);
   }
 
   async removePodcast(id: number) {
     return this.podcastRepo.delete(id);
   }
-
 }

@@ -19,6 +19,9 @@ import { GalleryModule } from './gallery/gallery.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import { AcademicCalendarModule } from './academic-calendar/academic-calendar.module';
+import { HomePageImagesModule } from './home-page-images/home-page-images.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -47,6 +50,8 @@ import { AppService } from './app.service';
     PlacementModule,
     AdmissionModule,
     GalleryModule,
+    AcademicCalendarModule,
+    HomePageImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

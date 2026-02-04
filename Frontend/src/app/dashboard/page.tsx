@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { PageTitle } from "@/components/page-title";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper, Video, Briefcase, Images } from "lucide-react";
+import { UsersRound, ShieldCheck, GraduationCap, Brain, LayoutDashboard, PartyPopper, Video, Briefcase, Images, Calendar } from "lucide-react";
 import { getAllFaculty, getFacultyCount } from "@/lib/faculty";
 import { getGalleryCount } from "@/lib/gallery";
 import { getGrievances } from "@/lib/grievance";
@@ -27,6 +27,7 @@ export default function DashboardPage() {
   const [admissionCount, setAdmissionCount] = useState<number | null>(null);
   const [galleryCount, setGalleryCount] = useState<number | null>(null);
   const [topRecruitersCount, setTopRecruitersCount] = useState<number | null>(null);
+  const [academicCalendarCount, setAcademicCalendarCount] = useState<number | null>(null);
 
   const router = useRouter();
 
@@ -186,6 +187,19 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchAcademicCalendarCount = async () => {
+    const token = getToken();
+    if (!token) return router.push("/login");
+    try {
+      const data = await apiFetch("/academic-calendar/count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAcademicCalendarCount(data.count);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchAllData();
     fetchGrievanceCounts();
@@ -198,6 +212,7 @@ export default function DashboardPage() {
     fetchAdmissionCount();
     fetchGalleryCount();
     fetchTopRecruitersCount();
+    fetchAcademicCalendarCount();
   }, []);
 
   // 🔹 Reusable card with skeleton
@@ -238,6 +253,7 @@ export default function DashboardPage() {
         <StatCard title="Gallery" icon={Images} count={galleryCount} description="Total images in gallery" />
         <StatCard title="Buzz" icon={Brain} count={buzzCount} description="Number of Buzz" />
         <StatCard title="Top Recruiters" icon={Briefcase} count={topRecruitersCount} description="Total top recruiters" />
+        <StatCard title="Academic Calendar" icon={Calendar} count={academicCalendarCount} description="Total academic calendars" />
 
         <StatCard title="Admission Enquiries" icon={UsersRound} count={admissionCount} description="Total admission enquiries received" />
 

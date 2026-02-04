@@ -17,6 +17,7 @@ import {
   Briefcase,
   UserCheck,
   Images,
+  Calendar,
 } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
@@ -32,8 +33,10 @@ const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/faculty", label: "Faculty", icon: UsersRound },
   { href: "/dashboard/events", label: "Events", icon: UserCog },
+  { href: "/dashboard/academic-calendar", label: "Academic Calendar", icon: Calendar },
   //  { href: "/dashboard/exam-timetable", label: "Exam Timetable", icon: BookOpenCheck },
   { href: "/dashboard/gallery", label: "Gallery", icon: Images },
+  { href: "/dashboard/hero-banners", label: "Hero Banners", icon: Images },
 
   { href: "/dashboard/buzz", label: "Buzz", icon: Newspaper },
   { href: "/dashboard/placement/top-recruiters", label: "Top Recruiters", icon: Briefcase },
@@ -67,7 +70,7 @@ export function SidebarNavItems() {
                 "justify-start",
                 pathname === item.href || (item.href !== "/dashboard" && "/dashboard" && pathname === item.href)
                   ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
-                  : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
               tooltip={item.label}
             >
