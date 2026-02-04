@@ -63,12 +63,19 @@ export class FacultyController {
     @Query('limit') limit: string = '10',
     @Query('all') all?: string, // New query param to fetch all
     @Query('search') search?: string,
+    @Query('keyFunctionary') keyFunctionary?: string,
+    @Query('hod') hod?: string,
   ) {
+    const isKeyFunctionary = keyFunctionary === 'true';
+    const isHod = hod === 'true';
+
     if (all === 'true') {
       return await this.facultyService.findAll({
         department,
         all: true,
         search,
+        keyFunctionary: isKeyFunctionary,
+        hod: isHod,
       });
     }
 
@@ -87,6 +94,8 @@ export class FacultyController {
       page: pageNum,
       limit: limitNum,
       search,
+      keyFunctionary: isKeyFunctionary,
+      hod: isHod,
     });
   }
   @Get('departments')

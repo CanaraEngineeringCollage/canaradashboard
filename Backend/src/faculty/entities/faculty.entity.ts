@@ -30,17 +30,16 @@ export class Faculty {
   @Column({ nullable: true })
   email?: string;
 
-  @Column({ type: 'date',nullable: true })
+  @Column({ type: 'date', nullable: true })
   joiningDate: Date;
 
   @Column()
   experience: string;
-  
+
   @CreateDateColumn()
   createdAt: Date;
 
-
-   @Column({ nullable: true })
+  @Column({ nullable: true })
   subDepartment?: string; // New field for sub-department
 
   @Column({ type: 'enum', enum: ['Regular', 'Contract', 'Visiting'] })
@@ -55,13 +54,22 @@ export class Faculty {
   @Column({ type: 'longblob', nullable: true })
   avatar: Buffer;
 
+  @Column({ type: 'boolean', default: false })
+  isKeyFunctionary: boolean;
+
+  @Column({ nullable: true })
+  keyFunctionaryName: string;
+
+  @Column({ type: 'int', nullable: true })
+  keyFunctionaryPriority: number;
+
   @OneToMany(() => Qualification, (qualification) => qualification.faculty, {
     cascade: true,
   })
   qualifications: Qualification[];
 
-  @OneToMany(() => Achievement, (achievement) => achievement.faculty, { 
-    cascade: true 
+  @OneToMany(() => Achievement, (achievement) => achievement.faculty, {
+    cascade: true,
   })
   achievements: Achievement[];
 
