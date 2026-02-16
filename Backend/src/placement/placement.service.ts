@@ -70,7 +70,7 @@ export class PlacementService implements OnModuleInit {
       where: whereCondition,
       skip,
       take: limit,
-      order: { count: 'DESC' },
+      order: { studentsRecruited: 'DESC' },
     });
 
     return {

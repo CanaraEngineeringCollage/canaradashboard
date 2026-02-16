@@ -22,16 +22,6 @@ import { Response } from 'express';
 export class AcademicCalendarController {
   constructor(private readonly service: AcademicCalendarService) {}
 
-  @Get('departments')
-  async getAvailableDepartments() {
-    return this.service.getAvailableDepartments();
-  }
-
-  @Get('years')
-  async getAvailableYears() {
-    return this.service.getAvailableYears();
-  }
-
   @Post()
   @UseInterceptors(FileInterceptor('pdf'))
   create(
@@ -42,48 +32,13 @@ export class AcademicCalendarController {
   }
 
   @Get()
-  async findAll(
-    @Query('department') department?: string,
-    @Query('year') year?: string,
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-    @Query('search') search?: string,
-  ) {
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-
-    if (isNaN(pageNum) || pageNum < 1)
-      throw new BadRequestException('Invalid page number');
-    if (isNaN(limitNum) || limitNum < 1)
-      throw new BadRequestException('Invalid limit');
-
-    return this.service.findAll({
-      department,
-      year,
-      page: pageNum,
-      limit: limitNum,
-      search,
-    });
-  }
-
-  @Get('count')
-  async getCount(@Query('department') department?: string) {
-    const count = await this.service.countAll(department);
-    return { count };
+  async findOne() {
+    return this.service.findOne();
   }
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('pdf'))
-  update(
-    @Param('id') id: string,
-    @Body() body: { year: string; department: string },
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.service.update(+id, body.year, body.department, file);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.service.remove(+id);
+  update(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    return this.service.update(+id, file);
   }
 }

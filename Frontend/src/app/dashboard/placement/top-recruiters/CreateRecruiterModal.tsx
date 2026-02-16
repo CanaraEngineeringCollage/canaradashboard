@@ -20,7 +20,7 @@ const CreateRecruiterModal: React.FC<CreateRecruiterModalProps> = ({ open, onOpe
   const [mode, setMode] = useState("");
   const [type, setType] = useState("");
   const [packageLpa, setPackageLpa] = useState("");
-  const [count, setCount] = useState("");
+  const [studentsRecruited, setStudentsRecruited] = useState("");
   const [year, setYear] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +43,7 @@ const CreateRecruiterModal: React.FC<CreateRecruiterModalProps> = ({ open, onOpe
           mode,
           type,
           package: packageLpa,
-          count: parseInt(count, 10),
+          studentsRecruited: parseInt(studentsRecruited, 10),
           year,
         }),
       });
@@ -54,7 +54,7 @@ const CreateRecruiterModal: React.FC<CreateRecruiterModalProps> = ({ open, onOpe
       setMode("");
       setType("");
       setPackageLpa("");
-      setCount("");
+      setStudentsRecruited("");
       setYear("");
       onSuccess();
     } catch (error) {
@@ -131,14 +131,14 @@ const CreateRecruiterModal: React.FC<CreateRecruiterModalProps> = ({ open, onOpe
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="count-create" className="text-right">
-                Count
+              <Label htmlFor="studentsRecruited-create" className="text-right">
+                Students Recruited
               </Label>
               <input
-                id="count-create"
+                id="studentsRecruited-create"
                 type="number"
-                value={count}
-                onChange={(e) => setCount(e.target.value)}
+                value={studentsRecruited}
+                onChange={(e) => setStudentsRecruited(e.target.value)}
                 className="col-span-3 border rounded p-2 outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />

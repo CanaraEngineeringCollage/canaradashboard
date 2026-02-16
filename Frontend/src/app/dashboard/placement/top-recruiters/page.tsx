@@ -18,7 +18,7 @@ export type TopRecruiter = {
   mode: string;
   type: string;
   package: string;
-  count: number;
+  studentsRecruited: number;
   year: string;
 };
 
@@ -204,7 +204,7 @@ export default function TopRecruitersPage() {
                 <th className="px-4 py-2 text-left">On Campus/Pool</th>
                 <th className="px-4 py-2 text-left">Type of Company</th>
                 <th className="px-4 py-2 text-left">Package (LPA)</th>
-                <th className="px-4 py-2 text-left">Grand Total</th>
+                <th className="px-4 py-2 text-left">Total students recruited</th>
                 <th className="px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
@@ -216,7 +216,7 @@ export default function TopRecruitersPage() {
                   <td className="px-4 py-2">{item.mode}</td>
                   <td className="px-4 py-2">{item.type}</td>
                   <td className="px-4 py-2">{item.package}</td>
-                  <td className="px-4 py-2">{item.count}</td>
+                  <td className="px-4 py-2">{item.studentsRecruited}</td>
                   <td className="px-4 py-2 flex">
                     <button onClick={() => handleEdit(item)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
                       Edit

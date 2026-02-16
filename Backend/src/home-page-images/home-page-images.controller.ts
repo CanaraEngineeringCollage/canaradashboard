@@ -6,12 +6,13 @@ import {
   Param,
   Delete,
   UseInterceptors,
-  UploadedFile,
+  UploadedFiles,
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  BadRequestException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { HomePageImagesService } from './home-page-images.service';
 import { CreateHomePageImageDto } from './dto/create-home-page-image.dto';
 
@@ -20,20 +21,30 @@ export class HomePageImagesController {
   constructor(private readonly service: HomePageImagesService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'image', maxCount: 1 },
+      { name: 'mobileImage', maxCount: 1 },
+    ]),
+  )
   create(
     @Body() dto: CreateHomePageImageDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
-          new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp|jpg)$/ }),
-        ],
-      }),
-    )
-    image: Express.Multer.File,
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      mobileImage?: Express.Multer.File[];
+    },
   ) {
-    return this.service.create(dto, image);
+    const imageFile = files.image?.[0];
+    const mobileImageFile = files.mobileImage?.[0];
+
+    if (!imageFile || !mobileImageFile) {
+      throw new BadRequestException(
+        'Both desktop and mobile images are required',
+      );
+    }
+
+    return this.service.create(dto, imageFile, mobileImageFile);
   }
 
   @Get()
