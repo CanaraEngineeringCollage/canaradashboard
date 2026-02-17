@@ -63,6 +63,15 @@ export class Faculty {
   @Column({ type: 'int', nullable: true })
   keyFunctionaryPriority: number;
 
+  @Column({ type: 'boolean', default: false })
+  isHod: boolean;
+
+  @Column({ nullable: true })
+  hodName: string;
+
+  @Column({ type: 'int', nullable: true })
+  hodPriority: number;
+
   @OneToMany(() => Qualification, (qualification) => qualification.faculty, {
     cascade: true,
   })

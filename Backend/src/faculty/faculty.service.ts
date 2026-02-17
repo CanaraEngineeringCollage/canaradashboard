@@ -54,6 +54,16 @@ export class FacultyService {
       .execute();
   }
 
+  private async shiftHodPriorities(startPriority: number) {
+    await this.facultyRepository
+      .createQueryBuilder()
+      .update(Faculty)
+      .set({ hodPriority: () => 'hodPriority + 1' })
+      .where('isHod = :isHod', { isHod: true })
+      .andWhere('hodPriority >= :startPriority', { startPriority })
+      .execute();
+  }
+
   async create(
     createFacultyDto: CreateFacultyDto,
     avatar?: Express.Multer.File,
@@ -72,6 +82,10 @@ export class FacultyService {
       await this.shiftKeyFunctionaryPriorities(
         createFacultyDto.keyFunctionaryPriority,
       );
+    }
+
+    if (createFacultyDto.isHod && createFacultyDto.hodPriority) {
+      await this.shiftHodPriorities(createFacultyDto.hodPriority);
     }
 
     const faculty = this.facultyRepository.create(createFacultyDto);
@@ -295,14 +309,9 @@ export class FacultyService {
     }
 
     if (hod) {
-      // Case-insensitive check for 'hod' in designation
-      query.andWhere('LOWER(faculty.designation) LIKE :hodPattern', {
-        hodPattern: '%hod%',
-      });
-      // Sort by department alphabetically only if not sorting by Key Functionary priority
-      if (!keyFunctionary) {
-        query.orderBy('faculty.department', 'ASC');
-      }
+      // Filter by isHod flag
+      query.andWhere('faculty.isHod = :isHod', { isHod: true });
+      query.orderBy('faculty.hodPriority', 'ASC');
     }
 
     if (department) {
@@ -410,6 +419,18 @@ export class FacultyService {
       await this.shiftKeyFunctionaryPriorities(
         updateFacultyDto.keyFunctionaryPriority,
       );
+    }
+
+    // Shift HOD priorities if priority is updated
+    const isHod = updateFacultyDto.isHod ?? faculty.isHod;
+
+    if (
+      isHod &&
+      updateFacultyDto.hodPriority !== undefined &&
+      updateFacultyDto.hodPriority !== null &&
+      updateFacultyDto.hodPriority !== faculty.hodPriority
+    ) {
+      await this.shiftHodPriorities(updateFacultyDto.hodPriority);
     }
 
     Object.assign(faculty, updateFacultyDto);
