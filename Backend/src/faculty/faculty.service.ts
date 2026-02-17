@@ -1,5 +1,9 @@
 // src/faculty/faculty.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Raw, MoreThanOrEqual } from 'typeorm';
 import { Faculty } from './entities/faculty.entity';
@@ -84,8 +88,23 @@ export class FacultyService {
       );
     }
 
-    if (createFacultyDto.isHod && createFacultyDto.hodPriority) {
-      await this.shiftHodPriorities(createFacultyDto.hodPriority);
+    if (createFacultyDto.isHod) {
+      const existingHod = await this.facultyRepository.findOne({
+        where: {
+          department: createFacultyDto.department,
+          isHod: true,
+        },
+      });
+
+      if (existingHod) {
+        throw new BadRequestException(
+          `An HOD already exists for the department ${createFacultyDto.department}`,
+        );
+      }
+
+      if (createFacultyDto.hodPriority) {
+        await this.shiftHodPriorities(createFacultyDto.hodPriority);
+      }
     }
 
     const faculty = this.facultyRepository.create(createFacultyDto);
@@ -315,7 +334,7 @@ export class FacultyService {
     }
 
     if (department) {
-      query.where('faculty.department = :department', { department });
+      query.andWhere('faculty.department = :department', { department });
     }
 
     if (search) {
@@ -430,6 +449,31 @@ export class FacultyService {
       updateFacultyDto.hodPriority !== null &&
       updateFacultyDto.hodPriority !== faculty.hodPriority
     ) {
+      // Check if trying to set as HOD
+      if (isHod) {
+        // If the user was NOT HOD before, OR if they are changing departments (unlikely but possible)
+        // We need to check if there's already an HOD in the target department
+        const targetDepartment =
+          updateFacultyDto.department || faculty.department;
+
+        // If 'isHod' is being set to true (or matches existing true), we must check for conflicts
+        // We only need to check if we are *changing* the HOD status to true, or if we represent an existing HOD
+        // But specifically, if we are saving as isHod=true, no other person in this dept should be HOD.
+        // We must exclude ourselves from the check.
+        const existingHod = await this.facultyRepository.findOne({
+          where: {
+            department: targetDepartment,
+            isHod: true,
+          },
+        });
+
+        if (existingHod && existingHod.id !== id) {
+          throw new BadRequestException(
+            `An HOD already exists for the department ${targetDepartment}`,
+          );
+        }
+      }
+
       await this.shiftHodPriorities(updateFacultyDto.hodPriority);
     }
 

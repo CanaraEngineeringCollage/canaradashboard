@@ -375,7 +375,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
         if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
         if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
+        if (faculty.isKeyFunctionary && (!faculty.keyFunctionaryName || faculty.keyFunctionaryName.trim() === "")) {
+          newErrors.keyFunctionaryName = "Key Functionary Name is required";
+        }
+
         if (!faculty.type) newErrors.type = "Type is required";
+
+        if (faculty.isHod && (!faculty.hodName || faculty.hodName.trim() === "")) {
+          newErrors.hodName = "Department Name (HOD) is required";
+        }
       }
     }
     if (currentStep === 2) {
@@ -1263,6 +1271,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                         placeholder="e.g. Dean"
                         className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      {errors.keyFunctionaryName && <p className="text-red-500 text-sm mt-1">{errors.keyFunctionaryName}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">Key Functionary Priority *</label>
@@ -1316,6 +1325,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                         placeholder="e.g. Head of Department"
                         className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      {errors.hodName && <p className="text-red-500 text-sm mt-1">{errors.hodName}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">HOD Priority *</label>
@@ -1994,7 +2004,7 @@ const Page: React.FC = () => {
           console.error("Error adding faculty:", error);
           toast({
             title: "Error",
-            description: "Failed to add faculty.",
+            description: error.message || "Failed to add faculty.",
             variant: "destructive",
           });
         });
@@ -2027,7 +2037,7 @@ const Page: React.FC = () => {
           console.error("Error updating faculty:", error);
           toast({
             title: "Error",
-            description: "Failed to update faculty.",
+            description: error.message || "Failed to update faculty.",
             variant: "destructive",
           });
         });

@@ -81,6 +81,7 @@ export default function BuzzPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingBuzz, setEditingBuzz] = useState<Buzz | null>(null);
@@ -140,6 +141,7 @@ export default function BuzzPage() {
   }, [currentPage, limit, category, search]);
 
   const fetchBuzzes = async (page: number, limit: number, categoryFilter: string, searchTerm: string) => {
+    setIsLoading(true);
     try {
       const response = await getAllBuzz(page, limit, categoryFilter, searchTerm);
       setBuzzes(response.data);
@@ -151,6 +153,8 @@ export default function BuzzPage() {
         description: "Failed to load buzzes. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -234,84 +238,90 @@ export default function BuzzPage() {
       </div>
 
       <div className="space-y-6">
-        {buzzes.map((buzz) => {
-          const { title, excerpt, image } = extractContent(buzz.content);
+        {isLoading ? (
+          <div className="text-center py-12 text-muted-foreground">Loading buzz...</div>
+        ) : (
+          <>
+            {buzzes.map((buzz) => {
+              const { title, excerpt, image } = extractContent(buzz.content);
 
-          return (
-            <div key={buzz.id} className="rounded-lg border bg-card p-6 shadow-sm">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Image</th>}
-                    <th className="border border-gray-300 p-2">Name</th>
-                    {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Description</th>}
-                    <th className="border border-gray-300 p-2">Category</th>
-                    {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Event Date</th>}
-                    {buzz.category === "Newsletter" && <th className="border border-gray-300 p-2">Resource</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {buzz.category !== "Newsletter" && (
-                      <td className="border border-gray-300 p-2 text-center">
-                        {image && <img src={image} alt={title} className="w-32 h-20 object-cover rounded-md" />}
-                      </td>
-                    )}
-                    <td className="border border-gray-300 p-2 align-top">
-                      <h2 className="text-lg font-semibold">{buzz.eventName}</h2>
-                    </td>
-                    {buzz.category !== "Newsletter" && (
-                      <td className="border border-gray-300 p-2 align-top">
-                        <p className="text-sm text-muted-foreground">{excerpt}</p>
-                      </td>
-                    )}
-                    <td className="border border-gray-300 p-2 align-top">
-                      <p className="text-sm text-muted-foreground">{buzz.category || "-"}</p>
-                    </td>
-                    {buzz.category !== "Newsletter" && (
-                      <td className="border border-gray-300 p-2 align-top">
-                        <p className="text-sm text-muted-foreground">{buzz.eventDate ? new Date(buzz.eventDate).toLocaleDateString() : "N/A"}</p>
-                      </td>
-                    )}
-                    {buzz.category === "Newsletter" && (
-                      <td className="border border-gray-300 p-2 align-top">
-                        {buzz.newsLetter ? (
-                          <a
-                            href={`${process.env.NEXT_PUBLIC_API_URL}/files/${buzz.newsLetter}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-blue-600 hover:underline text-sm block"
-                          >
-                            View PDF
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">-</span>
+              return (
+                <div key={buzz.id} className="rounded-lg border bg-card p-6 shadow-sm">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr>
+                        {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Image</th>}
+                        <th className="border border-gray-300 p-2">Name</th>
+                        {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Description</th>}
+                        <th className="border border-gray-300 p-2">Category</th>
+                        {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Event Date</th>}
+                        {buzz.category === "Newsletter" && <th className="border border-gray-300 p-2">Resource</th>}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        {buzz.category !== "Newsletter" && (
+                          <td className="border border-gray-300 p-2 text-center">
+                            {image && <img src={image} alt={title} className="w-32 h-20 object-cover rounded-md" />}
+                          </td>
                         )}
-                      </td>
-                    )}
-                  </tr>
-                </tbody>
-              </table>
+                        <td className="border border-gray-300 p-2 align-top">
+                          <h2 className="text-lg font-semibold">{buzz.eventName}</h2>
+                        </td>
+                        {buzz.category !== "Newsletter" && (
+                          <td className="border border-gray-300 p-2 align-top">
+                            <p className="text-sm text-muted-foreground">{excerpt}</p>
+                          </td>
+                        )}
+                        <td className="border border-gray-300 p-2 align-top">
+                          <p className="text-sm text-muted-foreground">{buzz.category || "-"}</p>
+                        </td>
+                        {buzz.category !== "Newsletter" && (
+                          <td className="border border-gray-300 p-2 align-top">
+                            <p className="text-sm text-muted-foreground">{buzz.eventDate ? new Date(buzz.eventDate).toLocaleDateString() : "N/A"}</p>
+                          </td>
+                        )}
+                        {buzz.category === "Newsletter" && (
+                          <td className="border border-gray-300 p-2 align-top">
+                            {buzz.newsLetter ? (
+                              <a
+                                href={`${process.env.NEXT_PUBLIC_API_URL}/files/${buzz.newsLetter}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 hover:underline text-sm block"
+                              >
+                                View PDF
+                              </a>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    </tbody>
+                  </table>
 
-              <div className="mt-4 flex justify-between items-center text-sm text-muted-foreground">
-                <div>Last updated: {new Date(buzz.updatedAt).toLocaleDateString()}</div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setDeleteBuzzId(buzz.id)}>
-                    Delete
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleEditBuzz(buzz)}>
-                    Edit
-                  </Button>
+                  <div className="mt-4 flex justify-between items-center text-sm text-muted-foreground">
+                    <div>Last updated: {new Date(buzz.updatedAt).toLocaleDateString()}</div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setDeleteBuzzId(buzz.id)}>
+                        Delete
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleEditBuzz(buzz)}>
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
 
-        {buzzes.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            No buzz items found. Try changing filters or click &quot;Add Buzz&quot; to create one.
-          </div>
+            {buzzes.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                No buzz items found. Try changing filters or click &quot;Add Buzz&quot; to create one.
+              </div>
+            )}
+          </>
         )}
       </div>
 
