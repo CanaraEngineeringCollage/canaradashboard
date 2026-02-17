@@ -121,6 +121,18 @@ export class CreateFacultyDto {
   @IsOptional()
   keyFunctionaryPriority?: number;
 
+  @IsBoolean()
+  @IsOptional()
+  isHod?: boolean;
+
+  @IsString()
+  @IsOptional()
+  hodName?: string;
+
+  @IsInt()
+  @IsOptional()
+  hodPriority?: number;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateQualificationDto)

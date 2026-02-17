@@ -8,17 +8,13 @@ export interface Buzz {
   category: string;
   eventDate?: string;
   eventName?: string;
+  newsLetter?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 // ✅ Updated: supports category + search filters
-export const getAllBuzz = (
-  page: number = 1,
-  limit: number = 10,
-  category: string = "",
-  search: string = ""
-) => {
+export const getAllBuzz = (page: number = 1, limit: number = 10, category: string = "", search: string = "") => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -51,13 +47,7 @@ export const deleteBuzz = (id: string) => {
   });
 };
 
-export const createBuzz = (
-  content: string,
-  design: object,
-  category: string,
-  eventDate: string,
-  eventName: string
-) => {
+export const createBuzz = (content: string, design: object, category: string, eventDate: string, eventName: string, newsLetter?: string) => {
   const encrypted = localStorage.getItem("token");
   const token = encrypted ? decryptToken(encrypted) : null;
 
@@ -74,6 +64,7 @@ export const createBuzz = (
       category,
       eventDate,
       eventName,
+      newsLetter,
     }),
   });
 };
@@ -84,7 +75,8 @@ export const editBuzz = (
   design: object,
   category: string,
   eventDate: string,
-  eventName: string
+  eventName: string,
+  newsLetter?: string,
 ) => {
   const encrypted = localStorage.getItem("token");
   const token = encrypted ? decryptToken(encrypted) : null;
@@ -102,6 +94,7 @@ export const editBuzz = (
       category,
       eventDate,
       eventName,
+      newsLetter,
     }),
   });
 };

@@ -3,6 +3,6 @@ export class CreateTopRecruiterDto {
   mode: string;
   type: string;
   package: string;
-  count: number;
+  studentsRecruited: number;
   year: string;
 }

@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsObject, IsIn, IsDateString, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsObject,
+  IsIn,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
 export class CreateBuzzDto {
@@ -23,18 +30,20 @@ export class CreateBuzzDto {
     'CSR',
     'Alumni',
     'Career Guidance',
-    'Student Achievements'
+    'Student Achievements',
+    'Newsletter',
   ])
   category: string;
-  
+
   @IsString()
   @IsNotEmpty()
   eventName: string;
 
-
+  @IsOptional()
+  newsLetter?: string;
 
   @IsOptional()
   @IsDateString()
-  @Transform(({ value }) => value === "" ? null : value)
+  @Transform(({ value }) => (value === '' ? null : value))
   eventDate?: string;
 }

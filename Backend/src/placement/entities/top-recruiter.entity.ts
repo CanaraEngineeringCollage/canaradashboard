@@ -18,7 +18,7 @@ export class TopRecruiter {
   package: string;
 
   @Column()
-  count: number;
+  studentsRecruited: number;
 
   @Column()
   year: string;

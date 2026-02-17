@@ -11,10 +11,19 @@ export class HomePageImagesService {
     private repo: Repository<HomePageImage>,
   ) {}
 
-  async create(dto: CreateHomePageImageDto, imageFile: Express.Multer.File) {
+  async create(
+    dto: CreateHomePageImageDto,
+    imageFile: Express.Multer.File,
+    mobileImageFile: Express.Multer.File,
+  ) {
+    if (!imageFile || !mobileImageFile) {
+      throw new Error('Both desktop and mobile images are required');
+    }
+
     const image = this.repo.create({
       ...dto,
       image: imageFile.buffer,
+      mobileImage: mobileImageFile.buffer,
     });
     return this.repo.save(image);
   }

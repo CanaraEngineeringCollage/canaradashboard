@@ -38,6 +38,9 @@ interface Faculty {
   isKeyFunctionary?: boolean;
   keyFunctionaryName?: string;
   keyFunctionaryPriority?: number | null;
+  isHod?: boolean;
+  hodName?: string;
+  hodPriority?: number | null;
 }
 
 interface Qualification {
@@ -134,12 +137,16 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     isKeyFunctionary: false,
     keyFunctionaryName: "",
     keyFunctionaryPriority: null,
+    isHod: false,
+    hodName: "",
+    hodPriority: null,
   };
   const [faculty, setFaculty] = useState<Faculty>(initialFaculty);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [availableKeyFunctionaryPriorities, setAvailableKeyFunctionaryPriorities] = useState<number[]>([]);
+  const [availableHodPriorities, setAvailableHodPriorities] = useState<number[]>([]);
 
   useEffect(() => {
     const loadAvailablePriorities = async () => {
@@ -192,11 +199,32 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       }
     };
 
+    const loadHodPriorities = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/faculty?hod=true&all=true`);
+        if (response.ok) {
+          const hods: Faculty[] = await response.json();
+          const maxHodPriority = hods.length + 1;
+          const list: number[] = [];
+          for (let i = 1; i <= maxHodPriority; i++) {
+            list.push(i);
+          }
+          setAvailableHodPriorities(list);
+        }
+      } catch (e) {
+        console.error(e);
+        setAvailableHodPriorities(Array.from({ length: 20 }, (_, i) => i + 1));
+      }
+    };
+
     loadAvailablePriorities();
     if (faculty.isKeyFunctionary) {
       loadKeyFunctionaryPriorities();
     }
-  }, [faculty.department, faculty.id, API_BASE_URL, faculty.isKeyFunctionary]);
+    if (faculty.isHod) {
+      loadHodPriorities();
+    }
+  }, [faculty.department, faculty.id, API_BASE_URL, faculty.isKeyFunctionary, faculty.isHod]);
 
   useEffect(() => {
     if (mode === "add" && faculty.department) {
@@ -347,7 +375,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         if (!faculty.experience || faculty.experience.trim() === "") newErrors.experience = "Experience is required";
         if (!faculty.employmentType) newErrors.employmentType = "Employment type is required";
         if (mode === "add" && !faculty.avatar && !avatarFile) newErrors.avatar = "Avatar is required";
+        if (faculty.isKeyFunctionary && (!faculty.keyFunctionaryName || faculty.keyFunctionaryName.trim() === "")) {
+          newErrors.keyFunctionaryName = "Key Functionary Name is required";
+        }
+
         if (!faculty.type) newErrors.type = "Type is required";
+
+        if (faculty.isHod && (!faculty.hodName || faculty.hodName.trim() === "")) {
+          newErrors.hodName = "Department Name (HOD) is required";
+        }
       }
     }
     if (currentStep === 2) {
@@ -599,6 +635,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
       setFaculty({ ...faculty, isKeyFunctionary: (e.target as HTMLInputElement).checked });
     } else if (name === "keyFunctionaryPriority") {
       setFaculty({ ...faculty, keyFunctionaryPriority: parseInt(value, 10) || null });
+    } else if (name === "isHod") {
+      setFaculty({ ...faculty, isHod: (e.target as HTMLInputElement).checked });
+    } else if (name === "hodPriority") {
+      setFaculty({ ...faculty, hodPriority: parseInt(value, 10) || null });
     } else {
       setFaculty({ ...faculty, [name]: value });
       if (name === "department" && value !== "Science & Humanities") {
@@ -1228,9 +1268,10 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                         name="keyFunctionaryName"
                         value={faculty.keyFunctionaryName || ""}
                         onChange={handleInputChange}
-                        placeholder="e.g. Dean, HOD"
+                        placeholder="e.g. Dean"
                         className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      {errors.keyFunctionaryName && <p className="text-red-500 text-sm mt-1">{errors.keyFunctionaryName}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">Key Functionary Priority *</label>
@@ -1243,6 +1284,60 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                         <option value="">Select Priority</option>
                         {availableKeyFunctionaryPriorities.length > 0
                           ? availableKeyFunctionaryPriorities.map((p) => (
+                              <option key={p} value={p}>
+                                {p}
+                              </option>
+                            ))
+                          : Array.from({ length: 20 }, (_, i) => i + 1).map((p) => (
+                              <option key={p} value={p}>
+                                {p}
+                              </option>
+                            ))}
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Lower number = Higher Priority (appears first)</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center mb-4 mt-4">
+                  <input
+                    type="checkbox"
+                    name="isHod"
+                    id="isHod"
+                    checked={faculty.isHod || false}
+                    onChange={handleInputChange}
+                    className="mr-2 h-4 w-4"
+                  />
+                  <label htmlFor="isHod" className="font-medium">
+                    Is HOD?
+                  </label>
+                </div>
+
+                {faculty.isHod && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Department Name*</label>
+                      <input
+                        type="text"
+                        name="hodName"
+                        value={faculty.hodName || ""}
+                        onChange={handleInputChange}
+                        placeholder="e.g. Head of Department"
+                        className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      {errors.hodName && <p className="text-red-500 text-sm mt-1">{errors.hodName}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">HOD Priority *</label>
+                      <select
+                        name="hodPriority"
+                        value={faculty.hodPriority || ""}
+                        onChange={handleInputChange}
+                        className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Priority</option>
+                        {availableHodPriorities.length > 0
+                          ? availableHodPriorities.map((p) => (
                               <option key={p} value={p}>
                                 {p}
                               </option>
@@ -1909,7 +2004,7 @@ const Page: React.FC = () => {
           console.error("Error adding faculty:", error);
           toast({
             title: "Error",
-            description: "Failed to add faculty.",
+            description: error.message || "Failed to add faculty.",
             variant: "destructive",
           });
         });
@@ -1942,7 +2037,7 @@ const Page: React.FC = () => {
           console.error("Error updating faculty:", error);
           toast({
             title: "Error",
-            description: "Failed to update faculty.",
+            description: error.message || "Failed to update faculty.",
             variant: "destructive",
           });
         });

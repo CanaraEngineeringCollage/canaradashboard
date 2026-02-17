@@ -22,7 +22,7 @@ const EditRecruiterModal: React.FC<EditRecruiterModalProps> = ({ open, onOpenCha
   const [mode, setMode] = useState("On Campus");
   const [type, setType] = useState("IT");
   const [packageLpa, setPackageLpa] = useState("");
-  const [count, setCount] = useState("");
+  const [studentsRecruited, setStudentsRecruited] = useState("");
   const [year, setYear] = useState("2022");
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +32,7 @@ const EditRecruiterModal: React.FC<EditRecruiterModalProps> = ({ open, onOpenCha
       setMode(data.mode);
       setType(data.type);
       setPackageLpa(data.package);
-      setCount(data.count.toString());
+      setStudentsRecruited(data.studentsRecruited.toString());
       setYear(data.year);
     }
   }, [data]);
@@ -57,7 +57,7 @@ const EditRecruiterModal: React.FC<EditRecruiterModalProps> = ({ open, onOpenCha
           mode,
           type,
           package: packageLpa,
-          count: parseInt(count, 10),
+          studentsRecruited: parseInt(studentsRecruited, 10),
           year,
         }),
       });
@@ -134,14 +134,14 @@ const EditRecruiterModal: React.FC<EditRecruiterModalProps> = ({ open, onOpenCha
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="count-edit" className="text-right">
-                Count
+              <Label htmlFor="studentsRecruited-edit" className="text-right">
+                Students Recruited
               </Label>
               <input
-                id="count-edit"
+                id="studentsRecruited-edit"
                 type="number"
-                value={count}
-                onChange={(e) => setCount(e.target.value)}
+                value={studentsRecruited}
+                onChange={(e) => setStudentsRecruited(e.target.value)}
                 className="col-span-3 border rounded p-2 outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />

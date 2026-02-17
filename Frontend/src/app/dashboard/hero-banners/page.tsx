@@ -110,12 +110,21 @@ const HomePageImagesPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {images.map((img) => (
           <div key={img.id} className="border rounded-lg overflow-hidden shadow-sm relative group">
-            <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+            <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden relative">
               {img.image ? (
-                <img src={bufferToBase64(img.image) || ""} alt="Home Page Image" className="w-full h-full object-cover" />
+                <img src={bufferToBase64(img.image) || ""} alt="Desktop Banner" className="w-full h-full object-cover" />
               ) : (
-                <div className="text-gray-400">No Image</div>
+                <div className="text-gray-400">No Desktop Image</div>
               )}
+
+              {/* Mobile Image Overlay (bottom right corner) */}
+              <div className="absolute bottom-2 right-2 w-16 h-24 border-2 border-white shadow-md bg-gray-200 overflow-hidden rounded-md z-10 hover:scale-150 transition-transform origin-bottom-right">
+                {img.mobileImage ? (
+                  <img src={bufferToBase64(img.mobileImage) || ""} alt="Mobile Banner" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-[8px] text-gray-500 text-center p-1">No Mobile</div>
+                )}
+              </div>
             </div>
             <div className="p-4 flex justify-end items-center bg-white">
               <Button variant="destructive" size="icon" className="h-8 w-8" onClick={() => confirmDelete(img.id)}>
