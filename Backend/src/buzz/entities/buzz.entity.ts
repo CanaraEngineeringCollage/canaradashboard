@@ -26,8 +26,8 @@ export class Buzz {
   @Column({ type: 'varchar', length: 50 })
   eventName: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  newsLetter: string;
+  @Column({ type: 'json', nullable: true })
+  weeklyDigest: any;
 
   @UpdateDateColumn()
   updatedAt: Date;
