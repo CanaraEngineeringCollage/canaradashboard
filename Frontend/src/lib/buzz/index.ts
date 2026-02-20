@@ -8,13 +8,13 @@ export interface Buzz {
   category: string;
   eventDate?: string;
   eventName?: string;
-  newsLetter?: string;
+  weeklyDigest?: any;
   createdAt: string;
   updatedAt: string;
 }
 
 // ✅ Updated: supports category + search filters
-export const getAllBuzz = (page: number = 1, limit: number = 10, category: string = "", search: string = "") => {
+export const getAllBuzz = (page: number = 1, limit: number = 10, category: string = "", search: string = "", edition: string = "") => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -22,6 +22,7 @@ export const getAllBuzz = (page: number = 1, limit: number = 10, category: strin
 
   if (category) params.append("category", category);
   if (search) params.append("search", search);
+  if (edition) params.append("edition", edition);
 
   return apiFetch(`/buzz?${params.toString()}`, {
     method: "GET",
@@ -31,6 +32,18 @@ export const getAllBuzz = (page: number = 1, limit: number = 10, category: strin
 // ✅ New: fetch unique categories from backend
 export const getCategories = () => {
   return apiFetch("/buzz/categories", {
+    method: "GET",
+  });
+};
+
+export const getWeeklyDigestEditions = () => {
+  return apiFetch("/buzz/weekly-digest/editions", {
+    method: "GET",
+  });
+};
+
+export const getBuzzById = (id: string) => {
+  return apiFetch(`/buzz/${id}`, {
     method: "GET",
   });
 };
@@ -47,7 +60,7 @@ export const deleteBuzz = (id: string) => {
   });
 };
 
-export const createBuzz = (content: string, design: object, category: string, eventDate: string, eventName: string, newsLetter?: string) => {
+export const createBuzz = (content: string, design: object, category: string, eventDate: string, eventName: string, weeklyDigest?: any) => {
   const encrypted = localStorage.getItem("token");
   const token = encrypted ? decryptToken(encrypted) : null;
 
@@ -64,20 +77,12 @@ export const createBuzz = (content: string, design: object, category: string, ev
       category,
       eventDate,
       eventName,
-      newsLetter,
+      weeklyDigest,
     }),
   });
 };
 
-export const editBuzz = (
-  id: string,
-  content: string,
-  design: object,
-  category: string,
-  eventDate: string,
-  eventName: string,
-  newsLetter?: string,
-) => {
+export const editBuzz = (id: string, content: string, design: object, category: string, eventDate: string, eventName: string, weeklyDigest?: any) => {
   const encrypted = localStorage.getItem("token");
   const token = encrypted ? decryptToken(encrypted) : null;
 
@@ -94,7 +99,7 @@ export const editBuzz = (
       category,
       eventDate,
       eventName,
-      newsLetter,
+      weeklyDigest,
     }),
   });
 };

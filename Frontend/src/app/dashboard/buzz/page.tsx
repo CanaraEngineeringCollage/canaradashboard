@@ -8,9 +8,10 @@ import { PlusCircle, Megaphone } from "lucide-react";
 import { BuzzEditor } from "./components/buzz-editor";
 import TablePagination from "@/components/ui/TablePagination";
 import { useToast } from "@/hooks/use-toast";
-import { createBuzz, deleteBuzz, editBuzz, getAllBuzz, getCategories } from "@/lib/buzz";
+import { createBuzz, deleteBuzz, editBuzz, getAllBuzz, getCategories, getWeeklyDigestEditions } from "@/lib/buzz";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
+import Link from "next/link";
 
 interface Buzz {
   id: string;
@@ -21,7 +22,7 @@ interface Buzz {
   createdAt: string;
   updatedAt: string;
   eventName?: string;
-  newsLetter?: string;
+  weeklyDigest?: { editionName: string; items: { name: string; pdf: string }[] }[];
 }
 
 interface DeleteConfirmationModalProps {
@@ -88,8 +89,10 @@ export default function BuzzPage() {
   const [deleteBuzzId, setDeleteBuzzId] = useState<string | null>(null);
 
   const [category, setCategory] = useState<string>(""); // filter category
+  const [editionFilter, setEditionFilter] = useState<string>(""); // filter edition specifically
   const [search, setSearch] = useState<string>(""); // search text
   const [categories, setCategories] = useState<string[]>([]); // dropdown options
+  const [dbEditions, setDbEditions] = useState<string[]>([]); // dropdown editions
 
   const { toast } = useToast();
   const router = useRouter();
@@ -130,20 +133,30 @@ export default function BuzzPage() {
     }
   };
 
+  const fetchEditions = async () => {
+    try {
+      const data = await getWeeklyDigestEditions();
+      setDbEditions([...(data || [])]);
+    } catch (error) {
+      console.error("Error fetching editions:", error);
+    }
+  };
+
   useEffect(() => {
     fetchCategories();
+    fetchEditions();
   }, []);
 
   // ✅ Fetch buzz list (with filters)
   useEffect(() => {
-    fetchBuzzes(currentPage, limit, category, search);
+    fetchBuzzes(currentPage, limit, category, search, editionFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, limit, category, search]);
+  }, [currentPage, limit, category, search, editionFilter]);
 
-  const fetchBuzzes = async (page: number, limit: number, categoryFilter: string, searchTerm: string) => {
+  const fetchBuzzes = async (page: number, limit: number, categoryFilter: string, searchTerm: string, editionTerm: string) => {
     setIsLoading(true);
     try {
-      const response = await getAllBuzz(page, limit, categoryFilter, searchTerm);
+      const response = await getAllBuzz(page, limit, categoryFilter, searchTerm, editionTerm);
       setBuzzes(response.data);
       setTotalPages(response.meta.totalPages);
     } catch (error) {
@@ -161,8 +174,9 @@ export default function BuzzPage() {
   const DeleteBuzz = async (id: string) => {
     try {
       await deleteBuzz(id);
-      await fetchBuzzes(currentPage, limit, category, search);
+      await fetchBuzzes(currentPage, limit, category, search, editionFilter);
       await fetchCategories(); // Refresh categories
+      await fetchEditions(); // Refresh editions
       toast({
         title: "Success",
         description: "Buzz deleted successfully.",
@@ -187,6 +201,8 @@ export default function BuzzPage() {
     setEditingBuzz(buzz);
     setIsEditorOpen(true);
   };
+
+  const uniqueEditions = dbEditions;
 
   return (
     <>
@@ -222,6 +238,7 @@ export default function BuzzPage() {
             value={category}
             onChange={(e) => {
               setCategory(e.target.value);
+              setEditionFilter("");
               setCurrentPage(1);
             }}
           >
@@ -232,6 +249,21 @@ export default function BuzzPage() {
               </option>
             ))}
           </select>
+
+          {category === "Weekly Digest" && (
+            <select
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+              value={editionFilter}
+              onChange={(e) => setEditionFilter(e.target.value)}
+            >
+              <option value="">All Editions</option>
+              {uniqueEditions.map((ed) => (
+                <option key={ed} value={ed}>
+                  {ed}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* Search Bar */}
@@ -250,48 +282,64 @@ export default function BuzzPage() {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Image</th>}
+                        {buzz.category !== "Weekly Digest" && <th className="border border-gray-300 p-2">Image</th>}
                         <th className="border border-gray-300 p-2">Name</th>
-                        {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Description</th>}
+                        {buzz.category !== "Weekly Digest" && <th className="border border-gray-300 p-2">Description</th>}
                         <th className="border border-gray-300 p-2">Category</th>
-                        {buzz.category !== "Newsletter" && <th className="border border-gray-300 p-2">Event Date</th>}
-                        {buzz.category === "Newsletter" && <th className="border border-gray-300 p-2">Resource</th>}
+                        {buzz.category !== "Weekly Digest" && <th className="border border-gray-300 p-2">Event Date</th>}
+                        {buzz.category === "Weekly Digest" && <th className="border border-gray-300 p-2">Resources</th>}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="">
                       <tr>
-                        {buzz.category !== "Newsletter" && (
-                          <td className="border border-gray-300 p-2 text-center">
-                            {image && <img src={image} alt={title} className="w-32 h-20 object-cover rounded-md" />}
+                        {buzz.category !== "Weekly Digest" && (
+                          <td className="border border-gray-300 p-2 text-center align-middle">
+                            {image && <img src={image} alt={title} className="w-32 h-20 object-cover rounded-md mx-auto" />}
                           </td>
                         )}
-                        <td className="border border-gray-300 p-2 align-top">
+                        <td className="border border-gray-300 p-2 text-center align-middle">
                           <h2 className="text-lg font-semibold">{buzz.eventName}</h2>
                         </td>
-                        {buzz.category !== "Newsletter" && (
-                          <td className="border border-gray-300 p-2 align-top">
+                        {buzz.category !== "Weekly Digest" && (
+                          <td className="border border-gray-300 p-2 text-center align-middle">
                             <p className="text-sm text-muted-foreground">{excerpt}</p>
                           </td>
                         )}
-                        <td className="border border-gray-300 p-2 align-top">
+                        <td className="border border-gray-300 p-2 text-center align-middle">
                           <p className="text-sm text-muted-foreground">{buzz.category || "-"}</p>
                         </td>
-                        {buzz.category !== "Newsletter" && (
-                          <td className="border border-gray-300 p-2 align-top">
+                        {buzz.category !== "Weekly Digest" && (
+                          <td className="border border-gray-300 p-2 text-center align-middle">
                             <p className="text-sm text-muted-foreground">{buzz.eventDate ? new Date(buzz.eventDate).toLocaleDateString() : "N/A"}</p>
                           </td>
                         )}
-                        {buzz.category === "Newsletter" && (
-                          <td className="border border-gray-300 p-2 align-top">
-                            {buzz.newsLetter ? (
-                              <a
-                                href={`${process.env.NEXT_PUBLIC_API_URL}/files/${buzz.newsLetter}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-blue-600 hover:underline text-sm block"
-                              >
-                                View PDF
-                              </a>
+                        {buzz.category === "Weekly Digest" && (
+                          <td className="border border-gray-300 p-2 text-center align-middle">
+                            {buzz.weeklyDigest && buzz.weeklyDigest.length > 0 ? (
+                              <div className="flex flex-wrap justify-center gap-2">
+                                {buzz.weeklyDigest
+                                  .filter((edition) => !editionFilter || edition.editionName === editionFilter)
+                                  .map((edition, idx) => (
+                                    <Link
+                                      key={idx}
+                                      href={`/dashboard/buzz/weekly-digest/${buzz.id}?edition=${encodeURIComponent(edition.editionName)}`}
+                                      className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition-colors border border-blue-200 text-sm font-medium"
+                                    >
+                                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                        />
+                                      </svg>
+                                     View {edition.editionName}
+                                      <span className="ml-2 px-1.5 py-0.5 rounded-full bg-blue-200/50 text-xs text-blue-800 font-bold">
+                                        {edition.items?.length || 0}
+                                      </span>
+                                    </Link>
+                                  ))}
+                              </div>
                             ) : (
                               <span className="text-gray-400">-</span>
                             )}
@@ -358,21 +406,23 @@ export default function BuzzPage() {
         initialCategory={editingBuzz?.category}
         initialEventDate={editingBuzz?.eventDate}
         initalEventName={editingBuzz?.eventName}
-        onSave={async (html, design, categoryValue, eventDate, eventName, newsLetter) => {
+        existingEditions={uniqueEditions}
+        onSave={async (html, design, categoryValue, eventDate, eventName, weeklyDigest) => {
           try {
             if (editingBuzz) {
-              await editBuzz(editingBuzz.id, html, design, categoryValue, eventDate, eventName, newsLetter);
+              await editBuzz(editingBuzz.id, html, design, categoryValue, eventDate, eventName, weeklyDigest);
               setEditingBuzz(null);
               setIsEditorOpen(false);
             } else {
-              await createBuzz(html, design, categoryValue, eventDate, eventName, newsLetter);
+              await createBuzz(html, design, categoryValue, eventDate, eventName, weeklyDigest);
               setEditingBuzz(null);
               setIsEditorOpen(false);
             }
 
             // ✅ Refresh with current filters
-            await fetchBuzzes(currentPage, limit, category, search);
+            await fetchBuzzes(currentPage, limit, category, search, editionFilter);
             await fetchCategories(); // Refresh categories
+            await fetchEditions();
 
             toast({
               title: "Success",

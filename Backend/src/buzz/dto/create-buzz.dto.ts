@@ -31,7 +31,7 @@ export class CreateBuzzDto {
     'Alumni',
     'Career Guidance',
     'Student Achievements',
-    'Newsletter',
+    'Weekly Digest',
   ])
   category: string;
 
@@ -40,7 +40,7 @@ export class CreateBuzzDto {
   eventName: string;
 
   @IsOptional()
-  newsLetter?: string;
+  weeklyDigest?: any;
 
   @IsOptional()
   @IsDateString()
