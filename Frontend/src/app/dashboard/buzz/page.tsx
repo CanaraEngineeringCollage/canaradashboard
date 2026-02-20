@@ -290,33 +290,33 @@ export default function BuzzPage() {
                         {buzz.category === "Weekly Digest" && <th className="border border-gray-300 p-2">Resources</th>}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="">
                       <tr>
                         {buzz.category !== "Weekly Digest" && (
-                          <td className="border border-gray-300 p-2 text-center">
-                            {image && <img src={image} alt={title} className="w-32 h-20 object-cover rounded-md" />}
+                          <td className="border border-gray-300 p-2 text-center align-middle">
+                            {image && <img src={image} alt={title} className="w-32 h-20 object-cover rounded-md mx-auto" />}
                           </td>
                         )}
-                        <td className="border border-gray-300 p-2 align-top">
+                        <td className="border border-gray-300 p-2 text-center align-middle">
                           <h2 className="text-lg font-semibold">{buzz.eventName}</h2>
                         </td>
                         {buzz.category !== "Weekly Digest" && (
-                          <td className="border border-gray-300 p-2 align-top">
+                          <td className="border border-gray-300 p-2 text-center align-middle">
                             <p className="text-sm text-muted-foreground">{excerpt}</p>
                           </td>
                         )}
-                        <td className="border border-gray-300 p-2 align-top">
+                        <td className="border border-gray-300 p-2 text-center align-middle">
                           <p className="text-sm text-muted-foreground">{buzz.category || "-"}</p>
                         </td>
                         {buzz.category !== "Weekly Digest" && (
-                          <td className="border border-gray-300 p-2 align-top">
+                          <td className="border border-gray-300 p-2 text-center align-middle">
                             <p className="text-sm text-muted-foreground">{buzz.eventDate ? new Date(buzz.eventDate).toLocaleDateString() : "N/A"}</p>
                           </td>
                         )}
                         {buzz.category === "Weekly Digest" && (
-                          <td className="border border-gray-300 p-2 align-top">
+                          <td className="border border-gray-300 p-2 text-center align-middle">
                             {buzz.weeklyDigest && buzz.weeklyDigest.length > 0 ? (
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-wrap justify-center gap-2">
                                 {buzz.weeklyDigest
                                   .filter((edition) => !editionFilter || edition.editionName === editionFilter)
                                   .map((edition, idx) => (
@@ -333,7 +333,7 @@ export default function BuzzPage() {
                                           d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                                         />
                                       </svg>
-                                      {edition.editionName}
+                                     View {edition.editionName}
                                       <span className="ml-2 px-1.5 py-0.5 rounded-full bg-blue-200/50 text-xs text-blue-800 font-bold">
                                         {edition.items?.length || 0}
                                       </span>

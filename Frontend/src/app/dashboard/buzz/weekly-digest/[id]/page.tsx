@@ -59,10 +59,14 @@ export default function WeeklyDigestEditionPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" onClick={() => router.push("/dashboard/buzz")}>
-            <ChevronLeft className="h-10 w-10" />
-          </Button>
+        <div className="flex items-center gap-1 [&>div]:mb-0">
+          <button
+            onClick={() => router.push("/dashboard/buzz")}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 focus:outline-none"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-7 w-7" />
+          </button>
           <PageTitle title={`Weekly Digest: ${editionName}`} />
         </div>
       </div>
