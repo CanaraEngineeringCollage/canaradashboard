@@ -22,8 +22,8 @@ export class HomePageImagesService {
 
     const image = this.repo.create({
       ...dto,
-      image: imageFile.buffer,
-      mobileImage: mobileImageFile.buffer,
+      image: `/uploads/${imageFile.filename}`,
+      mobileImage: `/uploads/${mobileImageFile.filename}`,
     });
     return this.repo.save(image);
   }

@@ -1,4 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity('timetables')
 export class Timetable {
@@ -8,8 +13,8 @@ export class Timetable {
   @Column({ type: 'varchar', length: 20 })
   academicYear: string;
 
-  @Column({ type: 'longblob' })
-  file: Buffer;
+  @Column()
+  file: string;
 
   @Column({ type: 'varchar', length: 255 })
   filename: string;

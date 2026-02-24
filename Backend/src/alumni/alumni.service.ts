@@ -43,7 +43,7 @@ export class AlumniService {
       throw new Error('Thumbnail image is required');
     }
     const podcast = this.podcastRepo.create(data);
-    podcast.thumbnail = file.buffer;
+    podcast.thumbnail = `/uploads/${file.filename}`;
     return this.podcastRepo.save(podcast);
   }
 
@@ -64,7 +64,7 @@ export class AlumniService {
     podcast.title = title;
     podcast.url = url;
     if (file) {
-      podcast.thumbnail = file.buffer;
+      podcast.thumbnail = `/uploads/${file.filename}`;
     }
     return this.podcastRepo.save(podcast);
   }

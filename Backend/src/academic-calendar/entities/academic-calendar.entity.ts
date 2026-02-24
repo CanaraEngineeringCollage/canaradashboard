@@ -10,8 +10,8 @@ export class AcademicCalendar {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'longblob' })
-  pdf: Buffer;
+  @Column()
+  pdf: string;
 
   @CreateDateColumn()
   createdAt: Date;

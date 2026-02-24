@@ -19,6 +19,7 @@ import { FacultyService } from './faculty.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { multerConfig } from 'src/config/multer.config';
 
 @Controller('faculty')
 export class FacultyController {
@@ -29,6 +30,7 @@ export class FacultyController {
   @Post()
   @UseInterceptors(
     FileInterceptor('avatar', {
+      ...multerConfig,
       limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
     }),
   )
@@ -123,6 +125,7 @@ export class FacultyController {
   @Patch(':id')
   @UseInterceptors(
     FileInterceptor('avatar', {
+      ...multerConfig,
       limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
     }),
   )

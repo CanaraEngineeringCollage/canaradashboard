@@ -8,13 +8,15 @@ export class FileEntity {
   @Column({ nullable: true })
   name: string;
 
-  // Store PDF file as BLOB
-  @Column({ type: 'longblob', nullable: true })
-  file: Buffer | null;
+  // Store PDF file URL
+  @Column({ nullable: true })
+  @Column({ nullable: true })
+  file: string;
 
-  // Store Image file as BLOB
-  @Column({ type: 'longblob', nullable: true })
-  avatar: Buffer | null;
+  // Store Image file URL
+  @Column({ nullable: true })
+  @Column({ nullable: true })
+  avatar: string;
 
   // Store Video file path (filename)
   @Column({ nullable: true })
@@ -25,7 +27,7 @@ export class FileEntity {
 
   @Column({ nullable: true })
   type: 'pdf' | 'image' | 'video';
-  
+
   @Column({ default: 'Common' })
   department: string;
 }

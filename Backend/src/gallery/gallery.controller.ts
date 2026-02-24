@@ -16,14 +16,15 @@ import { GalleryService } from './gallery.service';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/config/multer.config';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('gallery')
 export class GalleryController {
   constructor(private readonly galleryService: GalleryService) {}
- @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', multerConfig))
   create(
     @Body() createGalleryDto: CreateGalleryDto,
     @UploadedFile() file: Express.Multer.File,
@@ -55,7 +56,7 @@ export class GalleryController {
   getCategories() {
     return this.galleryService.getCategories();
   }
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('count')
   async countAll() {
     const count = await this.galleryService.countAll();
@@ -66,9 +67,9 @@ export class GalleryController {
   findOne(@Param('id') id: string) {
     return this.galleryService.findOne(id);
   }
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', multerConfig))
   update(
     @Param('id') id: string,
     @Body() updateGalleryDto: UpdateGalleryDto,
@@ -76,7 +77,7 @@ export class GalleryController {
   ) {
     return this.galleryService.update(id, updateGalleryDto, file);
   }
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.galleryService.remove(id);

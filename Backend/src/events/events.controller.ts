@@ -1,6 +1,16 @@
 import {
-  Controller, Get, Post, Put, Delete, Param, Body, Query,
-  UseInterceptors, UploadedFiles, UseGuards, BadRequestException
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseInterceptors,
+  UploadedFiles,
+  UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { EventService } from './events.service';
@@ -8,6 +18,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { S3Service } from './s3.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { multerConfig } from 'src/config/multer.config';
 
 @Controller('events')
 export class EventController {
@@ -19,21 +30,35 @@ export class EventController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'image', maxCount: 1 },
-      { name: 'video', maxCount: 1 },
-    ])
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+      ],
+      multerConfig,
+    ),
   )
   async create(
-    @UploadedFiles() files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @UploadedFiles()
+    files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
     @Body() dto: CreateEventDto,
   ) {
     console.log('--- Create Event Request Received ---');
     console.log('DTO:', JSON.stringify(dto, null, 2));
     console.log('Files Keys:', files ? Object.keys(files) : 'No files object');
     if (files) {
-      if (files.image) console.log('Image File:', files.image[0].originalname, files.image[0].size);
-      if (files.video) console.log('Video File:', files.video[0].originalname, files.video[0].size);
+      if (files.image)
+        console.log(
+          'Image File:',
+          files.image[0].originalname,
+          files.image[0].size,
+        );
+      if (files.video)
+        console.log(
+          'Video File:',
+          files.video[0].originalname,
+          files.video[0].size,
+        );
     }
 
     const imageFile = files.image ? files.image[0] : undefined;
@@ -43,18 +68,26 @@ export class EventController {
     if (dto.category === 'Alumni') {
       // Alumni: Must have Image XOR Video
       if (imageFile && videoFile) {
-        throw new BadRequestException('Alumni events can have either an image or a video, not both.');
+        throw new BadRequestException(
+          'Alumni events can have either an image or a video, not both.',
+        );
       }
       if (!imageFile && !videoFile) {
-        throw new BadRequestException('For Alumni events, either an Image or a Video is required. Received neither.');
+        throw new BadRequestException(
+          'For Alumni events, either an Image or a Video is required. Received neither.',
+        );
       }
     } else {
       // Others: Must have Image, Cannot have Video
       if (videoFile) {
-        throw new BadRequestException(`Video upload is only allowed for Alumni events. Category received: ${dto.category}`);
+        throw new BadRequestException(
+          `Video upload is only allowed for Alumni events. Category received: ${dto.category}`,
+        );
       }
       if (!imageFile) {
-        throw new BadRequestException(`Image file is required for category: ${dto.category}. Files received: ${files ? Object.keys(files).join(',') : 'none'}`);
+        throw new BadRequestException(
+          `Image file is required for category: ${dto.category}. Files received: ${files ? Object.keys(files).join(',') : 'none'}`,
+        );
       }
     }
 
@@ -76,11 +109,20 @@ export class EventController {
     @Query('sortBy') sortBy: 'date' | 'createdAt' = 'createdAt',
   ) {
     if (all === 'true') {
-      return await this.eventService.findAll({ category, search, all: true, sortBy });
+      return await this.eventService.findAll({
+        category,
+        search,
+        all: true,
+        sortBy,
+      });
     }
 
     return await this.eventService.findAll({
-      category, search, page: parseInt(page), limit: parseInt(limit), sortBy
+      category,
+      search,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      sortBy,
     });
   }
 
@@ -103,15 +145,19 @@ export class EventController {
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'image', maxCount: 1 },
-      { name: 'video', maxCount: 1 },
-    ])
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+      ],
+      multerConfig,
+    ),
   )
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateEventDto,
-    @UploadedFiles() files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @UploadedFiles()
+    files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
   ) {
     let videoUrl: string | undefined;
     if (files.video && files.video[0]) {

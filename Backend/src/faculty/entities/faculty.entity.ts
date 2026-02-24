@@ -51,8 +51,8 @@ export class Faculty {
   @Column({ type: 'int', nullable: true })
   priority: number | null;
 
-  @Column({ type: 'longblob', nullable: true })
-  avatar: Buffer;
+  @Column({ nullable: true })
+  avatar: string;
 
   @Column({ type: 'boolean', default: false })
   isKeyFunctionary: boolean;
