@@ -30,7 +30,8 @@ export class BuzzService {
     }
 
     if (excludeCategory) {
-      query.andWhere('buzz.category != :excludeCategory', { excludeCategory });
+      const excludeArray = excludeCategory.split(',').map((cat) => cat.trim());
+      query.andWhere('buzz.category NOT IN (:...excludeArray)', { excludeArray });
     }
 
     if (search) {
@@ -67,6 +68,7 @@ export class BuzzService {
   async countAll() {
     return this.buzzRepository.count();
   }
+
   async getCategories() {
     const rawCategories = await this.buzzRepository
       .createQueryBuilder('buzz')
