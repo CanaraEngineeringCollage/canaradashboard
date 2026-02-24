@@ -4,9 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getBuzzById, Buzz } from "@/lib/buzz";
 import { PageTitle } from "@/components/page-title";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, FileText, Download } from "lucide-react";
+import { ChevronLeft, FileText } from "lucide-react"; // Removed unused Download
 import { useToast } from "@/hooks/use-toast";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+
+// Configure pdfjs worker to run in browser
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export default function WeeklyDigestEditionPage() {
   const params = useParams();
@@ -77,31 +82,60 @@ export default function WeeklyDigestEditionPage() {
           <p className="text-sm text-gray-500 mt-1">Select a document below to view or download.</p>
         </div>
 
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* Updated Container to match Magazines flex layout */}
+        <div className="flex flex-row flex-wrap gap-6 p-4 md:p-6 text-[#1E1E1E]">
           {items.map((item, idx) => (
-            <a
-              key={idx}
-              href={`${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`}
-              target="_blank"
-              rel="noreferrer"
-              className="group flex flex-col p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all duration-200"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0 group-hover:bg-red-100 transition-colors">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div className="flex text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
-                  <Download className="w-4 h-4" />
-                </div>
-              </div>
-
-              <h4 className="font-medium text-gray-800 line-clamp-2 leading-tight group-hover:text-blue-700 transition-colors">
+            <div key={idx} className="flex flex-col w-40">
+              <a
+                href={`${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block transition-transform hover:scale-105"
+              >
+                {/* Fixed wrapper acting as "w-40 h-56 object-cover rounded shadow" */}
+             {/* Fixed wrapper acting exactly as "w-40 h-56 object-cover rounded shadow" */}
+<div className="w-40 h-48 overflow-hidden rounded shadow bg-gray-100 relative">
+  <Document
+    file={`${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`}
+    loading={
+      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 transition-colors animate-pulse">
+        <FileText className="w-8 h-8" />
+      </div>
+    }
+    error={
+      <div className="absolute inset-0 flex items-center justify-center bg-red-50 text-red-500 transition-colors">
+        <FileText className="w-8 h-8" />
+      </div>
+    }
+    className="w-full h-full"
+  >
+    {/* We set the baseline width to 160px (w-40). 
+      The custom className targets the inner canvas, forcing it to fill the 
+      parent block and crop cleanly using object-cover.
+    */}
+    <Page 
+      pageNumber={1} 
+      width={160} 
+      renderTextLayer={false} 
+      renderAnnotationLayer={false} 
+      className="w-full h-full [&>canvas]:!w-full [&>canvas]:!h-full [&>canvas]:!object-fit"
+    />
+  </Document>
+</div>
+              </a>
+              
+              {/* Item Title matching Magazines */}
+              <span className="mt-2 text-center text-sm font-medium line-clamp-2 leading-tight">
                 {item.name || "Untitled Document"}
-              </h4>
-            </a>
+              </span>
+            </div>
           ))}
 
-          {items.length === 0 && <div className="col-span-full py-12 text-center text-gray-400">No resources available in this edition.</div>}
+          {items.length === 0 && (
+            <div className="w-full py-12 text-center text-gray-400">
+              No resources available in this edition.
+            </div>
+          )}
         </div>
       </div>
     </div>
