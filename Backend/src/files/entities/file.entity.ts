@@ -10,11 +10,9 @@ export class FileEntity {
 
   // Store PDF file URL
   @Column({ nullable: true })
-  @Column({ nullable: true })
   file: string;
 
   // Store Image file URL
-  @Column({ nullable: true })
   @Column({ nullable: true })
   avatar: string;
 

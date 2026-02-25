@@ -11,6 +11,7 @@ import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
 import { apiFetch } from "@/lib/client";
+import { getImageUrl } from "@/lib/utils";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   id: string | null;
@@ -21,9 +22,9 @@ interface DeleteConfirmationModalProps {
 
 const EventsPage = () => {
   const [events, setEvents] = useState<Event[]>([]);
-  const [categories, setCategories] = useState<string[]>(['All']);
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Partial<Event>>({});
@@ -39,33 +40,28 @@ const EventsPage = () => {
   const [totalEvents, setTotalEvents] = useState(0);
   const { toast } = useToast();
 
+  const router = useRouter();
 
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
 
-const router = useRouter();
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
 
-useEffect(() => {
-  const encrypted = localStorage.getItem("token");
+    try {
+      const decrypted = decryptToken(encrypted);
 
-  if (!encrypted) {
-    router.push("/login");
-    return;
-  }
-
-  try {
-    const decrypted = decryptToken(encrypted);
-
-    if (!decrypted || decrypted.length < 10) {
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
       localStorage.removeItem("token");
       router.push("/login");
     }
-
-  } catch (err) {
-    localStorage.removeItem("token");
-    router.push("/login");
-  }
-}, []);
-
-
+  }, []);
 
   const fetchEvents = async () => {
     setIsLoading(true);
@@ -77,11 +73,11 @@ useEffect(() => {
       setEvents(data || []);
       setTotalEvents(total || 0);
     } catch (err) {
-      console.error('Error fetching events:', err);
+      console.error("Error fetching events:", err);
       toast({
-        title: 'Error',
-        description: 'Failed to load events.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load events.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -92,31 +88,31 @@ useEffect(() => {
     try {
       const data = await apiFetch("/events/categories");
       if (Array.isArray(data)) {
-        const validCategories = ['All', ...data.filter((cat: string) => cat && typeof cat === 'string' && cat.trim() !== '')];
+        const validCategories = ["All", ...data.filter((cat: string) => cat && typeof cat === "string" && cat.trim() !== "")];
         setCategories(validCategories);
         if (validCategories.length <= 1) {
           toast({
-            title: 'Warning',
-            description: 'No categories available.',
-            variant: 'default',
+            title: "Warning",
+            description: "No categories available.",
+            variant: "default",
           });
         }
       } else {
-        console.error('Categories response is not an array:', data);
-        setCategories(['All']);
+        console.error("Categories response is not an array:", data);
+        setCategories(["All"]);
         toast({
-          title: 'Error',
-          description: 'Invalid categories data received.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Invalid categories data received.",
+          variant: "destructive",
         });
       }
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      setCategories(['All']);
+      console.error("Error fetching categories:", err);
+      setCategories(["All"]);
       toast({
-        title: 'Error',
-        description: 'Failed to load categories.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load categories.",
+        variant: "destructive",
       });
     }
   };
@@ -134,16 +130,16 @@ useEffect(() => {
       await deleteEvent(id);
       fetchEvents();
       toast({
-        title: 'Success',
-        description: 'Event deleted successfully.',
+        title: "Success",
+        description: "Event deleted successfully.",
       });
       fetchCategories();
     } catch (err) {
-      console.error('Error deleting event:', err);
+      console.error("Error deleting event:", err);
       toast({
-        title: 'Error',
-        description: 'Failed to delete event.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to delete event.",
+        variant: "destructive",
       });
     } finally {
       setDeleteModalOpen(false);
@@ -154,17 +150,17 @@ useEffect(() => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('title', selectedEvent.title || '');
-    formData.append('description', selectedEvent.description || '');
-    formData.append('date', selectedEvent.date || '');
-    formData.append('category', selectedEvent.category || '');
+    formData.append("title", selectedEvent.title || "");
+    formData.append("description", selectedEvent.description || "");
+    formData.append("date", selectedEvent.date || "");
+    formData.append("category", selectedEvent.category || "");
     if (selectedFile) {
-      formData.append('image', selectedFile);
+      formData.append("image", selectedFile);
     }
     if (selectedVideoFile) {
-      formData.append('video', selectedVideoFile);
+      formData.append("video", selectedVideoFile);
     }
-    
+
     setIsSubmitting(true);
     try {
       if (isEdit && selectedEvent.id) {
@@ -173,8 +169,8 @@ useEffect(() => {
         await createEvent(formData);
       }
       toast({
-        title: 'Success',
-        description: 'Event submitted successfully.',
+        title: "Success",
+        description: "Event submitted successfully.",
       });
       setShowModal(false);
       setSelectedEvent({});
@@ -185,11 +181,11 @@ useEffect(() => {
       fetchEvents();
       fetchCategories();
     } catch (err) {
-      console.error('Error submitting event:', err);
+      console.error("Error submitting event:", err);
       toast({
-        title: 'Error',
-        description: 'Failed to submit event.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to submit event.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -198,13 +194,13 @@ useEffect(() => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
-    if (name === 'image' && files && files.length > 0) {
+    if (name === "image" && files && files.length > 0) {
       const file = files[0];
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       // Clear video if image is selected
       setSelectedVideoFile(null);
-    } else if (name === 'video' && files && files.length > 0) {
+    } else if (name === "video" && files && files.length > 0) {
       const file = files[0];
       setSelectedVideoFile(file);
       // Clear image if video is selected
@@ -216,17 +212,10 @@ useEffect(() => {
         [name]: value,
       });
       // If category changes to non-Alumni, clear video
-      if (name === 'category' && value !== 'Alumni') {
+      if (name === "category" && value !== "Alumni") {
         setSelectedVideoFile(null);
       }
     }
-  };
-
-  const bufferToBase64 = (buffer: { type: string; data: number[] } | null | undefined) => {
-    if (!buffer || !buffer.data) return null;
-    const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
-    const base64 = btoa(binary);
-    return `data:image/jpeg;base64,${base64}`;
   };
 
   const totalPages = Math.max(1, Math.ceil(totalEvents / rowsPerPage));
@@ -265,11 +254,7 @@ useEffect(() => {
           onChange={(e) => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
         />
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border rounded px-3 py-2"
-        >
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="border rounded px-3 py-2">
           {categories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -295,18 +280,18 @@ useEffect(() => {
                 <td className="px-4 py-2">
                   {(() => {
                     const d = new Date(event.date);
-                    const day = String(d.getDate()).padStart(2, '0');
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, "0");
+                    const month = String(d.getMonth() + 1).padStart(2, "0");
                     const year = d.getFullYear();
-                    return event.date ? `${day}/${month}/${year}` : 'N/A';
+                    return event.date ? `${day}/${month}/${year}` : "N/A";
                   })()}
                 </td>
                 <td className="px-4 py-2">
                   {event.image ? (
-                    <img src={bufferToBase64(event.image) || ''} alt={event.title} className="w-32 h-20 object-cover rounded ml-4" />
+                    <img src={getImageUrl(event.image as any) || ""} alt={event.title} className="w-32 h-20 object-cover rounded ml-4" />
                   ) : (
                     <div className="w-32 h-20 bg-gray-100 rounded ml-4 flex items-center justify-center text-gray-400 text-xs">
-                      {event.videoUrl ? 'Video' : 'No Media'}
+                      {event.videoUrl ? "Video" : "No Media"}
                     </div>
                   )}
                 </td>
@@ -331,7 +316,7 @@ useEffect(() => {
                         setSelectedEvent(event);
                         setSelectedFile(null);
                         setSelectedVideoFile(null);
-                        setPreviewUrl(bufferToBase64(event.image));
+                        setPreviewUrl(getImageUrl(event.image as any));
                         setShowModal(true);
                       }}
                     >
@@ -369,8 +354,8 @@ useEffect(() => {
           }}
         />
         <div className="text-sm text-gray-600 mt-2">
-          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalEvents || 0)} -{' '}
-          {Math.min(currentPage * rowsPerPage, totalEvents)} of {totalEvents} events
+          Showing {Math.min((currentPage - 1) * rowsPerPage + 1, totalEvents || 0)} - {Math.min(currentPage * rowsPerPage, totalEvents)} of{" "}
+          {totalEvents} events
         </div>
       </div>
       <EventModal
@@ -393,7 +378,7 @@ useEffect(() => {
       />
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}
-        id={deleteId || ''}
+        id={deleteId || ""}
         itemName="this event"
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}

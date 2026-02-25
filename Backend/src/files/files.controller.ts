@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
   BadRequestException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
@@ -63,8 +64,8 @@ export class FilesController {
   }
 
   // Get file by ID
-  @Get(':id')
-  async getFile(@Param('id') id: number, @Res() res: Response) {
+  @Get('id/:id')
+  async getFile(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
     const file = await this.filesService.getFile(id);
 
     if (file.type === 'video' && file.video) {
@@ -96,7 +97,7 @@ export class FilesController {
   @UseGuards(JwtAuthGuard)
   // Delete file
   @Delete(':id')
-  async deleteFile(@Param('id') id: number) {
+  async deleteFile(@Param('id', ParseIntPipe) id: number) {
     return this.filesService.deleteFile(id);
   }
 }

@@ -28,8 +28,8 @@ import { HomePageImagesModule } from './home-page-images/home-page-images.module
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads/',
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({

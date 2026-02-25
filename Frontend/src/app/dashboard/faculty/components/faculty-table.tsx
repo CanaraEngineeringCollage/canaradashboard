@@ -7,16 +7,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO } from "date-fns";
+import { getImageUrl } from "@/lib/utils";
 
 interface FacultyTableProps {
   faculties: Faculty[];
   onEdit: (faculty: Faculty) => void;
   onDelete: (facultyId: string) => void;
-}
-function bufferToBase64(buffer: number[]): string {
-  if (!buffer || !Array.isArray(buffer)) return "";
-  const binary = new Uint8Array(buffer).reduce((acc, byte) => acc + String.fromCharCode(byte), "");
-  return `data:image/jpeg;base64,${btoa(binary)}`;
 }
 
 export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps) {
@@ -45,15 +41,13 @@ export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps)
           {faculties.map((faculty) => (
             <TableRow key={faculty.id}>
               <TableCell>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage
-                    className="object-cover"
-                    src={faculty.image?.data ? bufferToBase64(faculty.image.data) : `https://placehold.co/40x40.png?text=${faculty.name.charAt(0)}`}
-                    alt={faculty.name}
-                  />
-
-                  <AvatarFallback>{faculty.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
+                <img
+                  className="h-10 w-10 object-cover rounded-full"
+                  src={
+                    (faculty as any).avatar ? getImageUrl((faculty as any).avatar) : `https://placehold.co/40x40.png?text=${faculty.name.charAt(0)}`
+                  }
+                  alt={faculty.name}
+                />
               </TableCell>
               <TableCell className="font-medium">{faculty.name}</TableCell>
               <TableCell>{faculty.designation}</TableCell>
