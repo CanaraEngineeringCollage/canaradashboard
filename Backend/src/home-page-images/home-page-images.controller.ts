@@ -11,7 +11,10 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
   BadRequestException,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
+import * as path from 'path';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { HomePageImagesService } from './home-page-images.service';
 import { CreateHomePageImageDto } from './dto/create-home-page-image.dto';
@@ -60,5 +63,11 @@ export class HomePageImagesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(id);
+  }
+
+  @Get('file/:filename')
+  getFile(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(process.cwd(), 'uploads', filename);
+    return res.sendFile(filePath);
   }
 }

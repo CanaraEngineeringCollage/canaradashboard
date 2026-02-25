@@ -23,7 +23,7 @@ interface AlumniPodcast {
   id: number;
   title: string;
   url: string;
-  thumbnail: any; // Type for buffer or base64
+  thumbnailUrl?: string; // Newly added URL column
   createdAt: string;
 }
 
@@ -150,7 +150,7 @@ const AlumniPodcastsPage = () => {
     setUrl(podcast.url);
     setEditingId(podcast.id);
     setSelectedImage(null);
-    setImagePreview(getThumbnailSrc(podcast.thumbnail));
+    setImagePreview(getThumbnailSrc(podcast));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -187,13 +187,9 @@ const AlumniPodcastsPage = () => {
     }
   };
 
-  const getThumbnailSrc = (thumbnail: any) => {
-    if (!thumbnail) return null;
-    if (typeof thumbnail === "string") return thumbnail; // If already base64 or url
-    if (thumbnail.type === "Buffer" && Array.isArray(thumbnail.data)) {
-      // Convert buffer array to base64
-      const base64String = Buffer.from(thumbnail.data).toString("base64");
-      return `data:image/jpeg;base64,${base64String}`;
+  const getThumbnailSrc = (podcast: AlumniPodcast) => {
+    if (podcast.thumbnailUrl) {
+      return `${api.defaults.baseURL}/alumni/file/${podcast.thumbnailUrl}`;
     }
     return null;
   };
@@ -272,7 +268,7 @@ const AlumniPodcastsPage = () => {
               <div className="mt-4">
                 <p className="text-sm font-medium mb-2">Preview:</p>
                 <div className="relative h-40 w-fit shrink-0 rounded-md overflow-hidden border shadow-sm">
-                  <img src={imagePreview} alt="Preview" className="h-full w-auto object-contain" />
+                  <img src={imagePreview} alt="Preview" className="h-full w-auto object-cover" />
                   <Button
                     type="button"
                     variant="destructive"
@@ -318,8 +314,8 @@ const AlumniPodcastsPage = () => {
             {podcasts.map((podcast) => (
               <div key={podcast.id} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="aspect-video bg-gray-100 relative">
-                  {podcast.thumbnail ? (
-                    <img src={getThumbnailSrc(podcast.thumbnail) || ""} alt={podcast.title} className="w-full h-full object-cover" />
+                  {podcast.thumbnailUrl ? (
+                    <img src={getThumbnailSrc(podcast) || ""} alt={podcast.title} className="w-full h-[300px] object-fit" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                       <Video className="h-12 w-12" />
@@ -338,9 +334,7 @@ const AlumniPodcastsPage = () => {
                   >
                     Watch on YouTube
                   </a>
-             <p className="text-xs text-gray-500 mt-2">
-  {new Date(podcast.createdAt).toLocaleDateString("en-GB")}
-</p>
+                  <p className="text-xs text-gray-500 mt-2">{new Date(podcast.createdAt).toLocaleDateString("en-GB")}</p>
 
                   <div className="mt-4 flex justify-end space-x-2">
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(podcast)}>

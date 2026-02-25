@@ -11,11 +11,11 @@ export class HomePageImage {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'longblob' })
-  image: Buffer;
+  @Column({ nullable: true })
+  imageUrl: string;
 
-  @Column({ type: 'longblob' })
-  mobileImage: Buffer;
+  @Column({ nullable: true })
+  mobileImageUrl: string;
 
   @CreateDateColumn()
   createdAt: Date;

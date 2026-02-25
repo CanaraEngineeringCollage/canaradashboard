@@ -11,7 +11,10 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
+import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AlumniService } from './alumni.service';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
@@ -60,6 +63,12 @@ export class AlumniController {
   async getPodcastCount() {
     const count = await this.alumniService.countPodcasts();
     return { count };
+  }
+
+  @Get('file/:filename')
+  getFile(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(process.cwd(), 'uploads', filename);
+    return res.sendFile(filePath);
   }
 
   @Patch('podcast/:id')

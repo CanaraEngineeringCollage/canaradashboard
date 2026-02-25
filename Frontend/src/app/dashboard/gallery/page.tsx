@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
+import { api } from "@/lib/axiosClient";
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
@@ -179,11 +180,9 @@ const GalleryPage = () => {
     });
   };
 
-  const bufferToBase64 = (buffer: { type: string; data: number[] } | null | undefined) => {
-    if (!buffer || !buffer.data) return null;
-    const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
-    const base64 = btoa(binary);
-    return `data:image/jpeg;base64,${base64}`;
+  const getImageUrl = (imageUrl: string | null) => {
+    if (!imageUrl) return null;
+    return `${api.defaults.baseURL}/gallery/file/${imageUrl}`;
   };
 
   const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
@@ -242,8 +241,8 @@ const GalleryPage = () => {
             {galleryItems.map((item) => (
               <tr key={item.id} className="border-t border-gray-200 hover:bg-gray-50">
                 <td className="px-4 py-2">
-                  {item.image ? (
-                    <img src={bufferToBase64(item.image) || ""} alt={item.title} className="w-20 h-20 object-cover rounded" />
+                  {item.imageUrl ? (
+                    <img src={getImageUrl(item.imageUrl) || ""} alt={item.title} className="w-20 h-20 object-cover rounded" />
                   ) : (
                     <div className="w-20 h-20 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">No Image</div>
                   )}
@@ -267,7 +266,7 @@ const GalleryPage = () => {
                         setIsEdit(true);
                         setSelectedItem(item);
                         setSelectedFile(null);
-                        setPreviewUrl(bufferToBase64(item.image));
+                        setPreviewUrl(getImageUrl(item.imageUrl));
                         setShowModal(true);
                       }}
                     >
