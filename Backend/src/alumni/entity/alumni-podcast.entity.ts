@@ -1,8 +1,8 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('alumni_podcast')
@@ -16,8 +16,8 @@ export class AlumniPodcast {
   @Column()
   url: string;
 
-  @Column({ type: 'longblob' })
-  thumbnail: Buffer;
+  @Column({ nullable: true })
+  thumbnailUrl: string;
 
   @CreateDateColumn()
   createdAt: Date;

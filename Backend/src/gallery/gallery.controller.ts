@@ -11,7 +11,10 @@ import {
   UploadedFile,
   BadRequestException,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
+import * as path from 'path';
 import { GalleryService } from './gallery.service';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
@@ -21,7 +24,8 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller('gallery')
 export class GalleryController {
   constructor(private readonly galleryService: GalleryService) {}
- @UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   create(
@@ -55,7 +59,8 @@ export class GalleryController {
   getCategories() {
     return this.galleryService.getCategories();
   }
-@UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Get('count')
   async countAll() {
     const count = await this.galleryService.countAll();
@@ -66,7 +71,8 @@ export class GalleryController {
   findOne(@Param('id') id: string) {
     return this.galleryService.findOne(id);
   }
-@UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('image'))
   update(
@@ -76,9 +82,16 @@ export class GalleryController {
   ) {
     return this.galleryService.update(id, updateGalleryDto, file);
   }
-@UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.galleryService.remove(id);
+  }
+
+  @Get('file/:filename')
+  getFile(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(process.cwd(), 'uploads', filename);
+    return res.sendFile(filePath);
   }
 }

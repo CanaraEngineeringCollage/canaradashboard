@@ -12,7 +12,7 @@ interface AcademicCalendar {
   id: number;
   year: string;
   department: string;
-  pdf: { type: string; data: number[] } | string;
+  pdfUrl?: string;
   createdAt: string;
 }
 
@@ -145,18 +145,12 @@ export default function AcademicCalendarPage() {
     }
   };
 
-  const openPdf = (pdfData: any) => {
-    if (!pdfData) return;
+  const openPdf = (pdfUrl?: string) => {
+    if (!pdfUrl) return;
 
     try {
-      if (pdfData.type === "Buffer" && Array.isArray(pdfData.data)) {
-        const byteArray = new Uint8Array(pdfData.data);
-        const blob = new Blob([byteArray], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-      } else if (typeof pdfData === "string") {
-        window.open(pdfData, "_blank");
-      }
+      const fullUrl = `${api.defaults.baseURL}/academic-calendar/file/${pdfUrl}`;
+      window.open(fullUrl, "_blank");
     } catch (e) {
       console.error("Error opening PDF", e);
       toast({ title: "Error", description: "Could not open PDF", variant: "destructive" });
@@ -185,7 +179,7 @@ export default function AcademicCalendarPage() {
             </div>
 
             <div className="flex gap-3 w-full mt-2">
-              <Button variant="outline" className="flex-1" onClick={() => openPdf(calendar.pdf)}>
+              <Button variant="outline" className="flex-1" onClick={() => openPdf(calendar.pdfUrl)}>
                 View PDF
               </Button>
 

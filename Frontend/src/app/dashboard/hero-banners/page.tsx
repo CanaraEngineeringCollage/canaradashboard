@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllHomePageImages, createHomePageImage, deleteHomePageImage } from "@/lib/home-page-images";
 import AddImageModal from "./components/AddImageModal";
 import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
+import { api } from "@/lib/axiosClient";
 
 const HomePageImagesPage = () => {
   const [images, setImages] = useState<any[]>([]);
@@ -87,11 +88,14 @@ const HomePageImagesPage = () => {
     }
   };
 
-  const bufferToBase64 = (buffer: { type: string; data: number[] } | null | undefined) => {
-    if (!buffer || !buffer.data) return null;
-    const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
-    const base64 = btoa(binary);
-    return `data:image/jpeg;base64,${base64}`;
+  const getDesktopImageSrc = (img: any) => {
+    if (img.imageUrl) return `${api.defaults.baseURL}/home-page-images/file/${img.imageUrl}`;
+    return null;
+  };
+
+  const getMobileImageSrc = (img: any) => {
+    if (img.mobileImageUrl) return `${api.defaults.baseURL}/home-page-images/file/${img.mobileImageUrl}`;
+    return null;
   };
 
   return (
@@ -111,16 +115,16 @@ const HomePageImagesPage = () => {
         {images.map((img) => (
           <div key={img.id} className="border rounded-lg overflow-hidden shadow-sm relative group">
             <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden relative">
-              {img.image ? (
-                <img src={bufferToBase64(img.image) || ""} alt="Desktop Banner" className="w-full h-full object-cover" />
+              {img.imageUrl ? (
+                <img src={getDesktopImageSrc(img) || ""} alt="Desktop Banner" className="w-full h-full object-cover" />
               ) : (
                 <div className="text-gray-400">No Desktop Image</div>
               )}
 
               {/* Mobile Image Overlay (bottom right corner) */}
               <div className="absolute bottom-2 right-2 w-16 h-24 border-2 border-white shadow-md bg-gray-200 overflow-hidden rounded-md z-10 hover:scale-150 transition-transform origin-bottom-right">
-                {img.mobileImage ? (
-                  <img src={bufferToBase64(img.mobileImage) || ""} alt="Mobile Banner" className="w-full h-full object-cover" />
+                {img.mobileImageUrl ? (
+                  <img src={getMobileImageSrc(img) || ""} alt="Mobile Banner" className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex items-center justify-center h-full text-[8px] text-gray-500 text-center p-1">No Mobile</div>
                 )}

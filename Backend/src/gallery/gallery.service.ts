@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Gallery } from './entity/gallery.entity';
@@ -12,16 +14,26 @@ export class GalleryService {
     private galleryRepo: Repository<Gallery>,
   ) {}
 
-  // 1. CREATE
   async create(dto: CreateGalleryDto, imageFile: Express.Multer.File) {
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const extension = path.extname(imageFile.originalname);
+    const filename = `gallery-${uniqueSuffix}${extension}`;
+    const uploadPath = path.join(uploadDir, filename);
+
+    fs.writeFileSync(uploadPath, imageFile.buffer);
+
     const gallery = this.galleryRepo.create({
       ...dto,
-      image: imageFile.buffer,
+      imageUrl: filename,
     });
     return this.galleryRepo.save(gallery);
   }
 
-  // 2. FIND ALL (with Pagination & Filtering)
   async findAll({ category, search, page, limit, all }: any) {
     const query = this.galleryRepo.createQueryBuilder('gallery');
 
@@ -59,14 +71,12 @@ export class GalleryService {
     };
   }
 
-  // 3. FIND ONE
   async findOne(id: string) {
     const gallery = await this.galleryRepo.findOneBy({ id });
     if (!gallery) return null;
     return gallery;
   }
 
-  // 4. UPDATE
   async update(id: string, dto: UpdateGalleryDto, file?: Express.Multer.File) {
     const existing = await this.galleryRepo.findOneBy({ id });
     if (!existing) throw new NotFoundException('Gallery item not found');
@@ -74,19 +84,43 @@ export class GalleryService {
     const updatedData: any = { ...dto };
 
     if (file) {
-      updatedData.image = file.buffer;
+      const uploadDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const extension = path.extname(file.originalname);
+      const filename = `gallery-${uniqueSuffix}${extension}`;
+      const uploadPath = path.join(uploadDir, filename);
+
+      fs.writeFileSync(uploadPath, file.buffer);
+      updatedData.imageUrl = filename;
     }
 
     await this.galleryRepo.update(id, updatedData);
     return this.galleryRepo.findOneBy({ id });
   }
 
-  // 5. REMOVE
   async remove(id: string) {
+    const galleryItem = await this.galleryRepo.findOneBy({ id });
+    if (galleryItem && galleryItem.imageUrl) {
+      const filePath = path.join(
+        process.cwd(),
+        'uploads',
+        galleryItem.imageUrl,
+      );
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (err) {
+          console.error('Error deleting gallery image:', err);
+        }
+      }
+    }
     return this.galleryRepo.delete(id);
   }
 
-  // 6. GET CATEGORIES
   async getCategories() {
     return await this.galleryRepo
       .createQueryBuilder('gallery')
@@ -100,7 +134,7 @@ export class GalleryService {
         results.map((r) => r.gallery_category).filter(Boolean),
       );
   }
-  // 7. COUNT ALL
+
   async countAll() {
     return this.galleryRepo.count();
   }

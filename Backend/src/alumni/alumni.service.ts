@@ -1,5 +1,7 @@
 // src/alumni/alumni.service.ts
 import { Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
@@ -43,7 +45,20 @@ export class AlumniService {
       throw new Error('Thumbnail image is required');
     }
     const podcast = this.podcastRepo.create(data);
-    podcast.thumbnail = file.buffer;
+
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const extension = path.extname(file.originalname);
+    const filename = `alumni-podcast-${uniqueSuffix}${extension}`;
+    const uploadPath = path.join(uploadDir, filename);
+
+    fs.writeFileSync(uploadPath, file.buffer);
+    podcast.thumbnailUrl = filename;
+
     return this.podcastRepo.save(podcast);
   }
 
@@ -64,12 +79,38 @@ export class AlumniService {
     podcast.title = title;
     podcast.url = url;
     if (file) {
-      podcast.thumbnail = file.buffer;
+      const uploadDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const extension = path.extname(file.originalname);
+      const filename = `alumni-podcast-${uniqueSuffix}${extension}`;
+      const uploadPath = path.join(uploadDir, filename);
+
+      fs.writeFileSync(uploadPath, file.buffer);
+      podcast.thumbnailUrl = filename;
     }
     return this.podcastRepo.save(podcast);
   }
 
   async removePodcast(id: number) {
+    const podcast = await this.podcastRepo.findOne({ where: { id } });
+    if (podcast && podcast.thumbnailUrl) {
+      const filePath = path.join(
+        process.cwd(),
+        'uploads',
+        podcast.thumbnailUrl,
+      );
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (err) {
+          console.error('Error deleting file:', err);
+        }
+      }
+    }
     return this.podcastRepo.delete(id);
   }
 }
