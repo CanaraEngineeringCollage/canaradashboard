@@ -149,12 +149,12 @@ export default function BuzzPage() {
 
   // ✅ Fetch buzz list (with filters)
   useEffect(() => {
-    fetchBuzzes(currentPage, limit, category, search, editionFilter);
+    fetchBuzzes(currentPage, limit, category, search, editionFilter, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, limit, category, search, editionFilter]);
 
-  const fetchBuzzes = async (page: number, limit: number, categoryFilter: string, searchTerm: string, editionTerm: string) => {
-    setIsLoading(true);
+  const fetchBuzzes = async (page: number, limit: number, categoryFilter: string, searchTerm: string, editionTerm: string, showLoader = true) => {
+    if (showLoader) setIsLoading(true);
     try {
       const response = await getAllBuzz(page, limit, categoryFilter, searchTerm, editionTerm);
       setBuzzes(response.data);
@@ -167,14 +167,14 @@ export default function BuzzPage() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      if (showLoader) setIsLoading(false);
     }
   };
 
   const DeleteBuzz = async (id: string) => {
     try {
       await deleteBuzz(id);
-      await fetchBuzzes(currentPage, limit, category, search, editionFilter);
+      await fetchBuzzes(currentPage, limit, category, search, editionFilter, false);
       await fetchCategories(); // Refresh categories
       await fetchEditions(); // Refresh editions
       toast({
@@ -333,10 +333,10 @@ export default function BuzzPage() {
                                           d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                                         />
                                       </svg>
-                                     View {edition.editionName}
-                                      <span className="ml-2 px-1.5 py-0.5 rounded-full bg-blue-200/50 text-xs text-blue-800 font-bold">
+                                      View All in {edition.editionName}
+                                      {/* <span className="ml-2 px-1.5 py-0.5 rounded-full bg-blue-200/50 text-xs text-blue-800 font-bold">
                                         {edition.items?.length || 0}
-                                      </span>
+                                      </span> */}
                                     </Link>
                                   ))}
                               </div>
@@ -420,7 +420,7 @@ export default function BuzzPage() {
             }
 
             // ✅ Refresh with current filters
-            await fetchBuzzes(currentPage, limit, category, search, editionFilter);
+            await fetchBuzzes(currentPage, limit, category, search, editionFilter, false);
             await fetchCategories(); // Refresh categories
             await fetchEditions();
 
