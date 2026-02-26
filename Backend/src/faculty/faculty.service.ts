@@ -109,7 +109,7 @@ export class FacultyService {
 
     const faculty = this.facultyRepository.create(createFacultyDto);
     if (avatar) {
-      faculty.avatar = avatar.buffer;
+      faculty.avatar = `/uploads/${avatar.filename}`;
     }
     return this.facultyRepository.save(faculty);
   }
@@ -479,7 +479,7 @@ export class FacultyService {
 
     Object.assign(faculty, updateFacultyDto);
     if (avatar) {
-      faculty.avatar = avatar.buffer;
+      faculty.avatar = `/uploads/${avatar.filename}`;
     }
     return this.facultyRepository.save(faculty);
   }

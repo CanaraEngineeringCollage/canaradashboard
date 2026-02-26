@@ -17,6 +17,7 @@ import { AlumniService } from './alumni.service';
 import { CreateAlumniDto } from './dto/create-alumni.dto';
 import { CreateAlumniPodcastDto } from './dto/create-alumni-podcast.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { multerConfig } from 'src/config/multer.config';
 
 @Controller('alumni')
 export class AlumniController {
@@ -42,7 +43,7 @@ export class AlumniController {
   }
   @UseGuards(JwtAuthGuard)
   @Post('podcast')
-  @UseInterceptors(FileInterceptor('thumbnail'))
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   createPodcast(
     @Body() data: CreateAlumniPodcastDto,
     @UploadedFile() file: Express.Multer.File,
@@ -63,7 +64,7 @@ export class AlumniController {
   }
 
   @Patch('podcast/:id')
-  @UseInterceptors(FileInterceptor('thumbnail'))
+  @UseInterceptors(FileInterceptor('thumbnail', multerConfig))
   updatePodcast(
     @Param('id') id: string,
     @Body() data: { title: string; url: string },

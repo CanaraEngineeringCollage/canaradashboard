@@ -7,6 +7,7 @@ import { LandPlot, PlusCircle, Upload } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import TablePagination from "@/components/ui/TablePagination";
 import { useRouter } from "next/navigation";
+import { getImageUrl } from "@/lib/utils";
 import { decryptToken } from "@/lib/encrypt";
 
 // Interfaces
@@ -105,10 +106,17 @@ const departments = [
 
 const subDepartments = ["Chemistry", "Physics", "Mathematics", "Humanities & Management", "Computintg Science", "Engineering Science", "Civil"];
 
-const bufferToBase64 = (buffer: { type: string; data: number[] }) => {
-  const binary = buffer.data.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
-  const base64 = btoa(binary);
-  return `data:image/jpeg;base64,${base64}`;
+const getAvatarSource = (buffer: any) => {
+  if (!buffer) return "";
+  if (typeof buffer === "string") {
+    return getImageUrl(buffer);
+  }
+  if (buffer.data && Array.isArray(buffer.data)) {
+    const binary = buffer.data.reduce((acc: string, byte: number) => acc + String.fromCharCode(byte), "");
+    const base64 = btoa(binary);
+    return `data:${buffer.type || "image/jpeg"};base64,${base64}`;
+  }
+  return "";
 };
 
 const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, mode, facultyToEdit, API_BASE_URL, facultyList }) => {
@@ -1241,7 +1249,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 />
                 {errors.avatar && <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>}
                 {faculty.avatar && (
-                  <img src={bufferToBase64(faculty.avatar)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
+                  <img src={getAvatarSource(faculty.avatar)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
                 )}
               </div>
               <div className="col-span-full border-t pt-4 mt-2">
@@ -2200,7 +2208,7 @@ const Page: React.FC = () => {
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
                 {faculty.avatar && (
-                  <img src={bufferToBase64(faculty.avatar)} alt={`${faculty.name}'s avatar`} className="w-12 h-12 object-cover rounded" />
+                  <img src={getAvatarSource(faculty.avatar)} alt={`${faculty.name}'s avatar`} className="w-12 h-12 object-cover rounded" />
                 )}
               </td>
               <td className="border px-4 py-2">{faculty.name}</td>

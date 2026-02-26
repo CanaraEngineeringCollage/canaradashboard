@@ -13,7 +13,7 @@ export class TimetableService {
   async create(academicYear: string, file: Express.Multer.File) {
     const timetable = this.repo.create({
       academicYear,
-      file: file.buffer,
+      file: `/uploads/${file.filename}`,
       filename: file.originalname,
       mimetype: file.mimetype,
     });

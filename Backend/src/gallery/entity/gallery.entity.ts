@@ -14,8 +14,8 @@ export class Gallery {
   @Column()
   title: string;
 
-  @Column({ type: 'longblob' })
-  image: Buffer;
+  @Column()
+  image: string;
 
   @Column()
   category: string;

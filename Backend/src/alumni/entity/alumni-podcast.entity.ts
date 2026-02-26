@@ -16,8 +16,8 @@ export class AlumniPodcast {
   @Column()
   url: string;
 
-  @Column({ type: 'longblob' })
-  thumbnail: Buffer;
+  @Column()
+  thumbnail: string;
 
   @CreateDateColumn()
   createdAt: Date;

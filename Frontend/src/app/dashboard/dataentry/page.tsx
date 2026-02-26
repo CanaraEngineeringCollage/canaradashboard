@@ -3,6 +3,7 @@
 import TablePagination from "@/components/ui/TablePagination";
 import { apiFetch } from "@/lib/client";
 import { decryptToken } from "@/lib/encrypt";
+import { getImageUrl } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +13,9 @@ interface FileItem {
   mimetype: string;
   type: "pdf" | "image" | "video";
   department: string;
+  file?: string;
+  avatar?: string;
+  video?: string;
 }
 
 const departments = [
@@ -262,11 +266,11 @@ export default function UploadPage() {
           files.map((f) => (
             <div key={f.id} className="p-4 bg-white rounded-xl shadow border flex flex-col items-center">
               {f.type === "image" ? (
-                <img src={`${process.env.NEXT_PUBLIC_API_URL}/files/${f.name}`} className="w-40 h-40 object-cover rounded-md border" />
+                <img src={getImageUrl(f.file || f.avatar)} className="w-40 h-40 object-cover rounded-md border" />
               ) : f.type === "video" ? (
-                <video src={`${process.env.NEXT_PUBLIC_API_URL}/files/${f.name}`} controls className="w-40 h-40 object-cover rounded-md border" />
+                <video src={getImageUrl(f.video)} controls className="w-40 h-40 object-cover rounded-md border" />
               ) : (
-                <a href={`${process.env.NEXT_PUBLIC_API_URL}/files/${f.name}`} target="_blank" className="text-blue-600 underline mt-4 truncate">
+                <a href={getImageUrl(f.file)} target="_blank" className="text-blue-600 underline mt-4 truncate">
                   {f.name}
                 </a>
               )}

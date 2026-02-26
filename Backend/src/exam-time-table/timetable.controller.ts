@@ -13,16 +13,19 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { TimetableService } from './timetable.service';
 import { CreateTimetableDto } from './dto/timetable.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-
+import { multerConfig } from 'src/config/multer.config';
 
 @Controller('timetables')
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      ...multerConfig,
+      limits: { fileSize: 150 * 1024 * 1024 }, // 150MB limit
+    }),
+  )
   async upload(
     @Body() body: CreateTimetableDto,
     @UploadedFile() file: Express.Multer.File,
@@ -34,7 +37,7 @@ export class TimetableController {
   async findAll() {
     return this.timetableService.findAll();
   }
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number) {
     return this.timetableService.remove(id);

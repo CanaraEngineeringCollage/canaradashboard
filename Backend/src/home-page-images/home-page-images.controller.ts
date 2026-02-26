@@ -13,6 +13,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/config/multer.config';
 import { HomePageImagesService } from './home-page-images.service';
 import { CreateHomePageImageDto } from './dto/create-home-page-image.dto';
 
@@ -22,10 +23,13 @@ export class HomePageImagesController {
 
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'image', maxCount: 1 },
-      { name: 'mobileImage', maxCount: 1 },
-    ]),
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'mobileImage', maxCount: 1 },
+      ],
+      multerConfig,
+    ),
   )
   create(
     @Body() dto: CreateHomePageImageDto,

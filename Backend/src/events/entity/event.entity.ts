@@ -1,4 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Event {
@@ -11,21 +16,21 @@ export class Event {
   // @Column()
   // tagline: string;
 
-   @Column({ type: 'longtext' }) 
+  @Column({ type: 'longtext' })
   description: string;
 
   @Column({ nullable: true })
   date: string;
 
-  @Column({ type: 'longblob', nullable: true }) 
-  image: Buffer;
+  @Column({ nullable: true })
+  image: string;
 
   @Column({ nullable: true })
   videoUrl: string;
 
-   @Column()
+  @Column()
   category: string;
 
-   @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 }

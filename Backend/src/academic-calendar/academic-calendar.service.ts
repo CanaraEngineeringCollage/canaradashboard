@@ -17,7 +17,7 @@ export class AcademicCalendarService {
   ) {
     const calendar = this.repo.create({
       ...createDto,
-      pdf: file.buffer,
+      pdf: `/uploads/${file.filename}`,
     });
     return await this.repo.save(calendar);
   }
@@ -37,7 +37,7 @@ export class AcademicCalendarService {
     }
 
     if (file) {
-      calendar.pdf = file.buffer;
+      calendar.pdf = `/uploads/${file.filename}`;
     }
 
     return await this.repo.save(calendar);

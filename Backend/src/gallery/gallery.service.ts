@@ -16,7 +16,7 @@ export class GalleryService {
   async create(dto: CreateGalleryDto, imageFile: Express.Multer.File) {
     const gallery = this.galleryRepo.create({
       ...dto,
-      image: imageFile.buffer,
+      image: `/uploads/${imageFile.filename}`,
     });
     return this.galleryRepo.save(gallery);
   }
@@ -74,7 +74,7 @@ export class GalleryService {
     const updatedData: any = { ...dto };
 
     if (file) {
-      updatedData.image = file.buffer;
+      updatedData.image = `/uploads/${file.filename}`;
     }
 
     await this.galleryRepo.update(id, updatedData);
