@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Buzz } from './entities/buzz.entity';
 import { CreateBuzzDto } from './dto/create-buzz.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class BuzzService {
@@ -31,7 +33,9 @@ export class BuzzService {
 
     if (excludeCategory) {
       const excludeArray = excludeCategory.split(',').map((cat) => cat.trim());
-      query.andWhere('buzz.category NOT IN (:...excludeArray)', { excludeArray });
+      query.andWhere('buzz.category NOT IN (:...excludeArray)', {
+        excludeArray,
+      });
     }
 
     if (search) {
@@ -123,10 +127,56 @@ export class BuzzService {
     return buzz;
   }
 
+  private deleteOldFiles(oldDigest: any[], newDigest?: any[]) {
+    if (!oldDigest || !Array.isArray(oldDigest)) return;
+
+    const oldFiles = new Set<string>();
+    oldDigest.forEach((ed: any) => {
+      if (Array.isArray(ed.items)) {
+        ed.items.forEach((item: any) => {
+          if (item.pdf && item.pdf.startsWith('buzz-digest-')) {
+            oldFiles.add(item.pdf);
+          }
+        });
+      }
+    });
+
+    const newFiles = new Set<string>();
+    if (newDigest && Array.isArray(newDigest)) {
+      newDigest.forEach((ed: any) => {
+        if (Array.isArray(ed.items)) {
+          ed.items.forEach((item: any) => {
+            if (item.pdf && item.pdf.startsWith('buzz-digest-')) {
+              newFiles.add(item.pdf);
+            }
+          });
+        }
+      });
+    }
+
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    oldFiles.forEach((filename) => {
+      if (!newFiles.has(filename)) {
+        const filePath = path.join(uploadDir, filename);
+        if (fs.existsSync(filePath)) {
+          try {
+            fs.unlinkSync(filePath);
+          } catch (e) {
+            console.error(`Failed to delete buzz digest file: ${filename}`, e);
+          }
+        }
+      }
+    });
+  }
+
   async updateBuzz(id: string, createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     const buzz = await this.buzzRepository.findOne({ where: { id } });
     if (!buzz) {
       throw new NotFoundException(`Buzz with ID ${id} not found`);
+    }
+
+    if (buzz.category === 'Weekly Digest') {
+      this.deleteOldFiles(buzz.weeklyDigest, createBuzzDto.weeklyDigest);
     }
 
     Object.assign(buzz, createBuzzDto);
@@ -134,6 +184,15 @@ export class BuzzService {
   }
 
   async deleteBuzz(id: string): Promise<void> {
+    const buzz = await this.buzzRepository.findOne({ where: { id } });
+    if (!buzz) {
+      throw new NotFoundException(`Buzz with ID ${id} not found`);
+    }
+
+    if (buzz.category === 'Weekly Digest') {
+      this.deleteOldFiles(buzz.weeklyDigest, []); // Pass empty array to delete all
+    }
+
     const result = await this.buzzRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Buzz with ID ${id} not found`);
