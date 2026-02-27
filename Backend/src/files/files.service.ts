@@ -36,7 +36,7 @@ export class FilesService {
       }
 
       const newFile = this.fileRepo.create({
-        name: customName || file.originalname, 
+        name: customName || file.originalname,
         mimetype: file.mimetype,
         type,
         department,
@@ -47,16 +47,16 @@ export class FilesService {
 
       return await this.fileRepo.save(newFile);
     } catch (error) {
-      console.error("Error processing/saving file:", error);
+      console.error('Error processing/saving file:', error);
       // Clean up uploaded video if DB save fails
       if (videoFilename) {
         const uploadPath = path.join(process.cwd(), 'uploads', videoFilename);
         if (fs.existsSync(uploadPath)) {
-            try {
-                fs.unlinkSync(uploadPath);
-            } catch (unlinkError) {
-                console.error("Error cleaning up file:", unlinkError);
-            }
+          try {
+            fs.unlinkSync(uploadPath);
+          } catch (unlinkError) {
+            console.error('Error cleaning up file:', unlinkError);
+          }
         }
       }
       throw error;
@@ -76,39 +76,48 @@ export class FilesService {
     return file;
   }
 
- async getAllFiles(
-  search?: string,
-  type?: 'pdf' | 'image' | 'video',
-  department?: string,
-  page: number = 1,
-  limit: number = 10,
-) {
-  const qb = this.fileRepo.createQueryBuilder('file');
+  async getAllFiles(
+    search?: string,
+    type?: 'pdf' | 'image' | 'video',
+    department?: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const qb = this.fileRepo.createQueryBuilder('file');
 
-  if (search) {
-    qb.andWhere('file.name LIKE :search', { search: `%${search}%` });
+    if (search) {
+      qb.andWhere('file.name LIKE :search', { search: `%${search}%` });
+    }
+    if (type) {
+      qb.andWhere('file.type = :type', { type });
+    }
+    if (department) {
+      qb.andWhere('file.department = :department', { department });
+    }
+
+    qb.orderBy('file.id', 'DESC');
+
+    const total = await qb.getCount();
+    const data = await qb
+      .select([
+        'file.id',
+        'file.name',
+        'file.mimetype',
+        'file.type',
+        'file.department',
+        'file.video',
+      ])
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
-  if (type) {
-    qb.andWhere('file.type = :type', { type });
-  }
-  if (department) {
-    qb.andWhere('file.department = :department', { department });
-  }
-
-  qb.orderBy('file.id', 'DESC');
-
-  const total = await qb.getCount();
-  const data = await qb.skip((page - 1) * limit).take(limit).getMany();
-
-  return {
-    data,
-    total,
-    currentPage: page,
-    totalPages: Math.ceil(total / limit),
-  };
-}
-
-
 
   async deleteFile(id: number) {
     const file = await this.fileRepo.findOne({ where: { id } });

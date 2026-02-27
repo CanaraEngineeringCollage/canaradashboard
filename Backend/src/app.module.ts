@@ -35,9 +35,6 @@ import { HomePageImagesModule } from './home-page-images/home-page-images.module
       database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
-      extra: {
-        maxAllowedPacket: 157286400, // 150MB
-      },
     }),
     BuzzModule,
     EventModule,
@@ -60,15 +57,4 @@ import { HomePageImagesModule } from './home-page-images/home-page-images.module
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-
-  async onModuleInit() {
-    try {
-      await this.dataSource.query('SET GLOBAL max_allowed_packet=157286400');
-      console.log('Successfully set GLOBAL max_allowed_packet to 150MB');
-    } catch (error) {
-      console.error('Failed to set max_allowed_packet:', error);
-    }
-  }
-}
+export class AppModule {}
