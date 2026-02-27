@@ -95,11 +95,11 @@ export function BuzzEditor({
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const response = await apiFetch("/files/upload?type=pdf&department=Common", {
+      const response = await apiFetch("/buzz/upload-pdf", {
         method: "POST",
         body: formData,
       });
-      return response.name;
+      return response.filename;
     } catch (error) {
       console.error("PDF Upload failed", error);
       throw error;
@@ -347,7 +347,8 @@ export function BuzzEditor({
                       size="sm"
                       onClick={() => {
                         const newDigest = [...weeklyDigest];
-                        newDigest[edIdx].items.push({ name: "", pdf: "" });
+                        const newItemName = `Issue ${newDigest[edIdx].items.length + 1}`;
+                        newDigest[edIdx].items.push({ name: newItemName, pdf: "" });
                         setWeeklyDigest(newDigest);
                       }}
                     >
@@ -383,18 +384,21 @@ export function BuzzEditor({
                           placeholder="Item Name (e.g. Circular 1)"
                           className="flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm focus:outline-none"
                         />
-                        <div className="flex-1 flex items-center gap-2">
-                          <input
-                            type="file"
-                            accept="application/pdf"
-                            onChange={(e) => handleItemFileChange(e, edIdx, itemIdx)}
-                            className="text-sm w-full"
-                          />
-                          {(item.file || item.pdf) && (
-                            <span className="text-xs text-green-600 font-semibold truncate max-w-[150px]">
-                              {item.file ? item.file.name : item.pdf}
+                        <div className="flex-1">
+                          <label className="flex items-center gap-2 cursor-pointer w-fit">
+                            <span className="bg-[#efefef] border border-[#767676] px-2 py-[2px] text-[13.3333px] text-black hover:bg-[#e5e5e5] rounded-[2px]">
+                              Choose File
                             </span>
-                          )}
+                            <span className="text-[13.3333px] text-black truncate max-w-[200px]">
+                              {item.file ? item.file.name : item.pdf ? item.pdf.replace("buzz-digest-", "") : "No file chosen"}
+                            </span>
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              onChange={(e) => handleItemFileChange(e, edIdx, itemIdx)}
+                              className="hidden"
+                            />
+                          </label>
                         </div>
                         <Button
                           type="button"

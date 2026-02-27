@@ -8,7 +8,15 @@ import {
   Param,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  Res,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import * as path from 'path';
+import * as fs from 'fs';
 import { BuzzService } from './buzz.service';
 import { Buzz } from './entities/buzz.entity';
 import { CreateBuzzDto } from './dto/create-buzz.dto';
@@ -49,6 +57,34 @@ export class BuzzController {
   @Post()
   async createBuzz(@Body() createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     return this.buzzService.createBuzz(createBuzzDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('upload-pdf')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadPdf(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const extension = path.extname(file.originalname);
+    const filename = `buzz-digest-${uniqueSuffix}${extension}`;
+    const uploadPath = path.join(uploadDir, filename);
+
+    fs.writeFileSync(uploadPath, file.buffer);
+
+    return { filename };
+  }
+
+  @Get('file/:filename')
+  getFile(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(process.cwd(), 'uploads', filename);
+    return res.sendFile(filePath);
   }
 
   @Get('categories')

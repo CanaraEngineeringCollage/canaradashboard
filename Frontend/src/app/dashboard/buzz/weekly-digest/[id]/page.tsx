@@ -38,7 +38,7 @@ export default function WeeklyDigestEditionPage() {
         setBuzz(data);
 
         if (data && Array.isArray(data.weeklyDigest)) {
-          const targetEdition = data.weeklyDigest.find((ed) => ed.editionName === editionName);
+          const targetEdition = data.weeklyDigest.find((ed: any) => ed.editionName === editionName);
           if (targetEdition) {
             setItems(targetEdition.items || []);
           } else {
@@ -87,55 +87,56 @@ export default function WeeklyDigestEditionPage() {
           {items.map((item, idx) => (
             <div key={idx} className="flex flex-col w-40">
               <a
-                href={`${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`}
+                href={
+                  item.pdf?.startsWith("buzz-digest-")
+                    ? `${process.env.NEXT_PUBLIC_API_URL}/buzz/file/${item.pdf}`
+                    : `${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block transition-transform hover:scale-105"
               >
-                {/* Fixed wrapper acting as "w-40 h-56 object-cover rounded shadow" */}
-             {/* Fixed wrapper acting exactly as "w-40 h-56 object-cover rounded shadow" */}
-<div className="w-40 h-48 overflow-hidden rounded shadow bg-gray-100 relative">
-  <Document
-    file={`${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`}
-    loading={
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 transition-colors animate-pulse">
-        <FileText className="w-8 h-8" />
-      </div>
-    }
-    error={
-      <div className="absolute inset-0 flex items-center justify-center bg-red-50 text-red-500 transition-colors">
-        <FileText className="w-8 h-8" />
-      </div>
-    }
-    className="w-full h-full"
-  >
-    {/* We set the baseline width to 160px (w-40). 
+                {/* Fixed wrapper acting exactly as "w-40 h-56 object-cover rounded shadow" */}
+                <div className="w-40 h-48 overflow-hidden rounded shadow bg-gray-100 relative">
+                  <Document
+                    file={
+                      item.pdf?.startsWith("buzz-digest-")
+                        ? `${process.env.NEXT_PUBLIC_API_URL}/buzz/file/${item.pdf}`
+                        : `${process.env.NEXT_PUBLIC_API_URL}/files/${item.pdf}`
+                    }
+                    loading={
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 transition-colors animate-pulse">
+                        <FileText className="w-8 h-8" />
+                      </div>
+                    }
+                    error={
+                      <div className="absolute inset-0 flex items-center justify-center bg-red-50 text-red-500 transition-colors">
+                        <FileText className="w-8 h-8" />
+                      </div>
+                    }
+                    className="w-full h-full"
+                  >
+                    {/* We set the baseline width to 160px (w-40). 
       The custom className targets the inner canvas, forcing it to fill the 
       parent block and crop cleanly using object-cover.
     */}
-    <Page 
-      pageNumber={1} 
-      width={160} 
-      renderTextLayer={false} 
-      renderAnnotationLayer={false} 
-      className="w-full h-full [&>canvas]:!w-full [&>canvas]:!h-full [&>canvas]:!object-fit"
-    />
-  </Document>
-</div>
+                    <Page
+                      pageNumber={1}
+                      width={160}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                      className="w-full h-full [&>canvas]:!w-full [&>canvas]:!h-full [&>canvas]:!object-fit"
+                    />
+                  </Document>
+                </div>
               </a>
-              
+
               {/* Item Title matching Magazines */}
-              <span className="mt-2 text-center text-sm font-medium line-clamp-2 leading-tight">
-                {item.name || "Untitled Document"}
-              </span>
+              <span className="mt-2 text-center text-sm font-medium line-clamp-2 leading-tight">{item.name || "Untitled Document"}</span>
             </div>
           ))}
 
-          {items.length === 0 && (
-            <div className="w-full py-12 text-center text-gray-400">
-              No resources available in this edition.
-            </div>
-          )}
+          {items.length === 0 && <div className="w-full py-12 text-center text-gray-400">No resources available in this edition.</div>}
         </div>
       </div>
     </div>
