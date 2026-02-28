@@ -40,6 +40,7 @@ export class AcademicCalendarController {
     return this.service.findOne();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('pdf'))
   update(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
