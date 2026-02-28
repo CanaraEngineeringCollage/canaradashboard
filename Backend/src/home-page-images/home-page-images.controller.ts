@@ -12,17 +12,20 @@ import {
   FileTypeValidator,
   BadRequestException,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import * as path from 'path';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { HomePageImagesService } from './home-page-images.service';
 import { CreateHomePageImageDto } from './dto/create-home-page-image.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('home-page-images')
 export class HomePageImagesController {
   constructor(private readonly service: HomePageImagesService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -60,6 +63,7 @@ export class HomePageImagesController {
     return this.service.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(id);

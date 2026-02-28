@@ -22,6 +22,7 @@ import { AppService } from './app.service';
 
 import { AcademicCalendarModule } from './academic-calendar/academic-calendar.module';
 import { HomePageImagesModule } from './home-page-images/home-page-images.module';
+import { AcademicSyllabusModule } from './academic-syllabus/academic-syllabus.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { HomePageImagesModule } from './home-page-images/home-page-images.module
     GalleryModule,
     AcademicCalendarModule,
     HomePageImagesModule,
+    AcademicSyllabusModule,
   ],
   controllers: [AppController],
   providers: [AppService],
