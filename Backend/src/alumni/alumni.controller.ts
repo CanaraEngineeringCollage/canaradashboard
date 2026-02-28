@@ -71,6 +71,7 @@ export class AlumniController {
     return res.sendFile(filePath);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('podcast/:id')
   @UseInterceptors(FileInterceptor('thumbnail'))
   updatePodcast(
@@ -81,6 +82,7 @@ export class AlumniController {
     return this.alumniService.updatePodcast(+id, data.title, data.url, file);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('podcast/:id')
   removePodcast(@Param('id') id: string) {
     return this.alumniService.removePodcast(+id);
