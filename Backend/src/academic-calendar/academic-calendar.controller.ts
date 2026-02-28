@@ -18,11 +18,14 @@ import { AcademicCalendarService } from './academic-calendar.service';
 import { CreateAcademicCalendarDto } from './dto/create-academic-calendar.dto';
 import { Response } from 'express';
 import * as path from 'path';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @Controller('academic-calendar')
 export class AcademicCalendarController {
   constructor(private readonly service: AcademicCalendarService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('pdf'))
   create(

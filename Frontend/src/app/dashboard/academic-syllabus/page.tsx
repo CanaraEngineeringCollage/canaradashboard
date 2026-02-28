@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpen, FileText, Loader2, Plus, Trash2, Edit } from "lucide-react";
 import React, { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 import { api } from "@/lib/axiosClient";
 import TablePagination from "@/components/ui/TablePagination";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -70,6 +72,25 @@ export default function AcademicSyllabusPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
+    try {
+      const decrypted = decryptToken(encrypted);
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }, [router]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -81,7 +102,12 @@ export default function AcademicSyllabusPage() {
       if (filterDepartment) params.append("department", filterDepartment);
       if (filterCategory) params.append("category", filterCategory);
 
-      const res = await api.get(`/academic-syllabus?${params.toString()}`);
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+
+      const res = await api.get(`/academic-syllabus?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.data) {
         setDataList(res.data.data || []);
         setTotalPages(res.data.totalPages || 0);
@@ -171,8 +197,14 @@ export default function AcademicSyllabusPage() {
       formPayload.append("category", formData.category);
       formPayload.append("pdf", selectedFile);
 
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+
       await api.post("/academic-syllabus", formPayload, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       toast({ title: "Success", description: "Added successfully" });
@@ -222,8 +254,14 @@ export default function AcademicSyllabusPage() {
         formPayload.append("pdf", editSelectedFile);
       }
 
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+
       await api.patch(`/academic-syllabus/${editId}`, formPayload, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       toast({ title: "Success", description: "Updated successfully" });
@@ -244,7 +282,12 @@ export default function AcademicSyllabusPage() {
 
   const confirmDelete = async (id: number) => {
     try {
-      await api.delete(`/academic-syllabus/${id}`);
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+
+      await api.delete(`/academic-syllabus/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast({ title: "Success", description: "Record deleted successfully" });
       fetchData();
     } catch (error) {

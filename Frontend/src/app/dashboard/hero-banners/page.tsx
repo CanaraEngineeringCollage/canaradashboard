@@ -4,6 +4,8 @@ import { PageTitle } from "@/components/page-title";
 import { Image as ImageIcon, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 import { getAllHomePageImages, createHomePageImage, deleteHomePageImage } from "@/lib/home-page-images";
 import AddImageModal from "./components/AddImageModal";
 import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
@@ -20,6 +22,25 @@ const HomePageImagesPage = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
+    try {
+      const decrypted = decryptToken(encrypted);
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }, [router]);
 
   const fetchImages = async () => {
     setIsLoading(true);

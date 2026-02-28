@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Loader2, Upload, FileText, Plus } from "lucide-react";
 import React, { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { decryptToken } from "@/lib/encrypt";
 import { api } from "@/lib/axiosClient";
 
 interface AcademicCalendar {
@@ -27,12 +29,36 @@ export default function AcademicCalendarPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
+    try {
+      const decrypted = decryptToken(encrypted);
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }, [router]);
 
   const fetchCalendar = useCallback(async () => {
     setLoading(true);
     try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+
       // Just fetch the latest one
-      const res = await api.get("/academic-calendar");
+      const res = await api.get("/academic-calendar", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.data) {
         setCalendar(res.data);
       } else {
@@ -109,6 +135,9 @@ export default function AcademicCalendarPage() {
 
     setSubmitting(true);
     try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+
       const formData = new FormData();
       // Hardcode required backend fields
       // formData.append("year", "Current");
@@ -120,12 +149,18 @@ export default function AcademicCalendarPage() {
 
       if (calendar) {
         await api.patch(`/academic-calendar/${calendar.id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
         });
         toast({ title: "Success", description: "Calendar updated successfully" });
       } else {
         await api.post("/academic-calendar", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
         });
         toast({ title: "Success", description: "Academic Calendar added successfully" });
       }
