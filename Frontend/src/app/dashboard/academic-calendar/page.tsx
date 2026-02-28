@@ -16,6 +16,7 @@ interface AcademicCalendar {
   department: string;
   pdfUrl?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function AcademicCalendarPage() {
@@ -210,7 +211,7 @@ export default function AcademicCalendarPage() {
 
             <div className="space-y-1">
               <h3 className="text-xl font-semibold">Current Academic Calendar</h3>
-              <p className="text-sm text-gray-500">Uploaded {new Date(calendar.createdAt).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500">Updated {new Date(calendar.updatedAt || calendar.createdAt).toLocaleDateString()}</p>
             </div>
 
             <div className="flex gap-3 w-full mt-2">
