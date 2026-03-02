@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/client";
 import TablePagination from "@/components/ui/TablePagination";
-// your API fetch function
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export interface Alumni {
   id: number;
@@ -27,28 +28,27 @@ const AlumniPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-
   const router = useRouter();
-  
- useEffect(() => {
-   const encrypted = localStorage.getItem("token");
- 
-   if (!encrypted) {
-     router.push("/login");
-     return;
-   }
- 
-   try {
-     const decrypted = decryptToken(encrypted);
-     if (!decrypted || decrypted.length < 10) {
-       localStorage.removeItem("token");
-       router.push("/login");
-     }
-   } catch (err) {
-     localStorage.removeItem("token");
-     router.push("/login");
-   }
- }, []);
+
+  useEffect(() => {
+    const encrypted = localStorage.getItem("token");
+
+    if (!encrypted) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const decrypted = decryptToken(encrypted);
+      if (!decrypted || decrypted.length < 10) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (err) {
+      localStorage.removeItem("token");
+      router.push("/login");
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,23 +56,17 @@ const AlumniPage = () => {
       const token = encrypted ? decryptToken(encrypted) : null;
       setLoading(true);
       try {
-        const result = await apiFetch(
-          `/alumni?page=${currentPage}&limit=${itemsPerPage}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`, // ✅ send token
-            },
-          }
-        );
+        const result = await apiFetch(`/alumni?page=${currentPage}&limit=${itemsPerPage}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ send token
+          },
+        });
 
-      const { data, total } = result;
-      
+        const { data, total } = result;
+
         // sort by createdAt descending
-        const sorted = data.sort(
-          (a: Alumni, b: Alumni) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        const sorted = data.sort((a: Alumni, b: Alumni) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setAlumniList(sorted);
         setTotalPages(Math.ceil(total / itemsPerPage));
       } catch (error) {
@@ -84,66 +78,110 @@ const AlumniPage = () => {
     fetchData();
   }, [currentPage, itemsPerPage]);
 
+  const handleDownloadCsv = async () => {
+    try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+      const result = await apiFetch(`/alumni?page=1&limit=100000`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = result.data || [];
+      if (data.length === 0) return;
+
+      const headers = ["Date", "Full Name", "Email", "Phone", "Date of Birth", "USN", "Address", "Comments"];
+      const csvRows = [headers.join(",")];
+
+      data.forEach((c: Alumni) => {
+        const row = [
+          new Date(c.createdAt).toLocaleDateString("en-GB"),
+          `"${(c.fullName || "").replace(/"/g, '""')}"`,
+          `"${(c.email || "").replace(/"/g, '""')}"`,
+          `"${(c.phone || "").replace(/"/g, '""')}"`,
+          c.dateOfBirth ? new Date(c.dateOfBirth).toLocaleDateString("en-GB") : "",
+          `"${(c.usn || "").replace(/"/g, '""')}"`,
+          `"${(c.address || "").replace(/"/g, '""')}"`,
+          `"${(c.comments || "").replace(/"/g, '""')}"`,
+        ];
+        csvRows.push(row.join(","));
+      });
+
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "alumni_submissions.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Failed to download CSV", err);
+    }
+  };
+
   return (
     <div className="p-6">
-      <PageTitle title="Alumni Network" icon={GraduationCap} />
+      <div className="flex justify-between items-center mb-4">
+        <PageTitle title="Alumni Submission" icon={GraduationCap} />
+        <Button onClick={handleDownloadCsv} className="bg-primary text-white">
+          <Download className="mr-2 h-4 w-4" /> Download CSV
+        </Button>
+      </div>
 
       {loading ? (
         <p>Loading...</p>
       ) : (
         <>
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 rounded-lg">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left">Full Name</th>
-                <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Phone</th>
-                <th className="px-4 py-2 text-left">Date of Birth</th>
-                <th className="px-4 py-2 text-left">USN</th>
-                <th className="px-4 py-2 text-left">Address</th>
-                <th className="px-4 py-2 text-left">Comments</th>
-              </tr>
-            </thead>
-            <tbody>
-              {alumniList.map((alumni) => (
-                <tr
-                  key={alumni.id}
-                  className="border-t border-gray-200 hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2">{alumni.fullName}</td>
-                  <td className="px-4 py-2">{alumni.email}</td>
-                  <td className="px-4 py-2">{alumni.phone}</td>
-                  <td className="px-4 py-2">
-                    {new Date(alumni.dateOfBirth).toLocaleDateString("en-GB")}
-                  </td>
-                  <td className="px-4 py-2">{alumni.usn}</td>
-                  <td className="px-4 py-2">{alumni.address}</td>
-                  <td className="px-4 py-2">{alumni.comments}</td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-200 rounded-lg">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">Full Name</th>
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Phone</th>
+                  <th className="px-4 py-2 text-left">Date of Birth</th>
+                  <th className="px-4 py-2 text-left">USN</th>
+                  <th className="px-4 py-2 text-left">Address</th>
+                  <th className="px-4 py-2 text-left">Comments</th>
                 </tr>
-              ))}
-            </tbody>
-               {alumniList.length === 0 && (
-            <tr>
-              <td colSpan={7} className="border px-4 py-2 text-center">
-                No alumni found.
-              </td>
-            </tr>
-          )}
-          </table>
-        </div>
-        <div className="mt-4">
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            rowsPerPage={itemsPerPage}
-            onPageChange={setCurrentPage}
-            onRowsPerPageChange={(rows) => {
-              setItemsPerPage(rows);
-              setCurrentPage(1);
-            }}
-          />
-        </div>
+              </thead>
+              <tbody>
+                {alumniList.map((alumni) => (
+                  <tr key={alumni.id} className="border-t border-gray-200 hover:bg-gray-50">
+                    <td className="px-4 py-2">{alumni.fullName}</td>
+                    <td className="px-4 py-2">{alumni.email}</td>
+                    <td className="px-4 py-2">{alumni.phone}</td>
+                    <td className="px-4 py-2">{new Date(alumni.dateOfBirth).toLocaleDateString("en-GB")}</td>
+                    <td className="px-4 py-2">{alumni.usn}</td>
+                    <td className="px-4 py-2">{alumni.address}</td>
+                    <td className="px-4 py-2">{alumni.comments}</td>
+                  </tr>
+                ))}
+              </tbody>
+              {alumniList.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="border px-4 py-2 text-center">
+                    No alumni found.
+                  </td>
+                </tr>
+              )}
+            </table>
+          </div>
+          <div className="mt-4">
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              rowsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onRowsPerPageChange={(rows) => {
+                setItemsPerPage(rows);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
         </>
       )}
     </div>

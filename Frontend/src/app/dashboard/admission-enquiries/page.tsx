@@ -7,6 +7,8 @@ import { UserCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { decryptToken } from "@/lib/encrypt";
 import { apiFetch } from "@/lib/client";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type AdmissionEnquiryType = {
   id: number;
@@ -67,9 +69,55 @@ const AdmissionEnquiriesPage = () => {
     loadData();
   }, [currentPage, itemsPerPage]);
 
+  const handleDownloadCsv = async () => {
+    try {
+      const encrypted = localStorage.getItem("token");
+      const token = encrypted ? decryptToken(encrypted) : null;
+      const result = await apiFetch(`/admission-enquiries?page=1&limit=100000`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = result.data || [];
+      if (data.length === 0) return;
+
+      const headers = ["Date", "Full Name", "Email", "Phone", "Comments"];
+      const csvRows = [headers.join(",")];
+
+      data.forEach((c: AdmissionEnquiryType) => {
+        const row = [
+          new Date(c.createdAt).toLocaleDateString("en-GB"),
+          `"${(c.fullName || "").replace(/"/g, '""')}"`,
+          `"${(c.email || "").replace(/"/g, '""')}"`,
+          `"${(c.phoneNumber || "").replace(/"/g, '""')}"`,
+          `"${(c.comments || "").replace(/"/g, '""')}"`,
+        ];
+        csvRows.push(row.join(","));
+      });
+
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "admission_enquiries.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Failed to download CSV", err);
+    }
+  };
+
   return (
     <div className="p-6">
-      <PageTitle title="Admission Enquiries" icon={UserCheck} />
+      <div className="flex justify-between items-center mb-4">
+        <PageTitle title="Admission Enquiries" icon={UserCheck} />
+        <Button onClick={handleDownloadCsv} className="bg-primary text-white">
+          <Download className="mr-2 h-4 w-4" /> Download CSV
+        </Button>
+      </div>
 
       {loading ? (
         <p>Loading...</p>
