@@ -1,4 +1,3 @@
-// src/faculty/faculty.service.ts
 import {
   Injectable,
   NotFoundException,
@@ -294,6 +293,7 @@ export class FacultyService {
     search,
     keyFunctionary,
     hod,
+    created, // ✅ Added created
   }: {
     department?: string;
     page?: number;
@@ -302,6 +302,7 @@ export class FacultyService {
     search?: string;
     keyFunctionary?: boolean;
     hod?: boolean;
+    created?: boolean; // ✅ Added created
   }) {
     const query = this.facultyRepository
       .createQueryBuilder('faculty')
@@ -324,7 +325,13 @@ export class FacultyService {
       });
       query.orderBy('faculty.keyFunctionaryPriority', 'ASC');
     } else {
-      query.orderBy('faculty.createdAt', 'DESC');
+      // ✅ FIX: Default is priority, fallback to createdAt. If 'created' is true, sort only by createdAt.
+      if (created) {
+        query.orderBy('faculty.createdAt', 'DESC');
+      } else {
+        query.orderBy('faculty.priority', 'ASC');
+        query.addOrderBy('faculty.createdAt', 'DESC');
+      }
     }
 
     if (hod) {

@@ -1,4 +1,3 @@
-// src/faculty/faculty.controller.ts
 import {
   Controller,
   Get,
@@ -68,9 +67,11 @@ export class FacultyController {
     @Query('search') search?: string,
     @Query('keyFunctionary') keyFunctionary?: string,
     @Query('hod') hod?: string,
+    @Query('created') created?: string, // ✅ Added created query
   ) {
     const isKeyFunctionary = keyFunctionary === 'true';
     const isHod = hod === 'true';
+    const isCreated = created === 'true'; // ✅ Parse created param
 
     if (all === 'true') {
       const result = await this.facultyService.findAll({
@@ -79,6 +80,7 @@ export class FacultyController {
         search,
         keyFunctionary: isKeyFunctionary,
         hod: isHod,
+        created: isCreated, // ✅ Pass to service
       });
       if (Array.isArray(result)) {
         result.forEach((faculty: any) => {
@@ -106,6 +108,7 @@ export class FacultyController {
       search,
       keyFunctionary: isKeyFunctionary,
       hod: isHod,
+      created: isCreated, // ✅ Pass to service
     });
 
     if (result && (result as any).data) {

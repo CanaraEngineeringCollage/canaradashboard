@@ -1922,6 +1922,7 @@ const Page: React.FC = () => {
       limit: rowsPerPage.toString(),
       ...(departmentFilter && { department: departmentFilter }),
       ...(search && { search }),
+      created: "true",
     });
     fetch(`${API_BASE_URL}/faculty?${queryParams}`)
       .then((res) => res.json())
