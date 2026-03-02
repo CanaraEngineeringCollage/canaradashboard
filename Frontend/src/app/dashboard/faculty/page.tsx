@@ -1240,9 +1240,15 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.avatar && <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>}
-                {faculty.avatar && (
-                  <img src={bufferToBase64(faculty.avatar)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
-                )}
+                {faculty.avatar ? (
+                  <img src={bufferToBase64(faculty.avatar as any)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
+                ) : faculty.hasAvatar ? (
+                  <img
+                    src={`${API_BASE_URL}/faculty/${faculty.id}/avatar?t=${Date.now()}`}
+                    alt="Avatar preview"
+                    className="mt-2 w-32 h-32 object-cover rounded-full"
+                  />
+                ) : null}
               </div>
               <div className="col-span-full border-t pt-4 mt-2">
                 <div className="flex items-center mb-4">
@@ -2199,8 +2205,12 @@ const Page: React.FC = () => {
           {displayedFaculties.map((faculty) => (
             <tr key={faculty.id}>
               <td className="border px-4 py-2">
-                {faculty.avatar && (
-                  <img src={bufferToBase64(faculty.avatar)} alt={`${faculty.name}'s avatar`} className="w-12 h-12 object-cover rounded" />
+                {faculty.hasAvatar && (
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/faculty/${faculty.id}/avatar?t=${Date.now()}`}
+                    alt={`${faculty.name}'s avatar`}
+                    className="w-12 h-12 object-cover rounded"
+                  />
                 )}
               </td>
               <td className="border px-4 py-2">{faculty.name}</td>
