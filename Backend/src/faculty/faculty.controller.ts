@@ -13,7 +13,10 @@ import {
   BadRequestException,
   UseGuards,
   Query,
+  Res,
+  Header,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
@@ -70,13 +73,20 @@ export class FacultyController {
     const isHod = hod === 'true';
 
     if (all === 'true') {
-      return await this.facultyService.findAll({
+      const result = await this.facultyService.findAll({
         department,
         all: true,
         search,
         keyFunctionary: isKeyFunctionary,
         hod: isHod,
       });
+      if (Array.isArray(result)) {
+        result.forEach((faculty: any) => {
+          faculty.hasAvatar = !!faculty.avatar;
+          delete faculty.avatar;
+        });
+      }
+      return result;
     }
 
     const pageNum = parseInt(page, 10);
@@ -89,7 +99,7 @@ export class FacultyController {
       throw new BadRequestException('Invalid limit');
     }
 
-    return await this.facultyService.findAll({
+    const result = await this.facultyService.findAll({
       department,
       page: pageNum,
       limit: limitNum,
@@ -97,6 +107,15 @@ export class FacultyController {
       keyFunctionary: isKeyFunctionary,
       hod: isHod,
     });
+
+    if (result && (result as any).data) {
+      (result as any).data.forEach((faculty: any) => {
+        faculty.hasAvatar = !!faculty.avatar;
+        delete faculty.avatar;
+      });
+    }
+
+    return result;
   }
   @Get('departments')
   async getDepartments() {
@@ -115,7 +134,19 @@ export class FacultyController {
     if (!faculty) {
       throw new NotFoundException(`Faculty with ID ${id} not found`);
     }
+    (faculty as any).hasAvatar = !!faculty.avatar;
+    delete (faculty as any).avatar;
     return faculty;
+  }
+
+  @Get(':id/avatar')
+  @Header('Content-Type', 'image/jpeg')
+  async getFacultyAvatar(@Param('id') id: string, @Res() res: Response) {
+    const faculty = await this.facultyService.findOne(id);
+    if (!faculty || !faculty.avatar) {
+      return res.status(404).send('Avatar not found');
+    }
+    res.send(faculty.avatar);
   }
 
   // ✅ Only logged-in admin can update

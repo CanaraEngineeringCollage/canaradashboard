@@ -37,7 +37,7 @@ export type Event = {
   description: string;
   date: string;
   category: string;
-  image: { type: string; data: number[] }; // Buffer-like structure for backend
+  hasImage?: boolean;
   videoUrl?: string; // S3 URL
 };
 
@@ -87,12 +87,13 @@ export interface Faculty {
   email: string;
   joiningDate: string; // Store as ISO string or YYYY-MM-DD
   experience: string; // e.g., "28 Years"
-  employmentType: 'Regular' | 'Contract' | 'Visiting';
+  employmentType: "Regular" | "Contract" | "Visiting";
   isDepartmentHead: boolean;
   username?: string;
   password?: string;
   qualifications: Qualification[];
-  image?: { data: number[] }; // Buffer data from backend
+  hasAvatar?: boolean;
+  avatar?: any;
   patents: Patent[];
   bookChapters: BookChapter[];
   certifications: Certification[];
@@ -110,7 +111,7 @@ export interface Buzz {
 }
 
 export interface Inquiry {
-  id:string;
+  id: string;
   name: string;
   email: string;
   subject: string;
@@ -133,8 +134,7 @@ export interface ScstGrievance {
   grievance_from: string; // e.g., STUDENT, PARENT, FACULTY
   contact_number: string;
   email: string;
-  category: 'SC' | 'ST' | 'OBC' | 'Other'; // SC/ST/OBC/Other
+  category: "SC" | "ST" | "OBC" | "Other"; // SC/ST/OBC/Other
   nature_of_grievance: string;
   created_at: string; // timestamp of creation
 }
-

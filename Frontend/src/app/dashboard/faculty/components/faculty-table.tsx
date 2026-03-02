@@ -13,11 +13,6 @@ interface FacultyTableProps {
   onEdit: (faculty: Faculty) => void;
   onDelete: (facultyId: string) => void;
 }
-function bufferToBase64(buffer: number[]): string {
-  if (!buffer || !Array.isArray(buffer)) return "";
-  const binary = new Uint8Array(buffer).reduce((acc, byte) => acc + String.fromCharCode(byte), "");
-  return `data:image/jpeg;base64,${btoa(binary)}`;
-}
 
 export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps) {
   return (
@@ -48,7 +43,11 @@ export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps)
                 <Avatar className="h-10 w-10">
                   <AvatarImage
                     className="object-cover"
-                    src={faculty.image?.data ? bufferToBase64(faculty.image.data) : `https://placehold.co/40x40.png?text=${faculty.name.charAt(0)}`}
+                    src={
+                      faculty.hasAvatar
+                        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/faculty/${faculty.id}/avatar`
+                        : `https://placehold.co/40x40.png?text=${faculty.name.charAt(0)}`
+                    }
                     alt={faculty.name}
                   />
 
