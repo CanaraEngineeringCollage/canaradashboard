@@ -1080,7 +1080,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
         <div className="mb-4">
           <div className="flex justify-between">
             {Array.from({ length: totalSteps }, (_, i) => (
-              <div key={i} className={`flex-1 h-2 mx-1 rounded ${i + 1 <= step ? "bg-blue-500" : "bg-gray-300"}`} />
+              <div key={i} className={`flex-1 h-2 mx-1 rounded ${i + 1 <= step ? "bg-primary" : "bg-gray-300"}`} />
             ))}
           </div>
           <p className="text-sm text-gray-600 mt-2">
@@ -1418,7 +1418,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               </div>
             </div>
             <div className="flex space-x-2">
-              <button onClick={addOrUpdateQualification} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              <button onClick={addOrUpdateQualification} className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
                 {editQualificationId ? "Update Qualification" : "Add Qualification"}
               </button>
               {editQualificationId && (
@@ -1497,7 +1497,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <div className="flex space-x-2 mt-4">
                 <button
                   onClick={addOrUpdateAchievement}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
                   disabled={!newAchievement.heading.trim() || !newAchievement.descriptions.some((desc) => desc.trim())}
                 >
                   {editAchievementId ? "Update Achievement" : "Add Achievement"}
@@ -1599,7 +1599,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <div className="flex space-x-2 mt-4">
                 <button
                   onClick={addOrUpdateBookChapter}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
                   disabled={!newBookChapter.heading.trim() || !newBookChapter.descriptions.some((desc) => desc.trim())}
                 >
                   {editBookChapterId ? "Update Career Advancement" : "Add Career Advancement"}
@@ -1701,7 +1701,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
               <div className="flex space-x-2 mt-4">
                 <button
                   onClick={addOrUpdateCertification}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
                   disabled={!newCertification.heading.trim() || !newCertification.descriptions.some((desc) => desc.trim())}
                 >
                   {editCertificationId ? "Update Publications" : "Add Publications"}
@@ -1767,7 +1767,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
     
             </div>
             <div className="flex space-x-2">
-              <button onClick={addOrUpdateJournalPublication} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              <button onClick={addOrUpdateJournalPublication} className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
                 {editJournalPublicationId ? "Update Journal Publication" : "Add Journal Publication"}
               </button>
               {editJournalPublicationId && (
@@ -1813,7 +1813,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
           
             </div>
             <div className="flex space-x-2">
-              <button onClick={addOrUpdateConferencePublication} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              <button onClick={addOrUpdateConferencePublication} className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
                 {editConferencePublicationId ? "Update Conference Publication" : "Add Conference Publication"}
               </button>
               {editConferencePublicationId && (
@@ -1857,7 +1857,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                 Skip
               </button>
             )}
-            <button onClick={handleNext} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <button onClick={handleNext} className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
               {step === totalSteps ? "Submit" : "Next"}
             </button>
           </div>

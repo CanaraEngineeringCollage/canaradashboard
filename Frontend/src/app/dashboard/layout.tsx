@@ -117,7 +117,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </Sidebar>
 
           <SidebarInset className="flex flex-col">
-            <header className="sticky top-0  flex h-16 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
+            <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
               <SidebarTrigger className="md:hidden" />
               <div className="flex items-center gap-4 ml-auto">
                 <NotificationBell />
