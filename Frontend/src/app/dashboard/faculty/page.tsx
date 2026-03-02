@@ -1244,7 +1244,7 @@ const FacultyModal: React.FC<FacultyModalProps> = ({ isOpen, onClose, onSubmit, 
                   <img src={bufferToBase64(faculty.avatar as any)} alt="Avatar preview" className="mt-2 w-32 h-32 object-cover rounded-full" />
                 ) : faculty.hasAvatar ? (
                   <img
-                    src={`${API_BASE_URL}/faculty/${faculty.id}/avatar`}
+                    src={`${API_BASE_URL}/faculty/${faculty.id}/avatar?t=${Date.now()}`}
                     alt="Avatar preview"
                     className="mt-2 w-32 h-32 object-cover rounded-full"
                   />
@@ -2207,7 +2207,7 @@ const Page: React.FC = () => {
               <td className="border px-4 py-2">
                 {faculty.hasAvatar && (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/faculty/${faculty.id}/avatar`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/faculty/${faculty.id}/avatar?t=${Date.now()}`}
                     alt={`${faculty.name}'s avatar`}
                     className="w-12 h-12 object-cover rounded"
                   />

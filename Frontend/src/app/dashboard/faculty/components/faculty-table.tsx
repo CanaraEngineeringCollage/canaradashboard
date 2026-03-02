@@ -45,7 +45,7 @@ export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps)
                     className="object-cover"
                     src={
                       faculty.hasAvatar
-                        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/faculty/${faculty.id}/avatar`
+                        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/faculty/${faculty.id}/avatar?t=${Date.now()}`
                         : `https://placehold.co/40x40.png?text=${faculty.name.charAt(0)}`
                     }
                     alt={faculty.name}

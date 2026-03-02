@@ -217,8 +217,9 @@ const EventsPage = () => {
     }
   };
 
+  // Use Date.now() for cache busting so the newly edited image renders immediately
   const getImageUrl = (eventId: string) => {
-    return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/events/${eventId}/image`;
+    return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/events/${eventId}/image?t=${Date.now()}`;
   };
 
   const totalPages = Math.max(1, Math.ceil(totalEvents / rowsPerPage));
