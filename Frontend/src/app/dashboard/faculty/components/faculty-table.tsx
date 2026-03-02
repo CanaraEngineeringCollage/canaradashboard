@@ -19,6 +19,7 @@ function bufferToBase64(buffer: number[]): string {
   return `data:image/jpeg;base64,${btoa(binary)}`;
 }
 
+
 export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps) {
   return (
     <div className="rounded-lg border shadow-sm">
