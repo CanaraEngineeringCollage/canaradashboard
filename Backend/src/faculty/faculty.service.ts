@@ -323,13 +323,15 @@ export class FacultyService {
       query.andWhere('faculty.isKeyFunctionary = :isKeyFunctionary', {
         isKeyFunctionary: true,
       });
-      query.orderBy('faculty.keyFunctionaryPriority', 'ASC');
+      query.orderBy('faculty.keyFunctionaryPriority IS NULL', 'ASC');
+      query.addOrderBy('faculty.keyFunctionaryPriority', 'ASC');
     } else {
       // ✅ FIX: Default is priority, fallback to createdAt. If 'created' is true, sort only by createdAt.
       if (created) {
         query.orderBy('faculty.createdAt', 'DESC');
       } else {
-        query.orderBy('faculty.priority', 'ASC');
+        query.orderBy('faculty.priority IS NULL', 'ASC');
+        query.addOrderBy('faculty.priority', 'ASC');
         query.addOrderBy('faculty.createdAt', 'DESC');
       }
     }
@@ -337,7 +339,8 @@ export class FacultyService {
     if (hod) {
       // Filter by isHod flag
       query.andWhere('faculty.isHod = :isHod', { isHod: true });
-      query.orderBy('faculty.hodPriority', 'ASC');
+      query.orderBy('faculty.hodPriority IS NULL', 'ASC');
+      query.addOrderBy('faculty.hodPriority', 'ASC');
     }
 
     if (department) {
