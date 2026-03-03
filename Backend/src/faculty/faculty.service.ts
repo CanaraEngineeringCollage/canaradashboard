@@ -319,19 +319,23 @@ export class FacultyService {
         'internationalConferencePublications',
       );
 
-    if (keyFunctionary) {
+   if (keyFunctionary) {
       query.andWhere('faculty.isKeyFunctionary = :isKeyFunctionary', {
         isKeyFunctionary: true,
       });
-      query.orderBy('faculty.keyFunctionaryPriority IS NULL', 'ASC');
-      query.addOrderBy('faculty.keyFunctionaryPriority', 'ASC');
+      // ✅ 1. Replaces NULL with 999999 to push them to the bottom
+      query.addSelect('COALESCE(faculty.keyFunctionaryPriority, 999999)', 'kf_sort');
+      query.orderBy('kf_sort', 'ASC');
+      // ✅ 2. Sorts the ones at the bottom by newest first
+      query.addOrderBy('faculty.createdAt', 'DESC'); 
     } else {
-      // ✅ FIX: Default is priority, fallback to createdAt. If 'created' is true, sort only by createdAt.
       if (created) {
         query.orderBy('faculty.createdAt', 'DESC');
       } else {
-        query.orderBy('faculty.priority IS NULL', 'ASC');
-        query.addOrderBy('faculty.priority', 'ASC');
+        // ✅ 1. Replaces NULL with 999999 to push them to the bottom
+        query.addSelect('COALESCE(faculty.priority, 999999)', 'priority_sort');
+        query.orderBy('priority_sort', 'ASC');
+        // ✅ 2. Sorts the ones at the bottom by newest first
         query.addOrderBy('faculty.createdAt', 'DESC');
       }
     }
@@ -339,8 +343,11 @@ export class FacultyService {
     if (hod) {
       // Filter by isHod flag
       query.andWhere('faculty.isHod = :isHod', { isHod: true });
-      query.orderBy('faculty.hodPriority IS NULL', 'ASC');
-      query.addOrderBy('faculty.hodPriority', 'ASC');
+      // ✅ 1. Replaces NULL with 999999 to push them to the bottom
+      query.addSelect('COALESCE(faculty.hodPriority, 999999)', 'hod_sort');
+      query.orderBy('hod_sort', 'ASC');
+      // ✅ 2. Sorts the ones at the bottom by newest first
+      query.addOrderBy('faculty.createdAt', 'DESC');
     }
 
     if (department) {
