@@ -28,7 +28,11 @@ export class AcademicSyllabusService {
 
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const extension = path.extname(file.originalname);
-      filename = `academic-syllabus-${uniqueSuffix}${extension}`;
+      const prefix =
+        createDto.category === 'Scheme'
+          ? 'academic-scheme'
+          : 'academic-syllabus';
+      filename = `${prefix}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 
       fs.writeFileSync(uploadPath, file.buffer);
@@ -77,7 +81,7 @@ export class AcademicSyllabusService {
   async findOne(id: number) {
     const entry = await this.repo.findOne({ where: { id } });
     if (!entry) {
-      throw new NotFoundException('Academic Syllabus/Schema not found');
+      throw new NotFoundException('Academic Syllabus/Scheme not found');
     }
     return entry;
   }
@@ -108,7 +112,10 @@ export class AcademicSyllabusService {
 
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const extension = path.extname(file.originalname);
-      const filename = `academic-syllabus-${uniqueSuffix}${extension}`;
+      const category = updateDto.category || entry.category;
+      const prefix =
+        category === 'Scheme' ? 'academic-scheme' : 'academic-syllabus';
+      const filename = `${prefix}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 
       fs.writeFileSync(uploadPath, file.buffer);

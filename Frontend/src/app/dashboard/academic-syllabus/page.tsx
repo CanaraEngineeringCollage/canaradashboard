@@ -41,7 +41,7 @@ const DEPARTMENTS = [
   "Science & Humanities",
 ];
 
-const CATEGORIES = ["Syllabus", "Schema"];
+const CATEGORIES = ["Syllabus", "Scheme"];
 
 export default function AcademicSyllabusPage() {
   const [dataList, setDataList] = useState<AcademicSyllabus[]>([]);
@@ -313,7 +313,7 @@ export default function AcademicSyllabusPage() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <PageTitle title="Academic Syllabus & Schema" icon={BookOpen} />
+        <PageTitle title="Academic Syllabus & Scheme" icon={BookOpen} />
         <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
@@ -328,7 +328,7 @@ export default function AcademicSyllabusPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Add Syllabus / Schema</DialogTitle>
+              <DialogTitle>Add Syllabus / Scheme</DialogTitle>
               <DialogDescription>Upload a new PDF document.</DialogDescription>
             </DialogHeader>
 
@@ -401,7 +401,7 @@ export default function AcademicSyllabusPage() {
         >
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Edit Syllabus / Schema</DialogTitle>
+              <DialogTitle>Edit Syllabus / Scheme</DialogTitle>
               <DialogDescription>Modify document details or upload a new PDF.</DialogDescription>
             </DialogHeader>
 

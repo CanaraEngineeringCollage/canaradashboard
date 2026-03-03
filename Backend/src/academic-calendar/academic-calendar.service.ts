@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -38,18 +38,24 @@ export class AcademicCalendarService {
     return await this.repo.save(calendar);
   }
 
-  async findOne() {
-    const [calendar] = await this.repo.find({
+  async findAll() {
+    return await this.repo.find({
       order: { createdAt: 'DESC' },
-      take: 1,
     });
+  }
+
+  async findOne(id: number) {
+    const calendar = await this.repo.findOne({ where: { id } });
+    if (!calendar) {
+      throw new NotFoundException(`Academic Calendar with ID ${id} not found`);
+    }
     return calendar;
   }
 
   async update(id: number, file?: Express.Multer.File) {
     const calendar = await this.repo.findOne({ where: { id } });
     if (!calendar) {
-      throw new Error('Academic Calendar not found');
+      throw new NotFoundException('Academic Calendar not found');
     }
 
     if (file) {
@@ -79,5 +85,26 @@ export class AcademicCalendarService {
     }
 
     return await this.repo.save(calendar);
+  }
+
+  async remove(id: number) {
+    const calendar = await this.repo.findOne({ where: { id } });
+    if (!calendar) {
+      throw new NotFoundException(`Academic Calendar with ID ${id} not found`);
+    }
+
+    if (calendar.pdfUrl) {
+      const uploadDir = path.join(process.cwd(), 'uploads');
+      const oldFile = path.join(uploadDir, calendar.pdfUrl);
+      if (fs.existsSync(oldFile)) {
+        try {
+          fs.unlinkSync(oldFile);
+        } catch (e) {
+          console.error('Failed to delete calendar file', e);
+        }
+      }
+    }
+
+    return await this.repo.remove(calendar);
   }
 }

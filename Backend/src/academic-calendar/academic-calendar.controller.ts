@@ -36,8 +36,13 @@ export class AcademicCalendarController {
   }
 
   @Get()
-  async findOne() {
-    return this.service.findOne();
+  async findAll() {
+    return this.service.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.service.findOne(+id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,6 +50,12 @@ export class AcademicCalendarController {
   @UseInterceptors(FileInterceptor('pdf'))
   update(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     return this.service.update(+id, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.service.remove(+id);
   }
 
   @Get('file/:filename')
