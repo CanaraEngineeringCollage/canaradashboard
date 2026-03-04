@@ -26,7 +26,10 @@ export class AcademicCalendarService {
 
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const extension = path.extname(file.originalname);
-    const filename = `academic-calendar-${uniqueSuffix}${extension}`;
+    const baseName = path
+      .basename(file.originalname, extension)
+      .replace(/[^a-zA-Z0-9-]/g, '-');
+    const filename = `${baseName}-${uniqueSuffix}${extension}`;
     const uploadPath = path.join(uploadDir, filename);
 
     fs.writeFileSync(uploadPath, file.buffer);
@@ -85,7 +88,10 @@ export class AcademicCalendarService {
 
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const extension = path.extname(file.originalname);
-      const filename = `academic-calendar-${uniqueSuffix}${extension}`;
+      const baseName = path
+        .basename(file.originalname, extension)
+        .replace(/[^a-zA-Z0-9-]/g, '-');
+      const filename = `${baseName}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 
       fs.writeFileSync(uploadPath, file.buffer);

@@ -28,13 +28,10 @@ export class AcademicSyllabusService {
 
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const extension = path.extname(file.originalname);
-      const prefix =
-        createDto.category === 'Scheme'
-          ? 'academic-scheme'
-          : createDto.category === 'Curriculum'
-            ? 'academic-curriculum'
-            : 'academic-syllabus';
-      filename = `${prefix}-${uniqueSuffix}${extension}`;
+      const baseName = path
+        .basename(file.originalname, extension)
+        .replace(/[^a-zA-Z0-9-]/g, '-');
+      filename = `${baseName}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 
       fs.writeFileSync(uploadPath, file.buffer);
@@ -114,14 +111,10 @@ export class AcademicSyllabusService {
 
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const extension = path.extname(file.originalname);
-      const category = updateDto.category || entry.category;
-      const prefix =
-        category === 'Scheme'
-          ? 'academic-scheme'
-          : category === 'Curriculum'
-            ? 'academic-curriculum'
-            : 'academic-syllabus';
-      const filename = `${prefix}-${uniqueSuffix}${extension}`;
+      const baseName = path
+        .basename(file.originalname, extension)
+        .replace(/[^a-zA-Z0-9-]/g, '-');
+      const filename = `${baseName}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 
       fs.writeFileSync(uploadPath, file.buffer);
