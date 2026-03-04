@@ -11,6 +11,9 @@ export class AcademicCalendar {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  title: string;
+
   @Column({ nullable: true })
   pdfUrl: string;
 

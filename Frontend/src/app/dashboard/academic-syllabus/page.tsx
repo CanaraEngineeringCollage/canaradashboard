@@ -41,7 +41,7 @@ const DEPARTMENTS = [
   "Science & Humanities",
 ];
 
-const CATEGORIES = ["Syllabus", "Scheme"];
+const CATEGORIES = ["Syllabus", "Scheme", "Curriculum"];
 
 export default function AcademicSyllabusPage() {
   const [dataList, setDataList] = useState<AcademicSyllabus[]>([]);
@@ -313,7 +313,7 @@ export default function AcademicSyllabusPage() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <PageTitle title="Academic Syllabus & Scheme" icon={BookOpen} />
+        <PageTitle title="Academic Syllabus, Scheme & Curriculum" icon={BookOpen} />
         <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
@@ -328,7 +328,7 @@ export default function AcademicSyllabusPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Add Syllabus / Scheme</DialogTitle>
+              <DialogTitle>Add Syllabus / Scheme / Curriculum</DialogTitle>
               <DialogDescription>Upload a new PDF document.</DialogDescription>
             </DialogHeader>
 
@@ -401,7 +401,7 @@ export default function AcademicSyllabusPage() {
         >
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Edit Syllabus / Scheme</DialogTitle>
+              <DialogTitle>Edit Syllabus / Scheme / Curriculum</DialogTitle>
               <DialogDescription>Modify document details or upload a new PDF.</DialogDescription>
             </DialogHeader>
 
@@ -539,7 +539,13 @@ export default function AcademicSyllabusPage() {
                         <td className="px-4 py-3">{item.department}</td>
                         <td className="px-4 py-3">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-semibold ${item.category === "Syllabus" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              item.category === "Syllabus"
+                                ? "bg-blue-100 text-blue-700"
+                                : item.category === "Scheme"
+                                  ? "bg-purple-100 text-purple-700"
+                                  : "bg-green-100 text-green-700"
+                            }`}
                           >
                             {item.category}
                           </span>

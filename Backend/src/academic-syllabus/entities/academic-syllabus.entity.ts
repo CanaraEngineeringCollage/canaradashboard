@@ -15,7 +15,7 @@ export class AcademicSyllabus {
   department: string;
 
   @Column()
-  category: string; // 'Syllabus' | 'Schema'
+  category: string; // 'Syllabus' | 'Scheme' | 'Curriculum'
 
   @Column({ nullable: true })
   pdfUrl: string;

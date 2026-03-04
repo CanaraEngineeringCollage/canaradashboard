@@ -31,7 +31,9 @@ export class AcademicSyllabusService {
       const prefix =
         createDto.category === 'Scheme'
           ? 'academic-scheme'
-          : 'academic-syllabus';
+          : createDto.category === 'Curriculum'
+            ? 'academic-curriculum'
+            : 'academic-syllabus';
       filename = `${prefix}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 
@@ -114,7 +116,11 @@ export class AcademicSyllabusService {
       const extension = path.extname(file.originalname);
       const category = updateDto.category || entry.category;
       const prefix =
-        category === 'Scheme' ? 'academic-scheme' : 'academic-syllabus';
+        category === 'Scheme'
+          ? 'academic-scheme'
+          : category === 'Curriculum'
+            ? 'academic-curriculum'
+            : 'academic-syllabus';
       const filename = `${prefix}-${uniqueSuffix}${extension}`;
       const uploadPath = path.join(uploadDir, filename);
 

@@ -13,6 +13,7 @@ import TablePagination from "@/components/ui/TablePagination";
 
 interface AcademicCalendar {
   id: number;
+  title?: string;
   pdfUrl?: string;
   createdAt: string;
   updatedAt: string;
@@ -23,6 +24,7 @@ export default function AcademicCalendarPage() {
   const [loading, setLoading] = useState(true);
 
   // Modal & Form State
+  const [title, setTitle] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -32,6 +34,7 @@ export default function AcademicCalendarPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
   const [editSelectedFile, setEditSelectedFile] = useState<File | null>(null);
 
   // Delete State
@@ -154,16 +157,27 @@ export default function AcademicCalendarPage() {
   };
 
   const resetForm = () => {
+    setTitle("");
     setSelectedFile(null);
   };
 
   const resetEditForm = () => {
+    setEditTitle("");
     setEditSelectedFile(null);
     setEditId(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!title.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a title",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (!selectedFile) {
       toast({
@@ -180,6 +194,7 @@ export default function AcademicCalendarPage() {
       const token = encrypted ? decryptToken(encrypted) : null;
 
       const formData = new FormData();
+      if (title.trim()) formData.append("title", title.trim());
       if (selectedFile) {
         formData.append("pdf", selectedFile);
       }
@@ -209,6 +224,7 @@ export default function AcademicCalendarPage() {
 
   const handleEditClick = (item: AcademicCalendar) => {
     setEditId(item.id);
+    setEditTitle(item.title || "");
     setEditSelectedFile(null);
     setIsEditDialogOpen(true);
   };
@@ -217,6 +233,15 @@ export default function AcademicCalendarPage() {
     e.preventDefault();
 
     if (!editId) {
+      return;
+    }
+
+    if (!editTitle.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a title",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -232,8 +257,11 @@ export default function AcademicCalendarPage() {
     setEditSubmitting(true);
     try {
       const formPayload = new FormData();
-      formPayload.append("pdf", editSelectedFile);
-
+      if (editTitle.trim()) formPayload.append("title", editTitle.trim());
+      else formPayload.append("title", "");
+      if (editSelectedFile) {
+        formPayload.append("pdf", editSelectedFile);
+      }
       const encrypted = localStorage.getItem("token");
       const token = encrypted ? decryptToken(encrypted) : null;
 
@@ -316,6 +344,18 @@ export default function AcademicCalendarPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6 mt-4">
               <div className="space-y-2">
+                <label className="text-sm font-medium">Title *</label>
+                <input
+                  type="text"
+                  placeholder="Enter calendar title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${
                     isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
@@ -388,6 +428,18 @@ export default function AcademicCalendarPage() {
             </DialogHeader>
 
             <form onSubmit={handleEditSubmit} className="space-y-6 mt-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Title *</label>
+                <input
+                  type="text"
+                  placeholder="Enter calendar title"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  required
+                />
+              </div>
+
               <div className="space-y-2">
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${
@@ -474,6 +526,7 @@ export default function AcademicCalendarPage() {
             <table className="min-w-full border border-gray-200 rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
+                  <th className="px-4 py-3 text-left font-medium">Title</th>
                   <th className="px-4 py-3 text-left font-medium">Uploaded Date</th>
                   <th className="px-4 py-3 text-left font-medium">Last Modified</th>
                   <th className="px-4 py-3 text-center font-medium">Actions</th>
@@ -483,6 +536,7 @@ export default function AcademicCalendarPage() {
                 {dataList.length > 0 ? (
                   dataList.map((item) => (
                     <tr key={item.id} className="border-t border-gray-200 hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium text-gray-900">{item.title || "Untitled"}</td>
                       <td className="px-4 py-3 whitespace-nowrap">{new Date(item.createdAt).toLocaleDateString("en-GB")}</td>
                       <td className="px-4 py-3 whitespace-nowrap">{new Date(item.updatedAt || item.createdAt).toLocaleDateString("en-GB")}</td>
                       <td className="px-4 py-3 text-center">
@@ -509,7 +563,7 @@ export default function AcademicCalendarPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="border-t px-4 py-8 text-center text-gray-500">
+                    <td colSpan={4} className="border-t px-4 py-8 text-center text-gray-500">
                       No calendars found. Please add a new academic calendar.
                     </td>
                   </tr>

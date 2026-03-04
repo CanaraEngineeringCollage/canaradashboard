@@ -48,8 +48,12 @@ export class AcademicCalendarController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('pdf'))
-  update(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
-    return this.service.update(+id, file);
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: CreateAcademicCalendarDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.service.update(+id, updateDto, file);
   }
 
   @UseGuards(JwtAuthGuard)

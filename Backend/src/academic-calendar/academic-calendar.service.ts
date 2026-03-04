@@ -52,10 +52,18 @@ export class AcademicCalendarService {
     return calendar;
   }
 
-  async update(id: number, file?: Express.Multer.File) {
+  async update(
+    id: number,
+    updateDto?: { title?: string },
+    file?: Express.Multer.File,
+  ) {
     const calendar = await this.repo.findOne({ where: { id } });
     if (!calendar) {
       throw new NotFoundException('Academic Calendar not found');
+    }
+
+    if (updateDto?.title !== undefined) {
+      calendar.title = updateDto.title;
     }
 
     if (file) {
