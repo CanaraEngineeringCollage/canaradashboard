@@ -122,6 +122,18 @@ export class FilesService {
   async deleteFile(id: number) {
     const file = await this.fileRepo.findOne({ where: { id } });
     if (!file) throw new NotFoundException('File not found');
+
+    if (file.type === 'video' && file.video) {
+      const uploadPath = path.join(process.cwd(), 'uploads', file.video);
+      if (fs.existsSync(uploadPath)) {
+        try {
+          fs.unlinkSync(uploadPath);
+        } catch (unlinkError) {
+          console.error('Error deleting video file:', unlinkError);
+        }
+      }
+    }
+
     await this.fileRepo.remove(file);
     return { message: 'File deleted successfully' };
   }
