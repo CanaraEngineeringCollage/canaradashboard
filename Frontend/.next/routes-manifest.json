@@ -1,0 +1,202 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [
+    {
+      "page": "/dashboard/buzz/weekly-digest/[id]",
+      "regex": "^/dashboard/buzz/weekly\\-digest/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/dashboard/buzz/weekly\\-digest/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/academic-calendar",
+      "regex": "^/dashboard/academic\\-calendar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/academic\\-calendar(?:/)?$"
+    },
+    {
+      "page": "/dashboard/academic-syllabus",
+      "regex": "^/dashboard/academic\\-syllabus(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/academic\\-syllabus(?:/)?$"
+    },
+    {
+      "page": "/dashboard/admission-enquiries",
+      "regex": "^/dashboard/admission\\-enquiries(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/admission\\-enquiries(?:/)?$"
+    },
+    {
+      "page": "/dashboard/alumni",
+      "regex": "^/dashboard/alumni(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/alumni(?:/)?$"
+    },
+    {
+      "page": "/dashboard/alumni-podcasts",
+      "regex": "^/dashboard/alumni\\-podcasts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/alumni\\-podcasts(?:/)?$"
+    },
+    {
+      "page": "/dashboard/buzz",
+      "regex": "^/dashboard/buzz(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/buzz(?:/)?$"
+    },
+    {
+      "page": "/dashboard/counselling",
+      "regex": "^/dashboard/counselling(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/counselling(?:/)?$"
+    },
+    {
+      "page": "/dashboard/dataentry",
+      "regex": "^/dashboard/dataentry(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/dataentry(?:/)?$"
+    },
+    {
+      "page": "/dashboard/events",
+      "regex": "^/dashboard/events(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/events(?:/)?$"
+    },
+    {
+      "page": "/dashboard/exam-timetable",
+      "regex": "^/dashboard/exam\\-timetable(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/exam\\-timetable(?:/)?$"
+    },
+    {
+      "page": "/dashboard/faculty",
+      "regex": "^/dashboard/faculty(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/faculty(?:/)?$"
+    },
+    {
+      "page": "/dashboard/gallery",
+      "regex": "^/dashboard/gallery(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/gallery(?:/)?$"
+    },
+    {
+      "page": "/dashboard/glimpses-of-cec",
+      "regex": "^/dashboard/glimpses\\-of\\-cec(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/glimpses\\-of\\-cec(?:/)?$"
+    },
+    {
+      "page": "/dashboard/grievance-redressal-cell",
+      "regex": "^/dashboard/grievance\\-redressal\\-cell(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/grievance\\-redressal\\-cell(?:/)?$"
+    },
+    {
+      "page": "/dashboard/hero-banners",
+      "regex": "^/dashboard/hero\\-banners(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/hero\\-banners(?:/)?$"
+    },
+    {
+      "page": "/dashboard/inquiries",
+      "regex": "^/dashboard/inquiries(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/inquiries(?:/)?$"
+    },
+    {
+      "page": "/dashboard/news-letters",
+      "regex": "^/dashboard/news\\-letters(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/news\\-letters(?:/)?$"
+    },
+    {
+      "page": "/dashboard/placement",
+      "regex": "^/dashboard/placement(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/placement(?:/)?$"
+    },
+    {
+      "page": "/dashboard/placement/top-recruiters",
+      "regex": "^/dashboard/placement/top\\-recruiters(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/placement/top\\-recruiters(?:/)?$"
+    },
+    {
+      "page": "/dashboard/profile",
+      "regex": "^/dashboard/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/profile(?:/)?$"
+    },
+    {
+      "page": "/icon.png",
+      "regex": "^/icon\\.png(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/icon\\.png(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://localhost:3000/api/:path*",
+      "regex": "^/api(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+    }
+  ]
+}
