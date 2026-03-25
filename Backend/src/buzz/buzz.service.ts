@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Buzz } from './entities/buzz.entity';
@@ -11,6 +13,7 @@ export class BuzzService {
   constructor(
     @InjectRepository(Buzz)
     private readonly buzzRepository: Repository<Buzz>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async getAllBuzz(
@@ -116,7 +119,9 @@ export class BuzzService {
 
   async createBuzz(createBuzzDto: CreateBuzzDto): Promise<Buzz> {
     const buzz = this.buzzRepository.create(createBuzzDto);
-    return this.buzzRepository.save(buzz);
+    const savedBuzz = await this.buzzRepository.save(buzz);
+    await this.cacheManager.del('all_buzz');
+    return savedBuzz;
   }
 
   async getBuzzById(id: string): Promise<Buzz> {
@@ -180,7 +185,9 @@ export class BuzzService {
     }
 
     Object.assign(buzz, createBuzzDto);
-    return this.buzzRepository.save(buzz);
+    const updatedBuzz = await this.buzzRepository.save(buzz);
+    await this.cacheManager.del('all_buzz');
+    return updatedBuzz;
   }
 
   async deleteBuzz(id: string): Promise<void> {
@@ -197,5 +204,6 @@ export class BuzzService {
     if (result.affected === 0) {
       throw new NotFoundException(`Buzz with ID ${id} not found`);
     }
+    await this.cacheManager.del('all_buzz');
   }
 }

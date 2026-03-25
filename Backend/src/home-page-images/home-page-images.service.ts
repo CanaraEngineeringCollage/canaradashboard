@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +13,7 @@ export class HomePageImagesService {
   constructor(
     @InjectRepository(HomePageImage)
     private repo: Repository<HomePageImage>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(
@@ -47,7 +50,9 @@ export class HomePageImagesService {
       imageUrl: filenameDesktop,
       mobileImageUrl: filenameMobile,
     });
-    return this.repo.save(image);
+    const savedImage = await this.repo.save(image);
+    await this.cacheManager.del('all_home_page_images');
+    return savedImage;
   }
 
   async findAll() {
@@ -90,6 +95,8 @@ export class HomePageImagesService {
         }
       }
     }
-    return this.repo.delete(id);
+    const result = await this.repo.delete(id);
+    await this.cacheManager.del('all_home_page_images');
+    return result;
   }
 }

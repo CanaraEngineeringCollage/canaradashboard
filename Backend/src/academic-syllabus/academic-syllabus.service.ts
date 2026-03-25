@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AcademicSyllabus } from './entities/academic-syllabus.entity';
@@ -12,6 +14,7 @@ export class AcademicSyllabusService {
   constructor(
     @InjectRepository(AcademicSyllabus)
     private readonly repo: Repository<AcademicSyllabus>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(
@@ -41,7 +44,9 @@ export class AcademicSyllabusService {
       ...createDto,
       pdfUrl: filename,
     });
-    return await this.repo.save(syllabus);
+    const savedSyllabus = await this.repo.save(syllabus);
+    await this.cacheManager.del('all_academic_syllabus');
+    return savedSyllabus;
   }
 
   async findAll(
@@ -122,7 +127,9 @@ export class AcademicSyllabusService {
     }
 
     Object.assign(entry, updateDto);
-    return await this.repo.save(entry);
+    const updatedEntry = await this.repo.save(entry);
+    await this.cacheManager.del('all_academic_syllabus');
+    return updatedEntry;
   }
 
   async remove(id: number) {
@@ -138,6 +145,8 @@ export class AcademicSyllabusService {
         }
       }
     }
-    return await this.repo.remove(entry);
+    const removedEntry = await this.repo.remove(entry);
+    await this.cacheManager.del('all_academic_syllabus');
+    return removedEntry;
   }
 }

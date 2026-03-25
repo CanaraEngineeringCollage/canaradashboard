@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Timetable } from './entity/timetable.entity';
@@ -8,6 +10,7 @@ export class TimetableService {
   constructor(
     @InjectRepository(Timetable)
     private repo: Repository<Timetable>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(academicYear: string, file: Express.Multer.File) {
@@ -17,7 +20,9 @@ export class TimetableService {
       filename: file.originalname,
       mimetype: file.mimetype,
     });
-    return this.repo.save(timetable);
+    const savedTimetable = await this.repo.save(timetable);
+    await this.cacheManager.del('all_timetable');
+    return savedTimetable;
   }
 
   async findAll() {
@@ -28,6 +33,7 @@ export class TimetableService {
     const timetable = await this.repo.findOneBy({ id });
     if (!timetable) throw new NotFoundException('Timetable not found');
     await this.repo.remove(timetable);
+    await this.cacheManager.del('all_timetable');
     return { message: 'Deleted successfully' };
   }
 }

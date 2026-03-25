@@ -2,7 +2,10 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Raw, MoreThanOrEqual } from 'typeorm';
 import { Faculty } from './entities/faculty.entity';
@@ -31,6 +34,7 @@ export class FacultyService {
     private readonly certificationRepo: Repository<Certification>,
     @InjectRepository(Achievement)
     private readonly achievementRepo: Repository<Achievement>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   /**
@@ -110,7 +114,9 @@ export class FacultyService {
     if (avatar) {
       faculty.avatar = avatar.buffer;
     }
-    return this.facultyRepository.save(faculty);
+    const savedFaculty = await this.facultyRepository.save(faculty);
+    await this.cacheManager.del('all_faculty');
+    return savedFaculty;
   }
 
   async importFacultyData(file: Express.Multer.File) {
@@ -498,7 +504,9 @@ export class FacultyService {
     if (avatar) {
       faculty.avatar = avatar.buffer;
     }
-    return this.facultyRepository.save(faculty);
+    const savedFaculty = await this.facultyRepository.save(faculty);
+    await this.cacheManager.del('all_faculty');
+    return savedFaculty;
   }
 
   async remove(id: string) {
@@ -506,6 +514,8 @@ export class FacultyService {
     if (!faculty) {
       throw new NotFoundException(`Faculty with ID ${id} not found`);
     }
-    return this.facultyRepository.remove(faculty);
+    const removedFaculty = await this.facultyRepository.remove(faculty);
+    await this.cacheManager.del('all_faculty');
+    return removedFaculty;
   }
 }

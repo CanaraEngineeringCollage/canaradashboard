@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +13,7 @@ export class AcademicCalendarService {
   constructor(
     @InjectRepository(AcademicCalendar)
     private readonly repo: Repository<AcademicCalendar>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(
@@ -38,7 +41,9 @@ export class AcademicCalendarService {
       ...createDto,
       pdfUrl: filename,
     });
-    return await this.repo.save(calendar);
+    const savedCalendar = await this.repo.save(calendar);
+    await this.cacheManager.del('all_academic_calendar');
+    return savedCalendar;
   }
 
   async findAll() {
@@ -98,7 +103,9 @@ export class AcademicCalendarService {
       calendar.pdfUrl = filename;
     }
 
-    return await this.repo.save(calendar);
+    const updatedCalendar = await this.repo.save(calendar);
+    await this.cacheManager.del('all_academic_calendar');
+    return updatedCalendar;
   }
 
   async remove(id: number) {
@@ -119,6 +126,8 @@ export class AcademicCalendarService {
       }
     }
 
-    return await this.repo.remove(calendar);
+    const deletedCalendar = await this.repo.remove(calendar);
+    await this.cacheManager.del('all_academic_calendar');
+    return deletedCalendar;
   }
 }

@@ -15,6 +15,7 @@ import {
   Res,
   Header,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FacultyService } from './faculty.service';
@@ -59,6 +60,8 @@ export class FacultyController {
 
   // Public – Anyone can view faculty list with pagination or all records
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_faculty')
   async findAll(
     @Query('department') department?: string,
     @Query('page') page: string = '1',
@@ -121,10 +124,14 @@ export class FacultyController {
     return result;
   }
   @Get('departments')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_faculty')
   async getDepartments() {
     return await this.facultyService.getDepartments();
   }
   @Get('count')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_faculty')
   async getFacultyCount(@Query('department') department?: string) {
     const count = await this.facultyService.getTotalCount(department);
     return { count };

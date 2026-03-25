@@ -13,6 +13,7 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Response } from 'express';
 import * as path from 'path';
 import { GalleryService } from './gallery.service';
@@ -39,6 +40,8 @@ export class GalleryController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_gallery')
   findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -56,12 +59,16 @@ export class GalleryController {
   }
 
   @Get('categories')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_gallery')
   getCategories() {
     return this.galleryService.getCategories();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('count')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_gallery')
   async countAll() {
     const count = await this.galleryService.countAll();
     return { count };

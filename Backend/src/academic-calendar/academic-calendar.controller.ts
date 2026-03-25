@@ -13,6 +13,7 @@ import {
   BadRequestException,
   Patch,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AcademicCalendarService } from './academic-calendar.service';
 import { CreateAcademicCalendarDto } from './dto/create-academic-calendar.dto';
@@ -36,6 +37,8 @@ export class AcademicCalendarController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_academic_calendar')
   async findAll() {
     return this.service.findAll();
   }

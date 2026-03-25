@@ -13,6 +13,7 @@ import {
   BadRequestException,
   Res,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as path from 'path';
@@ -27,6 +28,8 @@ export class BuzzController {
   constructor(private readonly buzzService: BuzzService) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_buzz')
   async getAllBuzz(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -46,6 +49,8 @@ export class BuzzController {
   }
 
   @Get('student-achievements')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_buzz')
   async getStudentAchievements(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -88,16 +93,22 @@ export class BuzzController {
   }
 
   @Get('categories')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_buzz')
   async getCategories() {
     return this.buzzService.getCategories();
   }
 
   @Get('weekly-digest/editions')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_buzz')
   async getWeeklyDigestEditions() {
     return this.buzzService.getWeeklyDigestEditions();
   }
 
   @Get('count')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_buzz')
   async getCount() {
     const count = await this.buzzService.countAll();
     return { count };

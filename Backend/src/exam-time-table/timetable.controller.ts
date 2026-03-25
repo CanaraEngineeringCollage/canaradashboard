@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TimetableService } from './timetable.service';
 import { CreateTimetableDto } from './dto/timetable.dto';
@@ -31,6 +32,8 @@ export class TimetableController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_timetable')
   async findAll() {
     return this.timetableService.findAll();
   }

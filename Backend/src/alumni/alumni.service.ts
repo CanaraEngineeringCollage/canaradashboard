@@ -1,5 +1,7 @@
 // src/alumni/alumni.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,11 +18,14 @@ export class AlumniService {
     private alumniRepo: Repository<Alumni>,
     @InjectRepository(AlumniPodcast)
     private podcastRepo: Repository<AlumniPodcast>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  create(data: CreateAlumniDto) {
+  async create(data: CreateAlumniDto) {
     const alumni = this.alumniRepo.create(data);
-    return this.alumniRepo.save(alumni);
+    const savedAlumni = await this.alumniRepo.save(alumni);
+    await this.cacheManager.del('all_alumni');
+    return savedAlumni;
   }
 
   async findAll(page: number = 1, limit: number = 10) {
@@ -40,7 +45,7 @@ export class AlumniService {
     return this.podcastRepo.count();
   }
 
-  createPodcast(data: CreateAlumniPodcastDto, file?: Express.Multer.File) {
+  async createPodcast(data: CreateAlumniPodcastDto, file?: Express.Multer.File) {
     if (!file) {
       throw new Error('Thumbnail image is required');
     }
@@ -59,7 +64,9 @@ export class AlumniService {
     fs.writeFileSync(uploadPath, file.buffer);
     podcast.thumbnailUrl = filename;
 
-    return this.podcastRepo.save(podcast);
+    const savedPodcast = await this.podcastRepo.save(podcast);
+    await this.cacheManager.del('all_alumni');
+    return savedPodcast;
   }
 
   findAllPodcasts() {
@@ -92,7 +99,9 @@ export class AlumniService {
       fs.writeFileSync(uploadPath, file.buffer);
       podcast.thumbnailUrl = filename;
     }
-    return this.podcastRepo.save(podcast);
+    const savedPodcast = await this.podcastRepo.save(podcast);
+    await this.cacheManager.del('all_alumni');
+    return savedPodcast;
   }
 
   async removePodcast(id: number) {
@@ -111,6 +120,8 @@ export class AlumniService {
         }
       }
     }
-    return this.podcastRepo.delete(id);
+    const result = await this.podcastRepo.delete(id);
+    await this.cacheManager.del('all_alumni');
+    return result;
   }
 }

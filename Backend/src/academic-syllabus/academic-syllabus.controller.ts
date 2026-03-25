@@ -12,6 +12,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AcademicSyllabusService } from './academic-syllabus.service';
 import { CreateAcademicSyllabusDto } from './dto/create-academic-syllabus.dto';
@@ -35,6 +36,8 @@ export class AcademicSyllabusController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_academic_syllabus')
   findAll(
     @Query('page') page: string,
     @Query('limit') limit: string,

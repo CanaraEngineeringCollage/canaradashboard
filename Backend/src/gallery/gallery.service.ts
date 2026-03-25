@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import * as fs from 'fs';
 import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +14,7 @@ export class GalleryService {
   constructor(
     @InjectRepository(Gallery)
     private galleryRepo: Repository<Gallery>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(dto: CreateGalleryDto, imageFile: Express.Multer.File) {
@@ -31,7 +34,9 @@ export class GalleryService {
       ...dto,
       imageUrl: filename,
     });
-    return this.galleryRepo.save(gallery);
+    const savedGallery = await this.galleryRepo.save(gallery);
+    await this.cacheManager.del('all_gallery');
+    return savedGallery;
   }
 
   async findAll({ category, search, page, limit, all }: any) {
@@ -99,6 +104,7 @@ export class GalleryService {
     }
 
     await this.galleryRepo.update(id, updatedData);
+    await this.cacheManager.del('all_gallery');
     return this.galleryRepo.findOneBy({ id });
   }
 
@@ -118,7 +124,9 @@ export class GalleryService {
         }
       }
     }
-    return this.galleryRepo.delete(id);
+    const result = await this.galleryRepo.delete(id);
+    await this.cacheManager.del('all_gallery');
+    return result;
   }
 
   async getCategories() {

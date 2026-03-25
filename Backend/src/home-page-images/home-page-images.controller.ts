@@ -14,6 +14,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Response } from 'express';
 import * as path from 'path';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -54,6 +55,8 @@ export class HomePageImagesController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_home_page_images')
   findAll() {
     return this.service.findAll();
   }

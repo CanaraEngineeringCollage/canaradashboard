@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entity/event.entity';
@@ -12,6 +14,7 @@ export class EventService {
     @InjectRepository(Event)
     private eventRepo: Repository<Event>,
     private s3Service: S3Service,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // HELPER: Convert private URL to Signed URL
@@ -41,6 +44,7 @@ export class EventService {
       videoUrl: videoUrl,
     });
     const saved = await this.eventRepo.save(event);
+    await this.cacheManager.del('all_events');
     return this.signEventVideo(saved);
   }
 
@@ -123,6 +127,7 @@ export class EventService {
     }
 
     await this.eventRepo.update(id, updatedData);
+    await this.cacheManager.del('all_events');
     const updated = await this.eventRepo.findOneBy({ id });
     return this.signEventVideo(updated!);
   }
@@ -140,6 +145,7 @@ export class EventService {
         console.error('Failed to delete S3 file:', err);
       }
     }
+    await this.cacheManager.del('all_events');
     return this.eventRepo.delete(id);
   }
 

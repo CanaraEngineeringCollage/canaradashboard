@@ -13,6 +13,7 @@ import {
   UploadedFile,
   Res,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Response } from 'express';
 import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -31,6 +32,8 @@ export class AlumniController {
   }
   @UseGuards(JwtAuthGuard)
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_alumni')
   findAll(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
@@ -39,6 +42,8 @@ export class AlumniController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('count')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_alumni')
   async getCount() {
     const count = await this.alumniService.countAll();
     return { count };
@@ -54,12 +59,16 @@ export class AlumniController {
   }
 
   @Get('podcast')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_alumni')
   findAllPodcasts() {
     return this.alumniService.findAllPodcasts();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('podcast/count')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_alumni')
   async getPodcastCount() {
     const count = await this.alumniService.countPodcasts();
     return { count };

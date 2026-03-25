@@ -14,6 +14,7 @@ import {
   Res,
   Header,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Response } from 'express';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { EventService } from './events.service';
@@ -99,6 +100,8 @@ export class EventController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_events')
   async findAll(
     @Query('category') category?: string,
     @Query('search') search?: string,
@@ -136,12 +139,16 @@ export class EventController {
   }
 
   @Get('count')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_events')
   async getCount() {
     const count = await this.eventService.countAll();
     return { count };
   }
 
   @Get('categories')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_events')
   async getCategories() {
     return await this.eventService.getCategories();
   }
