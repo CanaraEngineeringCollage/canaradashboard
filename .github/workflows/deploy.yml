@@ -1,0 +1,15 @@
+name: Deploy Dashboard to Server
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Deploy Frontend and Backend
+        run: |
+          /home/ubuntu/deploy.sh frontend
+          /home/ubuntu/deploy.sh backend
