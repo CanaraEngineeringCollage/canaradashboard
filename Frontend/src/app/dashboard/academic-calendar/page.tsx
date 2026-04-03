@@ -287,6 +287,7 @@ export default function AcademicCalendarPage() {
       setEditSubmitting(false);
     }
   };
+  
 
   const confirmDelete = async (id: number) => {
     try {
