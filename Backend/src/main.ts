@@ -28,7 +28,8 @@ async function bootstrap() {
       'https://cec.edu.in',
       'https://www.cec.edu.in',
       'https://cecdashboard.cec.edu.in',
-      'https://apply.canaraengineering.in'
+      'https://apply.canaraengineering.in',
+      'https://canaraengineering-git-ft-aids-canaras-projects.vercel.app'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
