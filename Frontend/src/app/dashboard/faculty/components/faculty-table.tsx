@@ -14,6 +14,7 @@ interface FacultyTableProps {
   onDelete: (facultyId: string) => void;
 }
 
+
 export function FacultyTable({ faculties, onEdit, onDelete }: FacultyTableProps) {
   return (
     <div className="rounded-lg border shadow-sm">
